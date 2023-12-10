@@ -7,9 +7,12 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="feed" />
-        <module name="itinerary" />
+        <module name="notification" />
         <module name="trip" />
+        <module name="chat" />
+        <module name="itinerary" />
         <module name="user" />
+        <module name="meetup" />
       </profile>
     </annotationProcessing>
   </component>

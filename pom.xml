@@ -13,6 +13,9 @@
     <module>feed</module>
     <module>trip</module>
     <module>itinerary</module>
+      <module>chat</module>
+    <module>meetup</module>
+    <module>notification</module>
   </modules>
 
   <name>localeconnect</name>
