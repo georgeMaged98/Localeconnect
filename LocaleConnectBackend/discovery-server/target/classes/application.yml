@@ -1,7 +1,5 @@
 server:
   port: 8761
-  servlet:
-    context-path: /eureka
 
 spring:
   application:
@@ -14,3 +12,5 @@ eureka:
   client:
     registerWithEureka: false
     fetchRegistry: false
+    serviceUrl:
+      defaultZone: http://localhost:8761/

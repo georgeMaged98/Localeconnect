@@ -7,14 +7,13 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:5432/user_service_db
-    username: 'lec_user'
-    password: 'lssa2324uer'
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
+    username: 'localeconnect'
+    password: 'lssa2324app'
+    jpa:
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.PostgreSQLDialect
+          format_sql: 'true'
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
-    show-sql: true
+        ddl-auto: update
+      show-sql: 'true'
