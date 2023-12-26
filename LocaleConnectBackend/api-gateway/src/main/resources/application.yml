@@ -1,3 +1,6 @@
+
+#To access a route use the link: localhost:8080/path-to-service
+# Example: eureka -> localhost:8080/eureka/web
 server:
   port: 8080
 spring:
