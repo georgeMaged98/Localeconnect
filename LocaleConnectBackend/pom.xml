@@ -18,6 +18,7 @@
     <module>meetup</module>
     <module>notification</module>
     <module>discovery-server</module>
+    <module>api-gateway</module>
   </modules>
 
   <name>localeconnect</name>
