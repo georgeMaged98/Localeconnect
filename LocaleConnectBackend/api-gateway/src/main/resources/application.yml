@@ -9,7 +9,7 @@ spring:
   cloud:
     gateway:
      routes:
-        - id: chat-service
+        - id: chat
           uri: lb://chat
           predicates:
             - Path=/api/chat
@@ -21,7 +21,7 @@ spring:
           uri: lb://feed
           predicates:
             - Path=/api/feed
-        - id: itinerary-service
+        - id: itinerary
           uri: lb://itinerary
           predicates:
             - Path=/api/itinerary
@@ -33,17 +33,17 @@ spring:
           uri: lb://trip
           predicates:
             - Path=/api/trip
-        - id: notification-service
+        - id: notification
           uri: lb://notification
           predicates:
             - Path=/api/notification
-        - id: discovery-server
+        - id: eureka-server
           uri: http://localhost:8761
           predicates:
             - Path=/eureka/web
           filters:
             - SetPath=/
-        - id: discovery-server-static
+        - id: eureka-server-static
           uri: http://localhost:8761
           predicates:
             - Path=/eureka/**
@@ -54,4 +54,11 @@ eureka:
  client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka
+    register-with-eureka: true
+    fetch-registry: true
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.loadbalancer: DEBUG
+    reactor.netty.http.client: DEBUG
 
