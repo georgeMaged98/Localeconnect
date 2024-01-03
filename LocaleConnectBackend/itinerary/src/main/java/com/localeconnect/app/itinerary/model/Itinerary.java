@@ -2,10 +2,6 @@ package com.localeconnect.app.itinerary.model;
 
 import lombok.*;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import jakarta.persistence.Id;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +20,6 @@ public class Itinerary {
 
     @Column(name = "user_id")
     private Long userId;
-
     private String name;
     private String description;
     private int numberOfDays;
