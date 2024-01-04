@@ -12,6 +12,7 @@
         <module name="trip" />
         <module name="discovery-server" />
         <module name="chat" />
+        <module name="api-gateway" />
         <module name="itinerary" />
         <module name="user" />
         <module name="meetup" />

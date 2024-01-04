@@ -1,17 +1,20 @@
 package com.localeconnect.app.user;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 import jakarta.persistence.Id;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 
 import java.time.LocalDate;
 
-@Data
 @Entity
+@Table(name = "user")
+@Getter
+@Setter
 @NoArgsConstructor
-@Table(name = "users")
+@AllArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,79 +25,31 @@ public class User {
     private String lastName;
     @Column(nullable = false, unique = true)
     private String userName;
+    @NotBlank(message = "Email cannot be empty")
+    @Email(message = "Invalid email format")
     @Column(nullable = false, unique = true)
     private String email;
-    @Column(nullable = false)
-    private String password;
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
     @Column
     private String bio;
 
-    public String getFirstName() {
-        return firstName;
-    }
+    @Setter(AccessLevel.NONE)
+    @Column(nullable = false)
+    private String password;
 
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getFullName() {
-        return firstName + " " + lastName;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public LocalDate getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public String getBio() {
-        return bio;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setDateOfBirth(LocalDate dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
+    // Setter method for password with hash logic
     public void setPassword(String password) {
-        this.password = password;
+        this.password = hashPassword(password);
     }
 
-    public void setBio(String bio) {
-        this.bio = bio;
+    // Private method for password hashing
+    private String hashPassword(String password) {
+        return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
-    public User(String firstName, String lastName, String userName, String email,
-                String password, LocalDate dateOfBirth, String bio) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.userName = userName;
-        this.email = email;
-        this.password = password;
-        this.dateOfBirth = dateOfBirth;
-        this.bio = bio;
+    // Method to check whether a given password matches the hashed password
+    public boolean checkPassword(String passwordToCheck) {
+        return BCrypt.checkpw(passwordToCheck, this.password);
     }
 }
