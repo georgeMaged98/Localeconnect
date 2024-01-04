@@ -1,4 +1,4 @@
-package com.localeconnect.app.user;
+package com.localeconnect.app.user.dto;
 
 
 import jakarta.validation.constraints.Email;
