@@ -7,6 +7,7 @@ import lombok.*;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -28,7 +29,12 @@ public class UserDTO {
     private LocalDate dateOfBirth;
     private String bio;
     @Setter(AccessLevel.NONE)
+    @NotBlank(message = "This is a required field")
     private String password;
+
+    private boolean registerAsLocalGuide;
+    private List<String> languages;  // For LocalGuide
+    private boolean acceptsConditions;  // For LocalGuide
 
     // Setter method for password with hash logic
     public void setPassword(String password) {
@@ -40,8 +46,4 @@ public class UserDTO {
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
-    // Method to check whether a given password matches the hashed password
-    public boolean checkPassword(String passwordToCheck) {
-        return BCrypt.checkpw(passwordToCheck, this.password);
-    }
 }

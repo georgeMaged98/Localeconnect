@@ -7,12 +7,11 @@ import jakarta.persistence.Id;
 import java.time.LocalDate;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "user")
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class User {
 
     @Id
@@ -33,5 +32,16 @@ public class User {
     @Setter(AccessLevel.NONE)
     @Column(nullable = false)
     private String password;
+
+    // Custom constructor to initialize all fields except Id as it is generated
+    public User(String firstName, String lastName, String userName, String email, LocalDate dateOfBirth, String bio, String password) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.userName = userName;
+        this.email = email;
+        this.dateOfBirth = dateOfBirth;
+        this.bio = bio;
+        this.password = password;
+    }
 
 }
