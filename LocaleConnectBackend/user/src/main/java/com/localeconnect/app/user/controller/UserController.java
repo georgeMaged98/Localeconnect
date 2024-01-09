@@ -31,10 +31,11 @@ public class UserController {
             return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+    @GetMapping("/{userId}")
+    public ResponseEntity<?> getUserById(@PathVariable("userId") Long userId) {
+        log.info("Received request for user with ID: {}", userId);
         try {
-            return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
+            return new ResponseEntity<>(userService.getUserById(userId), HttpStatus.OK);
         }
         catch (UserDoesNotExistException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

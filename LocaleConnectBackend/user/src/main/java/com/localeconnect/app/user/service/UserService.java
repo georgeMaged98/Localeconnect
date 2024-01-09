@@ -4,19 +4,26 @@ import com.localeconnect.app.user.dto.UserDTO;
 import com.localeconnect.app.user.exception.UserAlreadyExistsException;
 import com.localeconnect.app.user.exception.UserDoesNotExistException;
 import com.localeconnect.app.user.model.User;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import com.localeconnect.app.user.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class UserService {
     private final UserRepository userRepository;
-   // @Autowired
-   // private JavaMailSender mailSender;
+    @Autowired
+    private JavaMailSender mailSender;
 
     @Autowired
     public UserService(UserRepository userRepository) {
@@ -53,12 +60,7 @@ public class UserService {
             }
         }
 
-            /*sendConfirmationEmail(
-                    newLocalGuide.getEmail(),
-             "Welcome to LocaleConnect",
-              "Dear " + newLocalGuide.getFirstName() + ",\n\nWelcome to LocaleConnect! Your account has been successfully created."
-                    );
-            */
+            sendConfirmationEmail(userDTO);
             return userRepository.save(convertToUser(userDTO));
     }
 
@@ -92,12 +94,47 @@ public class UserService {
                 .build();
     }
 
-   /*  public void sendConfirmationEmail (String to, String subject, String body) {
+    public void sendConfirmationEmail(UserDTO userDTO) {
+        String subject = "Welcome to LocaleConnect!";
+        String body = "<html><body>"
+                + "<h1>Welcome to LocaleConnect, " + userDTO.getFirstName() + "!</h1>"
+                + "<p>We're excited to have you on board. Your account has been successfully created.</p>"
+                + "<p>Here are some next steps to get you started:</p>"
+                + "<ul>"
+                + "<li>Explore our <a href='URL_TO_FEATURES'>features</a>.</li>"
+                + "<li>Set up your <a href='URL_TO_PROFILE'>profile</a>.</li>"
+                + "</ul>"
+                + "<p>If you have any questions, feel free to contact our support team.</p>"
+                + "<p>Sincerely,<br>Your LocaleConnect Team</p>"
+                + "<hr>"
+                + "<footer>"
+                + "<p><a href='URL_TO_PRIVACY_POLICY'>Privacy Policy</a> | <a href='URL_TO_TERMS'>Terms of Service</a></p>"
+                + "</footer>"
+                + "</body></html>";
+
+        sendEmail(userDTO.getEmail(), subject, body, true);
+    }
+
+    public void sendEmail(String to, String subject, String body, boolean isHtml) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
         message.setSubject(subject);
-        message.setText(body);
-        mailSender.send(message);
+        try{
+            if (isHtml) {
+                MimeMessage mimeMessage = mailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+                helper.setText(body, true); // true indicates HTML content
+                helper.setTo(to);
+                helper.setSubject(subject);
+
+                mailSender.send(mimeMessage);
+            } else {
+                message.setText(body);
+                mailSender.send(message);
+            }
+        } catch (MessagingException e) {
+            log.error("Error sending email", e);
+            throw new RuntimeException("Error sending email", e);
+        }
     }
-    */
 }

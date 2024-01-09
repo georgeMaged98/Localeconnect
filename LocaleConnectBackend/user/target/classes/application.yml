@@ -17,6 +17,15 @@ spring:
          format_sql: true
     show-sql: true
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: localeconnect.team@gmail.com
+    password: dosa yoeh rbtc nzvb
+    properties.mail.smtp:
+       auth: true
+       starttls.enable: true
+
 eureka:
   client:
     serviceUrl:
