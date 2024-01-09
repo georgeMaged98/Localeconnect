@@ -31,10 +31,10 @@ public class UserDTO {
     @Setter(AccessLevel.NONE)
     @NotBlank(message = "This is a required field")
     private String password;
-
-    private boolean registerAsLocalGuide;
-    private List<String> languages;  // For LocalGuide
-    private boolean acceptsConditions;  // For LocalGuide
+    private List<String> visitedCountries;
+    @NotBlank(message = "this is a required field")
+    private boolean registeredAsLocalGuide;
+    private List<String> languages;
 
     // Setter method for password with hash logic
     public void setPassword(String password) {

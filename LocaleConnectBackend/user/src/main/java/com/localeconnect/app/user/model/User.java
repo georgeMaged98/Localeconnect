@@ -3,15 +3,19 @@ package com.localeconnect.app.user.model;
 import jakarta.persistence.*;
 import lombok.*;
 import jakarta.persistence.Id;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-@Table(name = "user")
+@Table(name = "app_user")
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
 
     @Id
@@ -32,16 +36,11 @@ public class User {
     @Setter(AccessLevel.NONE)
     @Column(nullable = false)
     private String password;
-
-    // Custom constructor to initialize all fields except Id as it is generated
-    public User(String firstName, String lastName, String userName, String email, LocalDate dateOfBirth, String bio, String password) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.userName = userName;
-        this.email = email;
-        this.dateOfBirth = dateOfBirth;
-        this.bio = bio;
-        this.password = password;
-    }
+    @ElementCollection
+    private List<String> visitedCountries = new ArrayList<>();
+    @Column
+    private boolean registeredAsLocalGuide;
+    @ElementCollection
+    private List<String> languages;
 
 }

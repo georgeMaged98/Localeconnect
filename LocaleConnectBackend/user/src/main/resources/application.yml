@@ -4,20 +4,18 @@ server:
 spring:
   application:
     name: user
-
   datasource:
     url: jdbc:postgresql://localhost:5432/user_service_db
-    username: 'localeconnect'
-    password: 'lssa2324app'
-    jpa:
-      properties:
-        hibernate:
-          dialect: org.hibernate.dialect.PostgreSQLDialect
-          format_sql: 'true'
+    username: localeconnect
+    password: lssa2324app
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
       hibernate:
-        ddl-auto: update
-      show-sql: 'true'
-
+         dialect: org.hibernate.dialect.PostgreSQLDialect
+         format_sql: true
+    show-sql: true
 
 eureka:
   client:
