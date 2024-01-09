@@ -5,7 +5,6 @@ import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 import java.util.List;
-@Builder
 @Getter
 @Setter
 @AllArgsConstructor

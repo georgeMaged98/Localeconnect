@@ -52,7 +52,7 @@ public class ItineraryServiceTest {
         Itinerary mockItinerary = new Itinerary();
         when(responseSpec.bodyToMono(Boolean.class)).thenReturn(Mono.just(true));
         when(itineraryRepository.save(any(Itinerary.class))).thenReturn(mockItinerary);
-        Itinerary result = itineraryService.createItinerary(dto, validUserId);
+        ItineraryDTO result = itineraryService.createItinerary(dto, validUserId);
         assertNotNull(result);
     }
 
