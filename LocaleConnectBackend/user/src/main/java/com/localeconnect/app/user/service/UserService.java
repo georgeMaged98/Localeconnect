@@ -95,24 +95,7 @@ public class UserService {
     }
 
     public void sendConfirmationEmail(UserDTO userDTO) {
-        String subject = "Welcome to LocaleConnect!";
-        String body = "<html><body>"
-                + "<h1>Welcome to LocaleConnect, " + userDTO.getFirstName() + "!</h1>"
-                + "<p>We're excited to have you on board. Your account has been successfully created.</p>"
-                + "<p>Here are some next steps to get you started:</p>"
-                + "<ul>"
-                + "<li>Explore our <a href='URL_TO_FEATURES'>features</a>.</li>"
-                + "<li>Set up your <a href='URL_TO_PROFILE'>profile</a>.</li>"
-                + "</ul>"
-                + "<p>If you have any questions, feel free to contact our support team.</p>"
-                + "<p>Sincerely,<br>Your LocaleConnect Team</p>"
-                + "<hr>"
-                + "<footer>"
-                + "<p><a href='URL_TO_PRIVACY_POLICY'>Privacy Policy</a> | <a href='URL_TO_TERMS'>Terms of Service</a></p>"
-                + "</footer>"
-                + "</body></html>";
-
-        sendEmail(userDTO.getEmail(), subject, body, true);
+        sendEmail(userDTO.getEmail(),"Welcome to LocaleConnect!", getConfirmationMailBody(userDTO), true);
     }
 
     public void sendEmail(String to, String subject, String body, boolean isHtml) {
@@ -136,5 +119,23 @@ public class UserService {
             log.error("Error sending email", e);
             throw new RuntimeException("Error sending email", e);
         }
+    }
+
+    private String getConfirmationMailBody(UserDTO userDTO) {
+        return   "<html><body>"
+                + "<h1>Welcome to LocaleConnect, " + userDTO.getFirstName() + "!</h1>"
+                + "<p>We're excited to have you on board. Your account has been successfully created.</p>"
+                + "<p>Here are some next steps to get you started:</p>"
+                + "<ul>"
+                + "<li>Explore our <a href='URL_TO_FEATURES'>features</a>.</li>"
+                + "<li>Set up your <a href='URL_TO_PROFILE'>profile</a>.</li>"
+                + "</ul>"
+                + "<p>If you have any questions, feel free to contact our support team.</p>"
+                + "<p>Sincerely,<br>Your LocaleConnect Team</p>"
+                + "<hr>"
+                + "<footer>"
+                + "<p><a href='URL_TO_PRIVACY_POLICY'>Privacy Policy</a> | <a href='URL_TO_TERMS'>Terms of Service</a></p>"
+                + "</footer>"
+                + "</body></html>";
     }
 }
