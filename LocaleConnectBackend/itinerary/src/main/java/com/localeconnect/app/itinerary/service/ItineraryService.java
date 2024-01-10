@@ -4,7 +4,6 @@ import com.localeconnect.app.itinerary.mapper.ItineraryMapper;
 import com.localeconnect.app.itinerary.model.Itinerary;
 import com.localeconnect.app.itinerary.dto.ItineraryDTO;
 import com.localeconnect.app.itinerary.repository.ItineraryRepository;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -20,7 +19,7 @@ public class ItineraryService {
     private final WebClient webClient;
     private final ItineraryMapper mapper;
 
-    public ItineraryDTO createItinerary( @Valid ItineraryDTO itineraryDTO, String userId) {
+    public ItineraryDTO createItinerary(ItineraryDTO itineraryDTO, Long userId) {
         Itinerary itinerary = mapper.toEntity(itineraryDTO);
         if(itinerary == null){
             return null;
@@ -28,14 +27,14 @@ public class ItineraryService {
         // Make a synchronous request to the userService and save the itinerary if userId matches
         if (this.checkUserId(userId)) {
             itineraryRepository.save(itinerary);
-            return itineraryDTO;
+            return mapper.toDomain(itinerary);
 
         } else {
             throw new IllegalArgumentException("Register as user to create an itinerary");
         }
     }
 
-    public ItineraryDTO updateItinerary(@Valid ItineraryDTO itineraryDTO, String userId, Long id) {
+    public ItineraryDTO updateItinerary(ItineraryDTO itineraryDTO, Long userId, Long id) {
         Itinerary itinerary = mapper.toEntity(itineraryDTO);
         if(itinerary == null){
             return null;
@@ -44,14 +43,14 @@ public class ItineraryService {
         if (this.checkUserId(userId)) {
 
             itineraryRepository.save(itinerary);
-            return itineraryDTO;
+            return mapper.toDomain(itinerary);
 
         } else {
             throw new IllegalArgumentException("Only registered users can edit their itinerary");
         }
     }
 
-    public void deleteItinerary(Long id, String userId) {
+    public void deleteItinerary(Long id, Long userId) {
         if(this.checkUserId(userId)){
             Optional<Itinerary> optional = itineraryRepository.findById(id);
             optional.ifPresent(itineraryRepository::delete);
@@ -69,9 +68,9 @@ public class ItineraryService {
                 .collect(Collectors.toList());
     }
 
-    public List<ItineraryDTO> getAllItinerariesByUserId(String userId) {
+    public List<ItineraryDTO> getAllItinerariesByUser(Long userId) {
 
-        List<Itinerary> itineraries = itineraryRepository.findAllByUserId(Long.parseLong(userId));
+        List<Itinerary> itineraries = itineraryRepository.findByUserId(userId);
         return itineraries.stream().map(mapper::toDomain).collect(Collectors.toList());
     }
 
@@ -82,11 +81,15 @@ public class ItineraryService {
 
     }
 
-    private Boolean checkUserId(String userId){
-       Boolean check = this.webClient.get()
+    // TODO. returns true for now, needs the user microservice to work properly
+    private Boolean checkUserId(Long userId){
+    /*   Boolean check = this.webClient.get()
                 .uri("http://localhost:8080/api/user/verifyUser/{userId}", userId)
                 .retrieve().bodyToMono(Boolean.class).block();
         return Boolean.TRUE.equals(check);
+
+     */
+        return true;
     }
 }
 

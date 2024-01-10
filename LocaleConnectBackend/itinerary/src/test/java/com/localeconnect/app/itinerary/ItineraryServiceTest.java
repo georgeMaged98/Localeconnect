@@ -47,7 +47,7 @@ public class ItineraryServiceTest {
 
     @Test
     public void createItineraryForValidUserId() {
-        String validUserId = "1";
+        Long validUserId = 1L;
         ItineraryDTO dto = new ItineraryDTO();
         Itinerary mockItinerary = new Itinerary();
         when(responseSpec.bodyToMono(Boolean.class)).thenReturn(Mono.just(true));
@@ -58,7 +58,7 @@ public class ItineraryServiceTest {
 
     @Test
     public void notCreateItineraryForInvalidUserId() {
-        String invalidUserId = "2";
+        Long invalidUserId = 2L;
         ItineraryDTO dto = new ItineraryDTO();
         when(responseSpec.bodyToMono(Boolean.class)).thenReturn(Mono.just(false));
         assertThrows(IllegalArgumentException.class, () -> {

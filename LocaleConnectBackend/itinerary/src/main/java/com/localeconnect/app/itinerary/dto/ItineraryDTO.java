@@ -9,8 +9,9 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class ItineraryDTO {
-
+    private Long id;
     private Long userId;
     @NotBlank(message = "This is a required field")
     private String name;

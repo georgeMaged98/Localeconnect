@@ -33,7 +33,6 @@ public class Itinerary {
     @ElementCollection
     private List<String> dailyActivities= new ArrayList<>();
 
-    //TODO: Images can be stored as URLs or as byte arrays
     @ElementCollection
     private List<String> imageUrls= new ArrayList<>();
 }
