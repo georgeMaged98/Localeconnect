@@ -9,7 +9,7 @@ import java.util.List;
 public interface ItineraryRepository extends JpaRepository<Itinerary, Long> {
     List<Itinerary> findByUserId(Long userId);
 
-    List<Itinerary> findAllByNameLike(String name);
+    List<Itinerary> findAllIByNameIgnoreCaseLike(String name);
 
     List<Itinerary> findAll(Specification<Itinerary> specification);
 
