@@ -89,13 +89,17 @@ public class ItineraryService {
     }
 
     public List<ItineraryDTO> searchByName(String name) {
-
-        List<Itinerary> itineraries = itineraryRepository.findAllByNameLike(name);
+        if (name == null) {
+            return null;
+        }
+        List<Itinerary> itineraries = itineraryRepository.findAllIByNameIgnoreCaseLike(name);
         return itineraries.stream().map(mapper::toDomain).collect(Collectors.toList());
     }
 
     public List<ItineraryDTO> filter(String place, String tag) {
-
+        if (place == null && tag == null) {
+            return null;
+        }
         Specification<Itinerary> spec = Specification.where(ItinerarySpecification.hasPlace(place))
                 .or(ItinerarySpecification.hasTag(tag));
         List<Itinerary> itineraries = itineraryRepository.findAll(spec);

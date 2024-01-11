@@ -10,7 +10,7 @@ public class ItinerarySpecification {
     public static Specification<Itinerary> hasPlace(String place) {
         return (root, query, criteriaBuilder) -> {
             if (place == null || place.isEmpty()) {
-                return criteriaBuilder.conjunction();
+                return criteriaBuilder.disjunction();
             }
             Join<Itinerary, String> tagsJoin = root.join("placesToVisit");
             return criteriaBuilder.equal(tagsJoin, place);
@@ -20,7 +20,7 @@ public class ItinerarySpecification {
     public static Specification<Itinerary> hasTag(String tag) {
         return (root, query, criteriaBuilder) -> {
             if (tag == null || tag.isEmpty()) {
-                return criteriaBuilder.conjunction();
+                return criteriaBuilder.disjunction();
             }
             Join<Itinerary, String> tagsJoin = root.join("tags");
             return criteriaBuilder.equal(tagsJoin, tag);
