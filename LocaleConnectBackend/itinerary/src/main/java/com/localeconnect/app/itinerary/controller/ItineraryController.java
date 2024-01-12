@@ -1,6 +1,7 @@
 package com.localeconnect.app.itinerary.controller;
 
 import com.localeconnect.app.itinerary.dto.ItineraryDTO;
+import com.localeconnect.app.itinerary.dto.Tag;
 import com.localeconnect.app.itinerary.service.ItineraryService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -86,10 +87,11 @@ private final ItineraryService itineraryService;
     @GetMapping("/filter")
     public ResponseEntity<List<ItineraryDTO>> searchItineraries(
             @RequestParam(value = "place", required = false) String place,
-            @RequestParam(value = "tag", required = false) String tag
+            @RequestParam(value = "tag", required = false) Tag tag,
+            @RequestParam(value = "days", required = false) Integer days
     ) {
 
-        List<ItineraryDTO> itineraries = itineraryService.filter(place, tag);
+        List<ItineraryDTO> itineraries = itineraryService.filter(place, tag, days);
         return ResponseEntity.ok(itineraries);
     }
 

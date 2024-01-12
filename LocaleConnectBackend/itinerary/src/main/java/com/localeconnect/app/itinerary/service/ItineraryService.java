@@ -1,6 +1,7 @@
 package com.localeconnect.app.itinerary.service;
 
 import com.localeconnect.app.itinerary.dto.ItineraryDTO;
+import com.localeconnect.app.itinerary.dto.Tag;
 import com.localeconnect.app.itinerary.mapper.ItineraryMapper;
 import com.localeconnect.app.itinerary.model.Itinerary;
 import com.localeconnect.app.itinerary.repository.ItineraryRepository;
@@ -96,12 +97,12 @@ public class ItineraryService {
         return itineraries.stream().map(mapper::toDomain).collect(Collectors.toList());
     }
 
-    public List<ItineraryDTO> filter(String place, String tag) {
-        if (place == null && tag == null) {
+    public List<ItineraryDTO> filter(String place, Tag tag, Integer days) {
+        if (place == null && tag == null && days < 1) {
             return null;
         }
         Specification<Itinerary> spec = Specification.where(ItinerarySpecification.hasPlace(place))
-                .or(ItinerarySpecification.hasTag(tag));
+                .and(ItinerarySpecification.hasTag(tag)).and(ItinerarySpecification.maxNumberOfDays(days));
         List<Itinerary> itineraries = itineraryRepository.findAll(spec);
         return itineraries.stream().map(mapper::toDomain).collect(Collectors.toList());
 
