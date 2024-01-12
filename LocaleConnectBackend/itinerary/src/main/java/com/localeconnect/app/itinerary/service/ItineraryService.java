@@ -1,8 +1,8 @@
 package com.localeconnect.app.itinerary.service;
 
+import com.localeconnect.app.itinerary.dto.ItineraryDTO;
 import com.localeconnect.app.itinerary.mapper.ItineraryMapper;
 import com.localeconnect.app.itinerary.model.Itinerary;
-import com.localeconnect.app.itinerary.dto.ItineraryDTO;
 import com.localeconnect.app.itinerary.repository.ItineraryRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +18,7 @@ public class ItineraryService {
     private final ItineraryRepository itineraryRepository;
     private final WebClient webClient;
     private final ItineraryMapper mapper;
+
 
     public ItineraryDTO createItinerary(ItineraryDTO itineraryDTO, Long userId) {
         Itinerary itinerary = mapper.toEntity(itineraryDTO);
@@ -82,13 +83,14 @@ public class ItineraryService {
     }
 
     // TODO. returns true for now, needs the user microservice to work properly
-    private Boolean checkUserId(Long userId){
-    /*   Boolean check = this.webClient.get()
+    private Boolean checkUserId(Long userId) {
+  /* Boolean check = this.webClient.get()
                 .uri("http://localhost:8080/api/user/verifyUser/{userId}", userId)
-                .retrieve().bodyToMono(Boolean.class).block();
+                .retrieve().bodyToMono(Boolean.class).onErrorReturn(false).block();
         return Boolean.TRUE.equals(check);
 
-     */
+   */
+
         return true;
     }
 }
