@@ -126,7 +126,7 @@ public class ItineraryService {
 
         Review reviewToUpdate = reviewMapper.toEntity(reviewDTO);
         reviewToUpdate.setId(id);
-
+        reviewToUpdate.setTimestamp(LocalDateTime.now());
         Review updatedReview = reviewRepository.save(reviewToUpdate);
         return reviewMapper.toDomain(updatedReview);
     }
