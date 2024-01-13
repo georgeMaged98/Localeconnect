@@ -11,7 +11,7 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - localeconnect-network
+      - postgres
     restart: unless-stopped
   pgadmin:
     container_name: pgadmin
@@ -25,20 +25,26 @@ services:
     ports:
       - "5050:80"
     networks:
-      - localeconnect-network
+      - postgres
     restart: unless-stopped
   user-service:
-    container_name: user-service
-    build: ./user
+    container_name: user
+    build: user
     ports:
       - "8084:8084"
+    environment:
+      -SPRING_PROFILES_ACTIVE: docker
+
+    networks:
+      - spring
+      - postgres
     depends_on:
       - postgres
-    networks:
-      - localeconnect-network
 
 networks:
-  localeconnect-network:
+  postgres:
+    driver: bridge
+  spring:
     driver: bridge
 
 volumes:
