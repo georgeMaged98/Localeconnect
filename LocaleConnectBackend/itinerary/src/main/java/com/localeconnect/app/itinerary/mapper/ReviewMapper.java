@@ -10,5 +10,5 @@ public interface ReviewMapper {
 
     Review toEntity(ReviewDTO dto);
 
-    ReviewDTO toDto(Review review);
+    ReviewDTO toDomain(Review review);
 }
