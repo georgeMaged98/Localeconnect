@@ -5,7 +5,7 @@ import com.localeconnect.app.itinerary.model.Itinerary;
 import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
 
-
+    // TODO: add filters to frontend according to these specifications
 public class ItinerarySpecification {
 
     public static Specification<Itinerary> hasPlace(String place) {
