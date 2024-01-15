@@ -19,4 +19,17 @@
       </profile>
     </annotationProcessing>
   </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="api-gateway" options="" />
+      <module name="chat" options="" />
+      <module name="discovery-server" options="" />
+      <module name="feed" options="" />
+      <module name="itinerary" options="" />
+      <module name="meetup" options="" />
+      <module name="notification" options="" />
+      <module name="trip" options="" />
+      <module name="user" options="" />
+    </option>
+  </component>
 </project>
