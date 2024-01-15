@@ -25,8 +25,10 @@ public class Meetup {
     private String name;
     private String description;
     private Date date;
-    private String from;
-    private String to;
+    @Column(name = "start_time")
+    private String startTime;
+    @Column(name = "end_time")
+    private String endTime;
     private double cost;
     private String location;
 

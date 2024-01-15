@@ -1,7 +1,7 @@
 package com.localeconnect.app.meetup.dto;
 
 
-import jakarta.persistence.*;
+//import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,10 +33,10 @@ public class MeetupDTO {
     private Date date;
 
     @NotBlank(message = "This is a required field")
-    private String from;
+    private String startTime;
 
     @NotBlank(message = "This is a required field")
-    private String to;
+    private String endTime;
 
     @NotBlank(message = "This is a required field")
     private double cost;
