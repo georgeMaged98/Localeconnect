@@ -1,7 +1,6 @@
 server:
   port: 8761
 
-
 spring:
   application:
     name: eureka-server
@@ -9,6 +8,7 @@ spring:
 eureka:
   instance:
     hostname: localhost
+    appname: eureka-server
 
   client:
     registerWithEureka: false
