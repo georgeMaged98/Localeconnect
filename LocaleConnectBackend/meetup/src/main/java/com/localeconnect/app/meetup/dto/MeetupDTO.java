@@ -3,6 +3,7 @@ package com.localeconnect.app.meetup.dto;
 
 //import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,7 @@ public class MeetupDTO {
 
     private Long id;
 
-    @NotBlank(message = "This is a required field")
+    @NotNull(message = "This is a required field")
     private Long creatorId;
 
     @NotBlank(message = "This is a required field")
@@ -29,7 +30,7 @@ public class MeetupDTO {
     @NotBlank(message = "This is a required field")
     private String description;
 
-    @NotBlank(message = "This is a required field")
+    @NotNull(message = "This is a required field")
     private Date date;
 
     @NotBlank(message = "This is a required field")
@@ -38,7 +39,7 @@ public class MeetupDTO {
     @NotBlank(message = "This is a required field")
     private String endTime;
 
-    @NotBlank(message = "This is a required field")
+    @NotNull(message = "This is a required field")
     private double cost;
 
     @NotBlank(message = "This is a required field")

@@ -1,25 +1,45 @@
 package com.localeconnect.app.meetup.controller;
 
 import com.localeconnect.app.meetup.dto.MeetupDTO;
-import com.localeconnect.app.meetup.model.Meetup;
 import com.localeconnect.app.meetup.service.MeetupService;
+import jakarta.validation.UnexpectedTypeException;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/meetup")
 @AllArgsConstructor
+@CrossOrigin
+@RequestMapping("/api/meetup")
 public class MeetupController {
 
     private final MeetupService meetupService;
 
-//    public ResponseEntity<Meetup> createMeetup(@RequestBody MeetupDTO meetupDTO){
-//
-//    }
+    @PostMapping("/")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<MeetupDTO> createMeetup(@RequestBody @Valid MeetupDTO meetupDTO){
+        try {
+            MeetupDTO createdMeetupDTO = meetupService.createMeetup(meetupDTO);
+
+            return ResponseEntity.ok(createdMeetupDTO);
+        }catch (IllegalArgumentException | UnexpectedTypeException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+
+    @GetMapping("/")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<String> getAllMeetups(){
+        try {
+            return ResponseEntity.ok("LOL");
+        }catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+
 }

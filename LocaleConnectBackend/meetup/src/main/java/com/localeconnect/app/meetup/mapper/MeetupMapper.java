@@ -4,7 +4,8 @@ import com.localeconnect.app.meetup.dto.MeetupDTO;
 import com.localeconnect.app.meetup.model.Meetup;
 import org.mapstruct.Mapper;
 
-@Mapper
+
+@Mapper(componentModel = "spring")
 public interface MeetupMapper {
 
     MeetupDTO toDomain(Meetup meetup);
