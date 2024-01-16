@@ -2,13 +2,15 @@ package com.localeconnect.app.itinerary.service;
 
 import com.localeconnect.app.itinerary.dto.ItineraryDTO;
 import com.localeconnect.app.itinerary.dto.ReviewDTO;
+import com.localeconnect.app.itinerary.exception.ReviewNotFoundException;
+import com.localeconnect.app.itinerary.exception.ReviewValidationException;
+import com.localeconnect.app.itinerary.exception.UnauthorizedUserException;
 import com.localeconnect.app.itinerary.mapper.ItineraryMapper;
 import com.localeconnect.app.itinerary.mapper.ReviewMapper;
 import com.localeconnect.app.itinerary.model.Itinerary;
 import com.localeconnect.app.itinerary.model.Review;
 import com.localeconnect.app.itinerary.repository.ItineraryRepository;
 import com.localeconnect.app.itinerary.repository.ReviewRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -94,34 +96,29 @@ public class ItineraryService {
     public ReviewDTO createReview(ReviewDTO reviewDto, Long userId) {
         Review review = reviewMapper.toEntity(reviewDto);
         if (review == null) {
-            return null;
+            throw new ReviewValidationException("Review data is invalid");
         }
 
         if (!this.checkUserId(reviewDto.getUserId())) {
-            throw new IllegalArgumentException("Only registered users can create a review");
+            throw new UnauthorizedUserException("Only registered users can create a review");
         }
         review.setUserId(userId);
         review.setTimestamp(LocalDateTime.now());
         review = reviewRepository.save(review);
         return reviewMapper.toDomain(review);
-
     }
 
+
     public ReviewDTO updateReview(ReviewDTO reviewDTO, Long id) {
-        Optional<Review> existingReview = reviewRepository.findById(id);
-        if (existingReview.isEmpty()) {
-            throw new EntityNotFoundException("Review not found with id: " + id);
-        }
+        Review existingReview = reviewRepository.findById(id)
+                .orElseThrow(() -> new ReviewNotFoundException("Review not found with id: " + id));
 
         if (!this.checkUserId(reviewDTO.getUserId())) {
-            throw new IllegalArgumentException("Only registered users can edit their reviews");
+            throw new UnauthorizedUserException("Only registered users can edit their reviews");
         }
 
-        if (!existingReview.get().getUserId().equals(reviewDTO.getUserId())) {
-            throw new IllegalArgumentException("Users can only edit their own reviews");
-        }
-        if (!existingReview.get().getItineraryId().equals(reviewDTO.getItineraryId())) {
-            throw new IllegalArgumentException("Review does not belong to the specified itinerary");
+        if (!existingReview.getUserId().equals(reviewDTO.getUserId())) {
+            throw new UnauthorizedUserException("Users can only edit their own reviews");
         }
 
         Review reviewToUpdate = reviewMapper.toEntity(reviewDTO);
@@ -133,17 +130,14 @@ public class ItineraryService {
 
 
     public void deleteReview(Long id) {
-        Optional<Review> existingReview = reviewRepository.findById(id);
-        if (existingReview.isEmpty()) {
-            throw new EntityNotFoundException("Review not found with id: " + id);
+        Review review = reviewRepository.findById(id)
+                .orElseThrow(() -> new ReviewNotFoundException("Review not found with id: " + id));
+
+        if (!this.checkUserId(review.getUserId())) {
+            throw new UnauthorizedUserException("Only registered users can delete their reviews");
         }
 
-        if (!this.checkUserId(existingReview.get().getUserId())) {
-            throw new IllegalArgumentException("Only registered users can delete their reviews");
-        }
-
-                reviewRepository.delete(existingReview.get());
-
+        reviewRepository.delete(review);
     }
 
     public List<ReviewDTO> getAllReviewsForItinerary(Long itineraryId) {
