@@ -1,12 +1,14 @@
 package com.localeconnect.app.itinerary.controller;
 
 import com.localeconnect.app.itinerary.dto.ItineraryDTO;
+import com.localeconnect.app.itinerary.dto.ItineraryShareDTO;
 import com.localeconnect.app.itinerary.service.ItineraryService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -59,7 +61,8 @@ private final ItineraryService itineraryService;
             return ResponseEntity.ok(itineraries);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);
-        }    }
+        }
+    }
 
     @GetMapping(path = "/allByUser")
     public ResponseEntity<List<ItineraryDTO>> getUserItineraries(@RequestParam(value = "user") Long userId) {
@@ -68,6 +71,15 @@ private final ItineraryService itineraryService;
             return ResponseEntity.ok(itineraries);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);
-        }    }
+        }
+    }
+
+
+    @PostMapping("/share/{itineraryId}")
+    public Mono<ResponseEntity<ItineraryShareDTO>> shareItinerary(@PathVariable("itineraryId") Long itineraryId) {
+        return itineraryService.shareItinerary(itineraryId)
+                .map(sharedItinerary -> ResponseEntity.ok().body(sharedItinerary))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
 
 }
