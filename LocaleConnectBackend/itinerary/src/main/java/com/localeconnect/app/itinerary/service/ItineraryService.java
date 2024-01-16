@@ -2,6 +2,9 @@ package com.localeconnect.app.itinerary.service;
 
 import com.localeconnect.app.itinerary.dto.ItineraryDTO;
 import com.localeconnect.app.itinerary.dto.Tag;
+import com.localeconnect.app.itinerary.exception.ItineraryAlreadyExistsException;
+import com.localeconnect.app.itinerary.exception.ItineraryNotFoundException;
+import com.localeconnect.app.itinerary.exception.UnauthorizedUserException;
 import com.localeconnect.app.itinerary.mapper.ItineraryMapper;
 import com.localeconnect.app.itinerary.model.Itinerary;
 import com.localeconnect.app.itinerary.repository.ItineraryRepository;
@@ -27,18 +30,17 @@ public class ItineraryService {
     public ItineraryDTO createItinerary(ItineraryDTO itineraryDTO, Long userId) {
         Itinerary itinerary = mapper.toEntity(itineraryDTO);
         if (itinerary == null) {
-            return null;
+            throw new ItineraryNotFoundException("Itinerary data is invalid");
         }
 
-        // Make a synchronous request to the userService and save the itinerary if userId matches
         if (!this.checkUserId(userId)) {
-            throw new IllegalArgumentException("Register as user to create an itinerary");
+            throw new UnauthorizedUserException("Register as user to create an itinerary");
         }
 
         if (this.itineraryRepository.existsByUserIdAndName(userId, itineraryDTO.getName())) {
-            System.out.println("test");
-            throw new IllegalArgumentException("This user already created this itinerary.");
+            throw new ItineraryAlreadyExistsException("This user already created this itinerary.");
         }
+
         itinerary.setUserId(userId);
         itineraryRepository.save(itinerary);
         return mapper.toDomain(itinerary);
@@ -47,27 +49,30 @@ public class ItineraryService {
     public ItineraryDTO updateItinerary(ItineraryDTO itineraryDTO, Long id) {
         Itinerary itinerary = mapper.toEntity(itineraryDTO);
         if (itinerary == null) {
-            return null;
+            throw new ItineraryNotFoundException("Itinerary data is invalid");
         }
+
         itinerary.setId(id);
+
         if (!this.checkUserId(itinerary.getUserId())) {
-            throw new IllegalArgumentException("Only registered users can edit their itinerary");
+            throw new UnauthorizedUserException("Only registered users can edit their itinerary");
         }
+
         itineraryRepository.save(itinerary);
         return mapper.toDomain(itinerary);
     }
 
     public void deleteItinerary(Long id) {
-        Optional<Itinerary> optional = itineraryRepository.findById(id);
-        if (optional.isPresent()) {
-            Itinerary itinerary = optional.get();
-            if (this.checkUserId(itinerary.getUserId())) {
-                itineraryRepository.delete(itinerary);
-            } else {
-                throw new IllegalArgumentException("Only registered users can delete their itinerary");
-            }
+        Itinerary itinerary = itineraryRepository.findById(id)
+                .orElseThrow(() -> new ItineraryNotFoundException("Itinerary not found for id: " + id));
+
+        if (!this.checkUserId(itinerary.getUserId())) {
+            throw new UnauthorizedUserException("Only registered users can delete their itinerary");
         }
+
+        itineraryRepository.delete(itinerary);
     }
+
 
     public List<ItineraryDTO> getAllItineraries() {
         List<Itinerary> itineraries = itineraryRepository.findAll();
@@ -86,7 +91,7 @@ public class ItineraryService {
 
     public ItineraryDTO getItineraryById(Long id) {
         Optional<Itinerary> optional = itineraryRepository.findById(id);
-        return optional.map(mapper::toDomain).orElse(null);
+        return optional.map(mapper::toDomain).orElseThrow(() -> new ItineraryNotFoundException("Itinerary not found"));
 
     }
 
