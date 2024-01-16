@@ -85,14 +85,17 @@ private final ItineraryService itineraryService;
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<List<ItineraryDTO>> searchItineraries(
+    public ResponseEntity<List<ItineraryDTO>> filterItineraries(
             @RequestParam(value = "place", required = false) String place,
             @RequestParam(value = "tag", required = false) Tag tag,
             @RequestParam(value = "days", required = false) Integer days
     ) {
-
-        List<ItineraryDTO> itineraries = itineraryService.filter(place, tag, days);
-        return ResponseEntity.ok(itineraries);
+        try {
+            List<ItineraryDTO> itineraries = itineraryService.filter(place, tag, days);
+            return ResponseEntity.ok(itineraries);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
 }

@@ -29,15 +29,19 @@ public class ItineraryService {
         if (itinerary == null) {
             return null;
         }
-        // Make a synchronous request to the userService and save the itinerary if userId matches
-        if (this.checkUserId(userId)) {
-            itinerary.setUserId(userId);
-            itineraryRepository.save(itinerary);
-            return mapper.toDomain(itinerary);
 
-        } else {
+        // Make a synchronous request to the userService and save the itinerary if userId matches
+        if (!this.checkUserId(userId)) {
             throw new IllegalArgumentException("Register as user to create an itinerary");
         }
+
+        if (this.itineraryRepository.existsByUserIdAndName(userId, itineraryDTO.getName())) {
+            System.out.println("test");
+            throw new IllegalArgumentException("This user already created this itinerary.");
+        }
+        itinerary.setUserId(userId);
+        itineraryRepository.save(itinerary);
+        return mapper.toDomain(itinerary);
     }
 
     public ItineraryDTO updateItinerary(ItineraryDTO itineraryDTO, Long id) {
@@ -46,14 +50,11 @@ public class ItineraryService {
             return null;
         }
         itinerary.setId(id);
-        if (this.checkUserId(itinerary.getUserId())) {
-
-            itineraryRepository.save(itinerary);
-            return mapper.toDomain(itinerary);
-
-        } else {
+        if (!this.checkUserId(itinerary.getUserId())) {
             throw new IllegalArgumentException("Only registered users can edit their itinerary");
         }
+        itineraryRepository.save(itinerary);
+        return mapper.toDomain(itinerary);
     }
 
     public void deleteItinerary(Long id) {

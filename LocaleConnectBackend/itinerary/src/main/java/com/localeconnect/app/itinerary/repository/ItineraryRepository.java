@@ -13,6 +13,7 @@ public interface ItineraryRepository extends JpaRepository<Itinerary, Long> {
 
     List<Itinerary> findAll(Specification<Itinerary> specification);
 
+    Boolean existsByUserIdAndName(Long userId, String name);
 
 }
 
