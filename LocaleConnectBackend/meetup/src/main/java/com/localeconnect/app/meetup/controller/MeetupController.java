@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,7 +21,7 @@ public class MeetupController {
 
     @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<MeetupDTO> createMeetup(@RequestBody @Valid MeetupDTO meetupDTO){
+    public ResponseEntity<MeetupDTO> createMeetup(@RequestBody @Validated(MeetupDTO.CreateValidation.class) MeetupDTO meetupDTO){
         try {
             MeetupDTO createdMeetupDTO = meetupService.createMeetup(meetupDTO);
 
@@ -36,6 +37,19 @@ public class MeetupController {
     public ResponseEntity<String> getAllMeetups(){
         try {
             return ResponseEntity.ok("LOL");
+        }catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<MeetupDTO> updateMeetup(@PathVariable("id") Long id, @RequestBody @Validated(MeetupDTO.UpdateValidation.class) MeetupDTO meetupDTO){
+        try {
+            MeetupDTO itinerary = meetupService.updateMeetup(meetupDTO, id);
+            return ResponseEntity.ok(itinerary);
+
         }catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);
         }

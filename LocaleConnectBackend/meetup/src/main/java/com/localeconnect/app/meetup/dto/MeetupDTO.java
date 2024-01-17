@@ -19,30 +19,34 @@ import java.util.List;
 @AllArgsConstructor
 public class MeetupDTO {
 
+    public interface CreateValidation {}
+
+    public interface UpdateValidation{}
+
     private Long id;
 
-    @NotNull(message = "This is a required field")
+    @NotNull(message = "This is a required field", groups = {CreateValidation.class})
     private Long creatorId;
 
-    @NotBlank(message = "This is a required field")
+    @NotBlank(message = "This is a required field", groups = {CreateValidation.class})
     private String name;
 
-    @NotBlank(message = "This is a required field")
+    @NotBlank(message = "This is a required field", groups = {CreateValidation.class})
     private String description;
 
-    @NotNull(message = "This is a required field")
+    @NotNull(message = "This is a required field", groups = {CreateValidation.class})
     private Date date;
 
-    @NotBlank(message = "This is a required field")
+    @NotBlank(message = "This is a required field", groups = {CreateValidation.class})
     private String startTime;
 
-    @NotBlank(message = "This is a required field")
+    @NotBlank(message = "This is a required field", groups = {CreateValidation.class})
     private String endTime;
 
-    @NotNull(message = "This is a required field")
+    @NotNull(message = "This is a required field", groups = {CreateValidation.class})
     private double cost;
 
-    @NotBlank(message = "This is a required field")
+    @NotBlank(message = "This is a required field", groups = {CreateValidation.class})
     private String location;
 
     private List<String> spokenLanguages= new ArrayList<>();
