@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @AllArgsConstructor
 @CrossOrigin
@@ -33,13 +35,36 @@ public class MeetupController {
 
     @GetMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<String> getAllMeetups(){
+    public ResponseEntity<List<MeetupDTO>> getAllMeetups(){
         try {
-            return ResponseEntity.ok("LOL");
+            List<MeetupDTO> meetupDTOS = meetupService.getAllMeetups();
+
+            return ResponseEntity.ok(meetupDTOS);
+        }catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @GetMapping(path = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<MeetupDTO> getMeetupById(@PathVariable("id") Long id ){
+        try {
+            MeetupDTO meetupDTO = meetupService.getMeetupById(id);
+            return ResponseEntity.ok(meetupDTO);
         }catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);
         }
     }
 
 
+    @DeleteMapping(path = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<String> deleteMeetupById(@PathVariable("id") Long id ){
+        try {
+            meetupService.deleteMeetupById(id);
+            return ResponseEntity.ok("Meetup Deleted Successfully!");
+        }catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
 }

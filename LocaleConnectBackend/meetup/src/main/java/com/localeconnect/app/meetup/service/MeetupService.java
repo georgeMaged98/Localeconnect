@@ -7,6 +7,10 @@ import com.localeconnect.app.meetup.repository.MeetupRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 @AllArgsConstructor
 public class MeetupService {
@@ -26,4 +30,23 @@ public class MeetupService {
 
         return meetupMapper.toDomain(createdMeetup);
     }
+
+    public List<MeetupDTO> getAllMeetups(){
+        List<Meetup> itineraries = meetupRepository.findAll();
+        return itineraries.stream().map(
+                        meetupMapper::toDomain)
+                .collect(Collectors.toList());
+
+    }
+
+    public MeetupDTO getMeetupById(Long id){
+        Optional<Meetup> optional = meetupRepository.findById(id);
+        return optional.map(meetupMapper::toDomain).orElse(null);
+    }
+
+    public void deleteMeetupById(Long id) {
+            Optional<Meetup> optional = meetupRepository.findById(id);
+            optional.ifPresent(meetupRepository::delete);
+    }
+
 }
