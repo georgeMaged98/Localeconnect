@@ -41,7 +41,7 @@ public class UserController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
         catch (Exception e) {
-            log.error("error has occured :internal error {}  ",  e);
+            log.error("error has occured :internal error {}",  e);
             return new ResponseEntity<>("An internal error has occured", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -58,6 +58,38 @@ public class UserController {
         } catch (Exception e) {
             log.error("error has occured :internal error {}  ",  e);
             return new ResponseEntity<>("An internal error has  occured", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @DeleteMapping("/delete/{userId}")
+    public ResponseEntity<?> deleteUser(@PathVariable("userId") Long userId) {
+        try {
+            userService.deleteUser(userId);
+            return new ResponseEntity<>("User successfully deleted", HttpStatus.OK);
+        } catch (UserDoesNotExistException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            log.error("Error deleting user: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PostMapping("/{userId}/follow/{followerId}")
+    public ResponseEntity<?> followUser(@PathVariable("userId") Long userId, @PathVariable("followerId") Long followerId) {
+        try {
+            userService.followUser(userId, followerId);
+            return new ResponseEntity<>("Follow request successful", HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Error following user: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/{userId}/unfollow/{followeeId}")
+    public ResponseEntity<?> unfollowUser(@PathVariable("userId") Long userId, @PathVariable("followeeId") Long followeeId) {
+        try {
+            userService.unfollowUser(userId, followeeId);
+            return new ResponseEntity<>("Unfollow successful", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 }

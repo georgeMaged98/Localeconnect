@@ -6,6 +6,7 @@ import com.localeconnect.app.user.exception.UserDoesNotExistException;
 import com.localeconnect.app.user.model.User;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -59,12 +60,60 @@ public class UserService {
                         " speak at least 2 languages and be at least 18 years old.");
             }
         }
-
             sendConfirmationEmail(userDTO);
             return userRepository.save(convertToUser(userDTO));
     }
 
+    public void deleteUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserDoesNotExistException("User not found"));
+        userRepository.delete(user);
+    }
+    public void followUser(Long userId, Long followerId) {
+        User userToFollow = userRepository.findById(userId)
+                .orElseThrow(() -> new UserDoesNotExistException("User not found"));
+        User follower = userRepository.findById(followerId)
+                .orElseThrow(() -> new UserDoesNotExistException("Follower not found"));
+        if(userId.equals(followerId)) {
+            throw new IllegalArgumentException("User cannot unfollow themselves");
+        }
+        if (!userToFollow.getFollowers().contains(follower)) {
+            userToFollow.getFollowers().add(follower);
+            userRepository.save(userToFollow);
+            // ToDo Notify the user about the new follower
+        } else {
+            throw new IllegalStateException("Already following this user");
+        }
+    }
+    public void unfollowUser(Long userId, Long followeeId) {
+        if(userId.equals(followeeId)) {
+            throw new IllegalArgumentException("User cannot unfollow themselves");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserDoesNotExistException("User not found"));
+        User followee = userRepository.findById(followeeId)
+                .orElseThrow(() -> new UserDoesNotExistException("Followee not found"));
+
+        if(user.getFollowing().contains(followee)) {
+            user.getFollowing().remove(followee);
+            followee.getFollowers().remove(user);
+
+            userRepository.save(user);
+            userRepository.save(followee);
+        } else {
+            throw new IllegalStateException("User is not following the specified followee");
+        }
+    }
+
     public UserDTO convertToDTO(User user) {
+        List<Long> followerIds = user.getFollowers().stream()
+                .map(User::getId)
+                .collect(Collectors.toList());
+        List<Long> followingIds = user.getFollowing().stream()
+                .map(User::getId)
+                .collect(Collectors.toList());
+
         return UserDTO.builder()
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
@@ -76,10 +125,19 @@ public class UserService {
                 .visitedCountries(user.getVisitedCountries())
                 .registeredAsLocalGuide(user.isRegisteredAsLocalGuide())
                 .languages(user.getLanguages())
+                .followerIds(followerIds)
+                .followingIds(followingIds)
                 .build();
     }
 
     public User convertToUser(UserDTO userDTO) {
+        List<User> followers = userDTO.getFollowerIds().stream()
+                .map(id -> userRepository.findById(id).orElse(null))
+                .collect(Collectors.toList());
+        List<User> following = userDTO.getFollowingIds().stream()
+                .map(id -> userRepository.findById(id).orElse(null))
+                .collect(Collectors.toList());
+
         return  User.builder()
                 .firstName(userDTO.getFirstName())
                 .lastName(userDTO.getLastName())
@@ -91,6 +149,8 @@ public class UserService {
                 .visitedCountries(userDTO.getVisitedCountries())
                 .registeredAsLocalGuide(userDTO.isRegisteredAsLocalGuide())
                 .languages(userDTO.getLanguages())
+                .followers(followers)
+                .following(following)
                 .build();
     }
 
