@@ -12,7 +12,7 @@ import {AuthService} from "../../api/auth.service";
 export class LoginComponent {
   loginForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private authService: AuthService,public dialog: MatDialog) {
+  constructor(private fb: FormBuilder, /*private authService: AuthService,*/public dialog: MatDialog) {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
       password: ['', [Validators.required, Validators.minLength(6)]]

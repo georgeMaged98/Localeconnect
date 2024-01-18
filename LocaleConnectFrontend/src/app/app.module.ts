@@ -14,12 +14,18 @@ import { RegisterComponent } from './pages/register/register.component';
 import {MatButtonModule} from "@angular/material/button";
 import {HttpClientModule} from "@angular/common/http";
 import {ReactiveFormsModule} from "@angular/forms";
+import { RegisterGuideComponent } from './pages/register-guide/register-guide.component';
+import {MatCheckboxModule} from "@angular/material/checkbox";
+import {MatSelectModule} from "@angular/material/select";
+import {MatDatepickerModule} from "@angular/material/datepicker";
+import {MAT_DATE_LOCALE, MatNativeDateModule} from "@angular/material/core";
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     RegisterComponent,
+    RegisterGuideComponent,
 
 
   ],
@@ -35,10 +41,13 @@ import {ReactiveFormsModule} from "@angular/forms";
     MatButtonModule,
     ReactiveFormsModule,
     HttpClientModule,
-
+    MatDatepickerModule,
+    MatSelectModule,
+    MatCheckboxModule,
+    MatNativeDateModule,
 
   ],
-  providers: [],
+  providers: [   MatDatepickerModule,{provide: MAT_DATE_LOCALE, useValue: 'en-GB'}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -3,6 +3,7 @@ import {LoginComponent} from "../login/login.component";
 import {MatDialog} from "@angular/material/dialog";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {AuthService} from "../../api/auth.service";
+import {RegisterGuideComponent} from "../register-guide/register-guide.component";
 
 @Component({
   selector: 'app-register',
@@ -12,7 +13,7 @@ import {AuthService} from "../../api/auth.service";
 export class RegisterComponent {
   registerForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private authService: AuthService,public dialog: MatDialog) {
+  constructor(private fb: FormBuilder,/*private authService: AuthService,*/public dialog: MatDialog) {
     this.registerForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
@@ -34,6 +35,12 @@ export class RegisterComponent {
   switchToLogin(): void {
     this.dialog.closeAll();
      this.dialog.open(LoginComponent, {
+      width: '400px'
+    });
+  }
+
+  openGuideDialog(): void {
+    this.dialog.open(RegisterGuideComponent, {
       width: '400px'
     });
   }
