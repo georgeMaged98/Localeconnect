@@ -3,6 +3,7 @@ package com.localeconnect.app.user.controller;
 import com.localeconnect.app.user.dto.UserDTO;
 import com.localeconnect.app.user.exception.UserAlreadyExistsException;
 import com.localeconnect.app.user.exception.UserDoesNotExistException;
+import com.localeconnect.app.user.model.User;
 import com.localeconnect.app.user.service.UserService;
 import feign.Response;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,6 @@ public class UserController {
 
     @GetMapping("/{userId}")
     public ResponseEntity<?> getUserById(@PathVariable("userId") Long userId) {
-        log.info("Received request for user with ID: {}", userId);
         try {
             return new ResponseEntity<>(userService.getUserById(userId), HttpStatus.OK);
         }
@@ -41,7 +41,6 @@ public class UserController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
         catch (Exception e) {
-            log.error("error has occured :internal error {}  ",  e);
             return new ResponseEntity<>("An internal error has occured", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -51,13 +50,26 @@ public class UserController {
     public ResponseEntity<?> registerUser(@RequestBody UserDTO userDTO) {
         try {
             return new ResponseEntity<>(userService.registerUser(userDTO), HttpStatus.CREATED);
-        } catch (UserAlreadyExistsException e) {
+        } catch (UserAlreadyExistsException | IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
-            log.error("error has occured :internal error {}  ",  e);
             return new ResponseEntity<>("An internal error has  occured", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+    @PutMapping("/update")
+    public ResponseEntity<?> updateUser(@RequestBody UserDTO userDTO) {
+        try {
+            return new ResponseEntity<>(userService.updateUser(userDTO), HttpStatus.OK);
+        }
+        catch(UserDoesNotExistException | IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>("An internal error has  occured", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @GetMapping("/exists/{userId}")
+    public ResponseEntity<Boolean> checkUserExists(@PathVariable("userId") Long userId) {
+        boolean exists = userService.checkUserId(userId);
+        return new ResponseEntity<>(exists, HttpStatus.OK);
     }
 }

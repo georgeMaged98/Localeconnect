@@ -81,15 +81,11 @@ public class ItineraryService {
 
     }
 
-    // TODO. returns true for now, needs the user microservice to work properly
-    private Boolean checkUserId(Long userId){
-    /*   Boolean check = this.webClient.get()
-                .uri("http://localhost:8080/api/user/verifyUser/{userId}", userId)
+    private Boolean checkUserId(Long userId) {
+        Boolean check = this.webClient.get()
+                .uri("http://user-service/api/user/exists/{userId}", userId)
                 .retrieve().bodyToMono(Boolean.class).block();
-        return Boolean.TRUE.equals(check);
-
-     */
-        return true;
+        return check != null && check;
     }
 }
 
