@@ -1,7 +1,9 @@
 package com.localeconnect.app.itinerary.model;
 
-import lombok.*;
+import com.localeconnect.app.itinerary.dto.Tag;
 import jakarta.persistence.*;
+import lombok.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,19 +24,21 @@ public class Itinerary {
     private Long userId;
     private String name;
     private String description;
-    private int numberOfDays;
+    private Integer numberOfDays;
 
-    @ElementCollection
-    private List<String> tags= new ArrayList<>();
+    @ElementCollection(targetClass = Tag.class)
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "itinerary_tags")
+    private List<Tag> tags = new ArrayList<>();
 
     @ElementCollection
     private List<String> placesToVisit = new ArrayList<>();
 
     @ElementCollection
-    private List<String> dailyActivities= new ArrayList<>();
+    private List<String> dailyActivities = new ArrayList<>();
 
     @ElementCollection
-    private List<String> imageUrls= new ArrayList<>();
+    private List<String> imageUrls = new ArrayList<>();
 }
 
 

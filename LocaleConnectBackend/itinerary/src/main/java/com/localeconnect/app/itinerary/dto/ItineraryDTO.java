@@ -1,4 +1,5 @@
 package com.localeconnect.app.itinerary.dto;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
@@ -16,9 +17,9 @@ public class ItineraryDTO {
     @NotBlank(message = "This is a required field")
     private String name;
     private String description;
-    @Positive( message = "Number of days must be greater than or equal to 1")
-    private int numberOfDays;
-    private List<String> tags;
+    @Positive(message = "Number of days must be greater than or equal to 1")
+    private Integer numberOfDays;
+    private List<Tag> tags;
     @NotEmpty(message = "Provide at least one destination")
     private List<String> placesToVisit;
     private List<String> dailyActivities;
