@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
+import {LoginComponent} from "../../pages/login/login.component";
+import {MatDialog} from "@angular/material/dialog";
 
 @Component({
   selector: 'app-header',
@@ -6,5 +8,12 @@ import { Component } from '@angular/core';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
+  constructor(public dialog: MatDialog) {}
+
+  openLoginDialog(): void {
+    this.dialog.open(LoginComponent, {
+      width: '400px'
+    });
+  }
 
 }
