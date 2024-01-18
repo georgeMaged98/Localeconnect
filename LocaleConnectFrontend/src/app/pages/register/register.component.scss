@@ -1,5 +1,7 @@
-mat-form-field{
+mat-form-field {
   width: 300px;
+  padding-bottom: 12px;
+
 }
 
 .register-card {
@@ -10,27 +12,28 @@ mat-form-field{
   flex-direction: column;
   align-items: center;
 
-    mat-card-title {
-      text-align: center;
-      color: #594E78;
-      margin-bottom: 20px;
-    }
+  mat-card-title {
+    text-align: center;
+    color: #594E78;
+    margin-bottom: 20px;
+  }
 
-  .register-form {
+  form {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    align-items: center
   }
 
   .or-separator {
     text-align: center;
-    margin: 0;
+    margin: 10px 0;
   }
 
   .register-actions {
     display: flex;
     justify-content: center;
     margin-top: 1rem;
+
     a {
       color: #594E78;
     }

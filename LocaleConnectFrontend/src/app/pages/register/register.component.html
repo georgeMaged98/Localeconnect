@@ -3,20 +3,38 @@
     <mat-card-title>Register</mat-card-title>
   </mat-card-header>
   <mat-card-content>
-    <form class="register-form">
+    <form [formGroup]="registerForm">
       <mat-form-field appearance="fill">
         <mat-label>Username</mat-label>
-        <input matInput placeholder="Enter your username">
+        <input matInput  formControlName="username" placeholder="Enter your username">
+        <mat-error *ngIf="registerForm.controls['username'].hasError('required')">
+          Username is required
+        </mat-error>
+        <mat-error *ngIf="registerForm.controls['username'].hasError('minlength')">
+          Username must be at least 3 characters long
+        </mat-error>
       </mat-form-field>
       <mat-form-field appearance="fill">
         <mat-label>Email</mat-label>
-        <input matInput type="email" placeholder="Enter your email">
+        <input matInput  formControlName="email" type="email" placeholder="Enter your email">
+        <mat-error *ngIf="registerForm.controls['email'].hasError('required')">
+          Email is required
+        </mat-error>
+        <mat-error *ngIf="registerForm.controls['email'].hasError('email')">
+          This is not a valid email format
+        </mat-error>
       </mat-form-field>
       <mat-form-field appearance="fill">
         <mat-label>Password</mat-label>
-        <input matInput type="password" placeholder="Enter your password">
+        <input matInput  formControlName="password" type="password" placeholder="Enter your password">
+        <mat-error *ngIf="registerForm.controls['password'].hasError('required')">
+          Password is required
+        </mat-error>
+        <mat-error *ngIf="registerForm.controls['password'].hasError('minlength')">
+          Password must be at least 6 characters long
+        </mat-error>
       </mat-form-field>
-      <button mat-raised-button color="primary" type="submit">Register</button>
+      <button mat-raised-button color="primary" type="submit" [disabled]="!registerForm.valid">Register</button>
       <p class="or-separator">OR</p>
       <button mat-stroked-button color="primary" type="button">Register as a Guide</button>
     </form>
