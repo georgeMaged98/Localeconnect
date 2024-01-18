@@ -1,3 +1,17 @@
+# Installation
+make sure to install the following: 
+
+node (version 10.2.4): to check run => npm -version 
+
+angular(version 15.0.0)
+
+angular material
+
+# Before Running the App
+Make sure you're using java jdk 17.0.1 (or a compatible version)
+
+run => npm install
+
 # LocaleConnectFrontend
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.0.0.
