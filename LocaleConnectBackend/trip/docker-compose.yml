@@ -4,11 +4,11 @@ services:
 
   postgresqlDB:
     image: postgres
-    container_name: meetup-postgres-DB
+    container_name: trip-postgres-DB
     environment:
       POSTGRES_USER: localeconnect
       POSTGRES_PASSWORD: lssa2324app
-      POSTGRES_DB: meetup-DB
+      POSTGRES_DB: trip-DB
       PGDATA: /data/postgres
     volumes:
       - postgres:/data/postgres
@@ -19,7 +19,7 @@ services:
     restart: unless-stopped
 
   pgadmin:
-    container_name: pgadmin-meetup
+    container_name: pgadmin-trip
     image: dpage/pgadmin4
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
@@ -33,19 +33,19 @@ services:
       - localeconnect-network
     restart: unless-stopped
 
-  meetup-service:
-    container_name: meetup-service
+  user-service:
+    container_name: trip-service
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ../
+      dockerfile: trip/Dockerfile
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresqlDB:5432/meetup-DB
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresqlDB:5432/trip-DB
       - SPRING_DATASOURCE_USERNAME=localeconnect
       - SPRING_DATASOURCE_PASSWORD=lssa2324app
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-#      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://localhost:8761/eureka
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://localhost:8761/eureka
     ports:
-      - "7001:7001"
+      - "8083:8083"
     depends_on:
       - postgresqlDB
     networks:
@@ -58,6 +58,3 @@ networks:
 volumes:
   postgres:
   pgadmin:
-
-
-

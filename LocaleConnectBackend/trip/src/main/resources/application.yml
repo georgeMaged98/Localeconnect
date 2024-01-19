@@ -4,6 +4,20 @@ server:
 spring:
   application:
     name: trip
+  datasource:
+    url: jdbc:postgresql://localhost:5432/trip-DB
+    username: localeconnect
+    password: lssa2324app
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
 
 eureka:
   client:
