@@ -5,9 +5,11 @@ spring:
   application:
     name: user
   datasource:
-    url: jdbc:postgresql://localhost:5432/user_service_db
+    url: jdbc:postgresql://localhost:5432/user-DB
     username: localeconnect
     password: lssa2324app
+    driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
