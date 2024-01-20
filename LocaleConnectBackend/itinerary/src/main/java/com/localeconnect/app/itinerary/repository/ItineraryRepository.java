@@ -1,11 +1,19 @@
 package com.localeconnect.app.itinerary.repository;
 
 import com.localeconnect.app.itinerary.model.Itinerary;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
 public interface ItineraryRepository extends JpaRepository<Itinerary, Long> {
     List<Itinerary> findByUserId(Long userId);
+
+    List<Itinerary> findAllIByNameIgnoreCaseLike(String name);
+
+    List<Itinerary> findAll(Specification<Itinerary> specification);
+
+    Boolean existsByUserIdAndName(Long userId, String name);
+
 }
 
