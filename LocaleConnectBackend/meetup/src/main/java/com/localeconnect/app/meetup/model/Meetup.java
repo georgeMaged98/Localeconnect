@@ -4,6 +4,8 @@ package com.localeconnect.app.meetup.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,11 +26,11 @@ public class Meetup {
     private Long creatorId;
     private String name;
     private String description;
-    private Date date;
+    private LocalDate date;
     @Column(name = "start_time")
-    private String startTime;
+    private LocalTime startTime;
     @Column(name = "end_time")
-    private String endTime;
+    private LocalTime endTime;
     private double cost;
     private String location;
 
