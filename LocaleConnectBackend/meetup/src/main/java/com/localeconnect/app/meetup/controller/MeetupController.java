@@ -1,8 +1,8 @@
 package com.localeconnect.app.meetup.controller;
 
 import com.localeconnect.app.meetup.dto.MeetupDTO;
+import com.localeconnect.app.meetup.response_handler.ResponseHandler;
 import com.localeconnect.app.meetup.service.MeetupService;
-import jakarta.validation.UnexpectedTypeException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
@@ -21,50 +21,33 @@ public class MeetupController {
     private final MeetupService meetupService;
 
     @PostMapping("/")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<MeetupDTO> createMeetup(@RequestBody @Valid MeetupDTO meetupDTO){
-        try {
-            MeetupDTO createdMeetupDTO = meetupService.createMeetup(meetupDTO);
+    public ResponseEntity<Object> createMeetup(@RequestBody @Valid MeetupDTO meetupDTO) {
+        System.out.println("------------------------HHHHHHHHH------------------------");
+        MeetupDTO createdMeetupDTO = meetupService.createMeetup(meetupDTO);
 
-            return ResponseEntity.ok(createdMeetupDTO);
-        }catch (IllegalArgumentException | UnexpectedTypeException e) {
-            return ResponseEntity.badRequest().body(null);
-        }
+        return ResponseHandler.generateResponse("Success!", HttpStatus.CREATED, createdMeetupDTO, null);
     }
 
 
     @GetMapping("/")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<List<MeetupDTO>> getAllMeetups(){
-        try {
-            List<MeetupDTO> meetupDTOS = meetupService.getAllMeetups();
+    public ResponseEntity<Object> getAllMeetups() {
 
-            return ResponseEntity.ok(meetupDTOS);
-        }catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
-        }
+        List<MeetupDTO> meetupDTOS = meetupService.getAllMeetups();
+
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, meetupDTOS, null);
     }
 
     @GetMapping(path = "/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<MeetupDTO> getMeetupById(@PathVariable("id") Long id ){
-        try {
-            MeetupDTO meetupDTO = meetupService.getMeetupById(id);
-            return ResponseEntity.ok(meetupDTO);
-        }catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
-        }
+    public ResponseEntity<Object> getMeetupById(@PathVariable("id") Long id) {
+
+        MeetupDTO meetupDTO = meetupService.getMeetupById(id);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, meetupDTO, null);
     }
 
 
     @DeleteMapping(path = "/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> deleteMeetupById(@PathVariable("id") Long id ){
-        try {
-            meetupService.deleteMeetupById(id);
-            return ResponseEntity.ok("Meetup Deleted Successfully!");
-        }catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
-        }
+    public ResponseEntity<Object> deleteMeetupById(@PathVariable("id") Long id) {
+        MeetupDTO deletedMeetupDTO = meetupService.deleteMeetupById(id);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, deletedMeetupDTO, null);
     }
 }

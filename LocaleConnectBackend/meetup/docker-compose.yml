@@ -36,8 +36,8 @@ services:
   meetup-service:
     container_name: meetup-service
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ../
+      dockerfile: meetup/Dockerfile
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresqlDB:5432/meetup-DB
       - SPRING_DATASOURCE_USERNAME=localeconnect
