@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import {RegisterComponent} from "../register/register.component";
 import {MatDialog} from "@angular/material/dialog";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {AuthService} from "../../api/auth.service";
 
 @Component({
   selector: 'app-login',
