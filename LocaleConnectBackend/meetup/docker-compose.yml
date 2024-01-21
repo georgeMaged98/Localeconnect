@@ -1,18 +1,23 @@
+version: '3.1'
+
 services:
-  postgres:
-    container_name: postgres
+
+  postgresqlDB:
     image: postgres
+    container_name: meetup-postgres-DB
     environment:
       POSTGRES_USER: localeconnect
       POSTGRES_PASSWORD: lssa2324app
+      POSTGRES_DB: meetup-DB
       PGDATA: /data/postgres
     volumes:
       - postgres:/data/postgres
     ports:
       - "5432:5432"
     networks:
-      - postgres
+      - localeconnect-network
     restart: unless-stopped
+
   pgadmin:
     container_name: pgadmin
     image: dpage/pgadmin4
@@ -25,28 +30,34 @@ services:
     ports:
       - "5050:80"
     networks:
-      - postgres
+      - localeconnect-network
     restart: unless-stopped
-  user-service:
-    container_name: user
-    build: user
-    ports:
-      - "8084:8084"
-    environment:
-      -SPRING_PROFILES_ACTIVE: docker
 
-    networks:
-      - spring
-      - postgres
+  meetup-service:
+    container_name: meetup-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresqlDB:5432/meetup-DB
+      - SPRING_DATASOURCE_USERNAME=localeconnect
+      - SPRING_DATASOURCE_PASSWORD=lssa2324app
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+#      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://localhost:8761/eureka
+    ports:
+      - "7001:7001"
     depends_on:
-      - postgres
+      - postgresqlDB
+    networks:
+      - localeconnect-network
 
 networks:
-  postgres:
-    driver: bridge
-  spring:
+  localeconnect-network:
     driver: bridge
 
 volumes:
   postgres:
   pgadmin:
+
+
+

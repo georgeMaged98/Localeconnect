@@ -5,6 +5,10 @@ import com.localeconnect.app.itinerary.dto.ReviewDTO;
 import com.localeconnect.app.itinerary.exception.ReviewNotFoundException;
 import com.localeconnect.app.itinerary.exception.ReviewValidationException;
 import com.localeconnect.app.itinerary.exception.UnauthorizedUserException;
+import com.localeconnect.app.itinerary.dto.Tag;
+import com.localeconnect.app.itinerary.exception.ItineraryAlreadyExistsException;
+import com.localeconnect.app.itinerary.exception.ItineraryNotFoundException;
+import com.localeconnect.app.itinerary.exception.UnauthorizedUserException;
 import com.localeconnect.app.itinerary.service.ItineraryService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -18,7 +22,7 @@ import java.util.List;
 @RequestMapping("/api/itinerary")
 @AllArgsConstructor
 public class ItineraryController {
-    private final ItineraryService itineraryService;
+private final ItineraryService itineraryService;
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
@@ -32,39 +36,42 @@ public class ItineraryController {
     }
 
     @PutMapping(path = "/update/{id}")
-    public ResponseEntity<ItineraryDTO> updateItinerary(@PathVariable("id") Long id, @RequestBody @Valid ItineraryDTO itineraryDTO, @RequestParam(value = "user") Long userId) {
+    public ResponseEntity<ItineraryDTO> updateItinerary(@PathVariable("id") Long id, @RequestBody @Valid ItineraryDTO itineraryDTO,@RequestParam(value = "user") Long userId) {
 
         try {
-            ItineraryDTO itinerary = itineraryService.updateItinerary(itineraryDTO, userId, id);
-            return ResponseEntity.ok(itinerary);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
+            ItineraryDTO updatedItinerary = itineraryService.updateItinerary(itineraryDTO, id);
+            return ResponseEntity.ok(updatedItinerary);
+        } catch (UnauthorizedUserException | ItineraryNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @DeleteMapping(path = "/delete/{id}")
-    public void deleteItinerary(@PathVariable("id") Long id, @RequestParam(value = "user") Long userId) {
-        itineraryService.deleteItinerary(id, userId);
-    }
+    public void deleteItinerary(@PathVariable("id") Long id,@RequestParam(value = "user") Long userId) {
+        itineraryService.deleteItinerary(id,userId);
+          }
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<ItineraryDTO> getItineraryById(@PathVariable("id") Long id) {
         try {
             ItineraryDTO itinerary = itineraryService.getItineraryById(id);
             return ResponseEntity.ok(itinerary);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
+        } catch (ItineraryNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
 
     @GetMapping(path = "/all")
     public ResponseEntity<List<ItineraryDTO>> getAllItineraries() {
         try {
             List<ItineraryDTO> itineraries = itineraryService.getAllItineraries();
             return ResponseEntity.ok(itineraries);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -73,6 +80,33 @@ public class ItineraryController {
         try {
             List<ItineraryDTO> itineraries = itineraryService.getAllItinerariesByUser(userId);
             return ResponseEntity.ok(itineraries);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping(path = "/search")
+    public ResponseEntity<?> searchItineraries(@RequestParam("name") String name) {
+        try {
+            List<ItineraryDTO> itineraries = itineraryService.searchByName(name);
+            return ResponseEntity.ok(itineraries);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<?> filterItineraries(
+            @RequestParam(value = "place", required = false) String place,
+            @RequestParam(value = "tag", required = false) Tag tag,
+            @RequestParam(value = "days", required = false) Integer days) {
+        try {
+            List<ItineraryDTO> itineraries = itineraryService.filter(place, tag, days);
+            return ResponseEntity.ok(itineraries);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);
         }

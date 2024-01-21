@@ -5,69 +5,63 @@ import com.localeconnect.app.itinerary.dto.ReviewDTO;
 import com.localeconnect.app.itinerary.exception.ReviewNotFoundException;
 import com.localeconnect.app.itinerary.exception.ReviewValidationException;
 import com.localeconnect.app.itinerary.exception.UnauthorizedUserException;
+import com.localeconnect.app.itinerary.dto.ItineraryDTO;
+import com.localeconnect.app.itinerary.dto.Tag;
+import com.localeconnect.app.itinerary.exception.ItineraryAlreadyExistsException;
+import com.localeconnect.app.itinerary.exception.ItineraryNotFoundException;
+import com.localeconnect.app.itinerary.exception.UnauthorizedUserException;
 import com.localeconnect.app.itinerary.mapper.ItineraryMapper;
-import com.localeconnect.app.itinerary.mapper.ReviewMapper;
 import com.localeconnect.app.itinerary.model.Itinerary;
 import com.localeconnect.app.itinerary.model.Review;
 import com.localeconnect.app.itinerary.repository.ItineraryRepository;
 import com.localeconnect.app.itinerary.repository.ReviewRepository;
+import com.localeconnect.app.itinerary.repository.ItinerarySpecification;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 @Service
 @AllArgsConstructor
 public class ItineraryService {
 
     private final ItineraryRepository itineraryRepository;
-    private final ReviewRepository reviewRepository;
     private final WebClient webClient;
-    private final ItineraryMapper itineraryMapper;
-    private final ReviewMapper reviewMapper;
-
+    private final ItineraryMapper mapper;
 
     public ItineraryDTO createItinerary(ItineraryDTO itineraryDTO, Long userId) {
-        Itinerary itinerary = itineraryMapper.toEntity(itineraryDTO);
-        if (itinerary == null) {
+        Itinerary itinerary = mapper.toEntity(itineraryDTO);
+        if(itinerary == null){
             return null;
         }
         // Make a synchronous request to the userService and save the itinerary if userId matches
         if (this.checkUserId(userId)) {
             itineraryRepository.save(itinerary);
-            return itineraryMapper.toDomain(itinerary);
-
-        } else {
-            throw new IllegalArgumentException("Register as user to create an itinerary");
-        }
+        return mapper.toDomain(itinerary);
     }
 
-    public ItineraryDTO updateItinerary(ItineraryDTO itineraryDTO, Long userId, Long id) {
-        Itinerary itinerary = itineraryMapper.toEntity(itineraryDTO);
-        if (itinerary == null) {
+    public ItineraryDTO updateItinerary(ItineraryDTO itineraryDTO, Long id) {
+        Itinerary itinerary = mapper.toEntity(itineraryDTO);
+        if(itinerary == null){
             return null;
         }
         itinerary.setId(id);
         if (this.checkUserId(userId)) {
 
             itineraryRepository.save(itinerary);
-            return itineraryMapper.toDomain(itinerary);
-
-        } else {
-            throw new IllegalArgumentException("Only registered users can edit their itinerary");
-        }
+        return mapper.toDomain(itinerary);
     }
 
-    public void deleteItinerary(Long id, Long userId) {
-        if (this.checkUserId(userId)) {
-            Optional<Itinerary> optional = itineraryRepository.findById(id);
-            optional.ifPresent(itineraryRepository::delete);
-        } else {
-            throw new IllegalArgumentException("Only registered users can delete their itinerary");
+    public void deleteItinerary(Long id) {
+        Itinerary itinerary = itineraryRepository.findById(id)
+                .orElseThrow(() -> new ItineraryNotFoundException("Itinerary not found for id: " + id));
+
+        if (!this.checkUserId(itinerary.getUserId())) {
+            throw new UnauthorizedUserException("Only registered users can delete their itinerary");
         }
     }
 
@@ -75,14 +69,14 @@ public class ItineraryService {
         List<Itinerary> itineraries = itineraryRepository.findAll();
 
         return itineraries.stream().map(
-                        itineraryMapper::toDomain)
+                        mapper::toDomain)
                 .collect(Collectors.toList());
     }
 
     public List<ItineraryDTO> getAllItinerariesByUser(Long userId) {
 
         List<Itinerary> itineraries = itineraryRepository.findByUserId(userId);
-        return itineraries.stream().map(itineraryMapper::toDomain).collect(Collectors.toList());
+        return itineraries != null ? itineraries.stream().map(mapper::toDomain).collect(Collectors.toList()) : new ArrayList<>();
     }
 
 
@@ -127,35 +121,37 @@ public class ItineraryService {
         Review updatedReview = reviewRepository.save(reviewToUpdate);
         return reviewMapper.toDomain(updatedReview);
     }
+        return optional.map(mapper::toDomain).orElseThrow(() -> new ItineraryNotFoundException("Itinerary not found"));
 
+    }
 
-    public void deleteReview(Long id) {
-        Review review = reviewRepository.findById(id)
-                .orElseThrow(() -> new ReviewNotFoundException("Review not found with id: " + id));
-
-        if (!this.checkUserId(review.getUserId())) {
-            throw new UnauthorizedUserException("Only registered users can delete their reviews");
+    public List<ItineraryDTO> searchByName(String name) {
+        if (name == null) {
+            return null;
         }
-
-        reviewRepository.delete(review);
+        List<Itinerary> itineraries = itineraryRepository.findAllIByNameIgnoreCaseLike(name);
+        return itineraries.stream().map(mapper::toDomain).collect(Collectors.toList());
     }
 
-    public List<ReviewDTO> getAllReviewsForItinerary(Long itineraryId) {
-        List<Review> reviews = reviewRepository.findByItineraryId(itineraryId);
+    public List<ItineraryDTO> filter(String place, Tag tag, Integer days) {
+        if (place == null && tag == null && days < 1) {
+            return null;
+        }
+        Specification<Itinerary> spec = Specification.where(ItinerarySpecification.hasPlace(place))
+                .and(ItinerarySpecification.hasTag(tag)).and(ItinerarySpecification.maxNumberOfDays(days));
+        List<Itinerary> itineraries = itineraryRepository.findAll(spec);
+        return itineraries.stream().map(mapper::toDomain).collect(Collectors.toList());
 
-        return reviews.stream().map(
-                        reviewMapper::toDomain)
-                .collect(Collectors.toList());
     }
 
-    // TODO: returns true for now, needs the user microservice to work properly
-    private Boolean checkUserId(Long userId) {
-  /* Boolean check = this.webClient.get()
+    // TODO. returns true for now, needs the user microservice to work properly
+    private Boolean checkUserId(Long userId){
+    /*   Boolean check = this.webClient.get()
                 .uri("http://localhost:8080/api/user/verifyUser/{userId}", userId)
-                .retrieve().bodyToMono(Boolean.class).onErrorReturn(false).block();
+                .retrieve().bodyToMono(Boolean.class).block();
         return Boolean.TRUE.equals(check);
 
-   */
+     */
         return true;
     }
 }
