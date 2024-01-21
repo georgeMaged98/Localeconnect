@@ -2,29 +2,26 @@ package com.localeconnect.app.itinerary.service;
 
 import com.localeconnect.app.itinerary.dto.ItineraryDTO;
 import com.localeconnect.app.itinerary.dto.ReviewDTO;
-import com.localeconnect.app.itinerary.exception.ReviewNotFoundException;
-import com.localeconnect.app.itinerary.exception.ReviewValidationException;
-import com.localeconnect.app.itinerary.exception.UnauthorizedUserException;
-import com.localeconnect.app.itinerary.dto.ItineraryDTO;
 import com.localeconnect.app.itinerary.dto.Tag;
-import com.localeconnect.app.itinerary.exception.ItineraryAlreadyExistsException;
-import com.localeconnect.app.itinerary.exception.ItineraryNotFoundException;
-import com.localeconnect.app.itinerary.exception.UnauthorizedUserException;
+import com.localeconnect.app.itinerary.exception.*;
 import com.localeconnect.app.itinerary.mapper.ItineraryMapper;
+import com.localeconnect.app.itinerary.mapper.ReviewMapper;
 import com.localeconnect.app.itinerary.model.Itinerary;
 import com.localeconnect.app.itinerary.model.Review;
 import com.localeconnect.app.itinerary.repository.ItineraryRepository;
-import com.localeconnect.app.itinerary.repository.ReviewRepository;
 import com.localeconnect.app.itinerary.repository.ItinerarySpecification;
+import com.localeconnect.app.itinerary.repository.ReviewRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.ArrayList;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 @Service
 @AllArgsConstructor
 public class ItineraryService {
@@ -32,27 +29,41 @@ public class ItineraryService {
     private final ItineraryRepository itineraryRepository;
     private final WebClient webClient;
     private final ItineraryMapper mapper;
+    private final ReviewMapper reviewMapper;
+    private final ReviewRepository reviewRepository;
 
     public ItineraryDTO createItinerary(ItineraryDTO itineraryDTO, Long userId) {
         Itinerary itinerary = mapper.toEntity(itineraryDTO);
-        if(itinerary == null){
-            return null;
+        if (itinerary == null) {
+            throw new ItineraryNotFoundException("Itinerary data is invalid");
         }
-        // Make a synchronous request to the userService and save the itinerary if userId matches
-        if (this.checkUserId(userId)) {
-            itineraryRepository.save(itinerary);
+
+        if (!this.checkUserId(userId)) {
+            throw new UnauthorizedUserException("Register as user to create an itinerary");
+        }
+
+        if (this.itineraryRepository.existsByUserIdAndName(userId, itineraryDTO.getName())) {
+            throw new ItineraryAlreadyExistsException("This user already created this itinerary.");
+        }
+
+        itinerary.setUserId(userId);
+        itineraryRepository.save(itinerary);
         return mapper.toDomain(itinerary);
     }
 
     public ItineraryDTO updateItinerary(ItineraryDTO itineraryDTO, Long id) {
         Itinerary itinerary = mapper.toEntity(itineraryDTO);
-        if(itinerary == null){
-            return null;
+        if (itinerary == null) {
+            throw new ItineraryNotFoundException("Itinerary data is invalid");
         }
-        itinerary.setId(id);
-        if (this.checkUserId(userId)) {
 
-            itineraryRepository.save(itinerary);
+        itinerary.setId(id);
+
+        if (!this.checkUserId(itinerary.getUserId())) {
+            throw new UnauthorizedUserException("Only registered users can edit their itinerary");
+        }
+
+        itineraryRepository.save(itinerary);
         return mapper.toDomain(itinerary);
     }
 
@@ -63,7 +74,10 @@ public class ItineraryService {
         if (!this.checkUserId(itinerary.getUserId())) {
             throw new UnauthorizedUserException("Only registered users can delete their itinerary");
         }
+
+        itineraryRepository.delete(itinerary);
     }
+
 
     public List<ItineraryDTO> getAllItineraries() {
         List<Itinerary> itineraries = itineraryRepository.findAll();
@@ -82,9 +96,10 @@ public class ItineraryService {
 
     public ItineraryDTO getItineraryById(Long id) {
         Optional<Itinerary> optional = itineraryRepository.findById(id);
-        return optional.map(itineraryMapper::toDomain).orElse(null);
+        return optional.map(mapper::toDomain).orElseThrow(() -> new ItineraryNotFoundException("Itinerary not found"));
 
     }
+
 
     //TODO: combine the user information and the review in the frontend
     public ReviewDTO createReview(ReviewDTO reviewDto, Long userId) {
@@ -121,9 +136,7 @@ public class ItineraryService {
         Review updatedReview = reviewRepository.save(reviewToUpdate);
         return reviewMapper.toDomain(updatedReview);
     }
-        return optional.map(mapper::toDomain).orElseThrow(() -> new ItineraryNotFoundException("Itinerary not found"));
 
-    }
 
     public List<ItineraryDTO> searchByName(String name) {
         if (name == null) {
@@ -144,8 +157,27 @@ public class ItineraryService {
 
     }
 
+    public void deleteReview(Long id) {
+        Review review = reviewRepository.findById(id)
+                .orElseThrow(() -> new ReviewNotFoundException("Review not found with id: " + id));
+
+        if (!this.checkUserId(review.getUserId())) {
+            throw new UnauthorizedUserException("Only registered users can delete their reviews");
+        }
+
+        reviewRepository.delete(review);
+    }
+
+    public List<ReviewDTO> getAllReviewsForItinerary(Long itineraryId) {
+        List<Review> reviews = reviewRepository.findByItineraryId(itineraryId);
+
+        return reviews.stream().map(
+                        reviewMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
     // TODO. returns true for now, needs the user microservice to work properly
-    private Boolean checkUserId(Long userId){
+    private Boolean checkUserId(Long userId) {
     /*   Boolean check = this.webClient.get()
                 .uri("http://localhost:8080/api/user/verifyUser/{userId}", userId)
                 .retrieve().bodyToMono(Boolean.class).block();
