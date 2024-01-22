@@ -41,5 +41,14 @@ public class User {
     private boolean registeredAsLocalGuide;
     @ElementCollection
     private List<String> languages;
+    @ManyToMany
+    @JoinTable(
+            name = "user_followers",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "follower_id")
+    )
+    private List<User> followers = new ArrayList<>();
 
+    @ManyToMany(mappedBy = "followers")
+    private List<User> following = new ArrayList<>();
 }

@@ -5,14 +5,7 @@ import com.localeconnect.app.user.exception.UserAlreadyExistsException;
 import com.localeconnect.app.user.exception.UserDoesNotExistException;
 import com.localeconnect.app.user.mapper.UserMapper;
 import com.localeconnect.app.user.model.User;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
-import org.mapstruct.MappingTarget;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import com.localeconnect.app.user.repository.UserRepository;
 
@@ -64,6 +57,48 @@ public class UserService {
         userRepository.save(userMapper.toEntity(userDTO));
 
         return userDTO;
+    }
+
+    public void deleteUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserDoesNotExistException("User not found"));
+        userRepository.delete(user);
+    }
+    public void followUser(Long userId, Long followerId) {
+        User userToFollow = userRepository.findById(userId)
+                .orElseThrow(() -> new UserDoesNotExistException("User not found"));
+        User follower = userRepository.findById(followerId)
+                .orElseThrow(() -> new UserDoesNotExistException("Follower not found"));
+        if(userId.equals(followerId)) {
+            throw new IllegalArgumentException("User cannot unfollow themselves");
+        }
+        if (!userToFollow.getFollowers().contains(follower)) {
+            userToFollow.getFollowers().add(follower);
+            userRepository.save(userToFollow);
+            // ToDo Notify the user about the new follower
+        } else {
+            throw new IllegalStateException("Already following this user");
+        }
+    }
+    public void unfollowUser(Long userId, Long followeeId) {
+        if(userId.equals(followeeId)) {
+            throw new IllegalArgumentException("User cannot unfollow themselves");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserDoesNotExistException("User not found"));
+        User followee = userRepository.findById(followeeId)
+                .orElseThrow(() -> new UserDoesNotExistException("Followee not found"));
+
+        if(user.getFollowing().contains(followee)) {
+            user.getFollowing().remove(followee);
+            followee.getFollowers().remove(user);
+
+            userRepository.save(user);
+            userRepository.save(followee);
+        } else {
+            throw new IllegalStateException("User is not following the specified followee");
+        }
     }
 
     public UserDTO updateUser(UserDTO userDTO) {
