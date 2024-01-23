@@ -42,6 +42,8 @@ public class UserController {
         }
     }
 
+    // ToDo i want to seperate the implementation of register in 2 methods:
+    // registerAsLocalGuide and registerAsTraveler
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> registerUser(@RequestBody UserDTO userDTO) {
