@@ -2,6 +2,10 @@ package com.localeconnect.app.itinerary.controller;
 
 import com.localeconnect.app.itinerary.dto.ItineraryDTO;
 import com.localeconnect.app.itinerary.dto.ItineraryShareDTO;
+import com.localeconnect.app.itinerary.dto.Tag;
+import com.localeconnect.app.itinerary.exception.ItineraryAlreadyExistsException;
+import com.localeconnect.app.itinerary.exception.ItineraryNotFoundException;
+import com.localeconnect.app.itinerary.exception.UnauthorizedUserException;
 import com.localeconnect.app.itinerary.service.ItineraryService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -59,8 +63,8 @@ private final ItineraryService itineraryService;
         try {
             List<ItineraryDTO> itineraries = itineraryService.getAllItineraries();
             return ResponseEntity.ok(itineraries);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -69,12 +73,9 @@ private final ItineraryService itineraryService;
         try {
             List<ItineraryDTO> itineraries = itineraryService.getAllItinerariesByUser(userId);
             return ResponseEntity.ok(itineraries);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
-        }
-    }
-
-
+        }  catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }   }
     @PostMapping("/share/{itineraryId}")
     public Mono<ResponseEntity<ItineraryShareDTO>> shareItinerary(@PathVariable("itineraryId") Long itineraryId) {
         return itineraryService.shareItinerary(itineraryId)
