@@ -74,7 +74,7 @@ public class UserService {
         }
 
         userConfirmationEmail.sendConfirmationEmail(localguideDTO);
-        userRepository.save(userMapper.toEntity(localguideDTO));
+        userRepository.save(localguideMapper.toEntity(localguideDTO));
 
         return localguideDTO;
     }
