@@ -115,7 +115,7 @@ private final ItineraryService itineraryService;
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> createReview(@RequestBody @Valid ReviewDTO reviewDto) {
         try {
-            ReviewDTO review = itineraryService.createReview(reviewDto, reviewDto.getUserId());
+            ReviewDTO review = itineraryService.createReview(reviewDto, reviewDto.getUserId(), reviewDto.getItineraryId());
             return ResponseEntity.status(HttpStatus.CREATED).body(review);
         } catch (UnauthorizedUserException | ReviewValidationException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());

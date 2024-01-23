@@ -102,7 +102,7 @@ public class ItineraryService {
 
 
     //TODO: combine the user information and the review in the frontend
-    public ReviewDTO createReview(ReviewDTO reviewDto, Long userId) {
+    public ReviewDTO createReview(ReviewDTO reviewDto, Long userId, Long itineraryId) {
         Review review = reviewMapper.toEntity(reviewDto);
         if (review == null) {
             throw new ReviewValidationException("Review data is invalid");
@@ -111,6 +111,11 @@ public class ItineraryService {
         if (!this.checkUserId(reviewDto.getUserId())) {
             throw new UnauthorizedUserException("Only registered users can create a review");
         }
+
+        if (this.itineraryRepository.findById(itineraryId).isEmpty()) {
+            throw new ItineraryNotFoundException("could not find itinerary for this review");
+        }
+        review.setItineraryId(itineraryId);
         review.setUserId(userId);
         review.setTimestamp(LocalDateTime.now());
         review = reviewRepository.save(review);
