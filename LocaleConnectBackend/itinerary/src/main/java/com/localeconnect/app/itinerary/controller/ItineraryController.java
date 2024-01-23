@@ -2,7 +2,6 @@ package com.localeconnect.app.itinerary.controller;
 
 import com.localeconnect.app.itinerary.dto.ItineraryDTO;
 import com.localeconnect.app.itinerary.dto.ItineraryShareDTO;
-import com.localeconnect.app.itinerary.dto.Tag;
 import com.localeconnect.app.itinerary.exception.ItineraryAlreadyExistsException;
 import com.localeconnect.app.itinerary.exception.ItineraryNotFoundException;
 import com.localeconnect.app.itinerary.exception.UnauthorizedUserException;
@@ -23,43 +22,55 @@ public class ItineraryController {
 private final ItineraryService itineraryService;
 
     @PostMapping("/create")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<ItineraryDTO> createItinerary(@RequestBody @Valid ItineraryDTO itineraryDTO, @RequestParam(value = "user") Long userId) {
+    public ResponseEntity<?> createItinerary(@RequestBody @Valid ItineraryDTO itineraryDTO) {
         try {
-            ItineraryDTO itinerary = itineraryService.createItinerary(itineraryDTO, userId);
-            return ResponseEntity.ok(itinerary);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
+            ItineraryDTO itinerary = itineraryService.createItinerary(itineraryDTO, itineraryDTO.getUserId());
+            return ResponseEntity.status(HttpStatus.CREATED).body(itinerary);
+        } catch (UnauthorizedUserException | ItineraryAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @PutMapping(path = "/update/{id}")
-    public ResponseEntity<ItineraryDTO> updateItinerary(@PathVariable("id") Long id, @RequestBody @Valid ItineraryDTO itineraryDTO,@RequestParam(value = "user") Long userId) {
-
+    public ResponseEntity<?> updateItinerary(@PathVariable("id") Long id, @RequestBody @Valid ItineraryDTO itineraryDTO) {
         try {
-            ItineraryDTO itinerary = itineraryService.updateItinerary(itineraryDTO,userId,id);
-            return ResponseEntity.ok(itinerary);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
-        }    }
+            ItineraryDTO updatedItinerary = itineraryService.updateItinerary(itineraryDTO, id);
+            return ResponseEntity.ok(updatedItinerary);
+        } catch (UnauthorizedUserException | ItineraryNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
     @DeleteMapping(path = "/delete/{id}")
-    public void deleteItinerary(@PathVariable("id") Long id,@RequestParam(value = "user") Long userId) {
-        itineraryService.deleteItinerary(id,userId);
-          }
+    public ResponseEntity<?> deleteItinerary(@PathVariable("id") Long id) {
+        try {
+            itineraryService.deleteItinerary(id);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (UnauthorizedUserException | ItineraryNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
     @GetMapping(path = "/{id}")
-    public ResponseEntity<ItineraryDTO> getItineraryById(@PathVariable("id") Long id) {
+    public ResponseEntity<?> getItineraryById(@PathVariable("id") Long id) {
         try {
             ItineraryDTO itinerary = itineraryService.getItineraryById(id);
             return ResponseEntity.ok(itinerary);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
-        }    }
-
+        } catch (ItineraryNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
     @GetMapping(path = "/all")
-    public ResponseEntity<List<ItineraryDTO>> getAllItineraries() {
+    public ResponseEntity<?> getAllItineraries() {
         try {
             List<ItineraryDTO> itineraries = itineraryService.getAllItineraries();
             return ResponseEntity.ok(itineraries);
@@ -68,14 +79,16 @@ private final ItineraryService itineraryService;
         }
     }
 
-    @GetMapping(path = "/allByUser")
-    public ResponseEntity<List<ItineraryDTO>> getUserItineraries(@RequestParam(value = "user") Long userId) {
+    @GetMapping(path = "/allByUser/{user}")
+    public ResponseEntity<?> getUserItineraries(@PathVariable("user") Long userId) {
         try {
             List<ItineraryDTO> itineraries = itineraryService.getAllItinerariesByUser(userId);
             return ResponseEntity.ok(itineraries);
-        }  catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
-        }   }
+        }
+    }
+
     @PostMapping("/share/{itineraryId}")
     public Mono<ResponseEntity<ItineraryShareDTO>> shareItinerary(@PathVariable("itineraryId") Long itineraryId) {
         return itineraryService.shareItinerary(itineraryId)
