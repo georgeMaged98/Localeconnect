@@ -8,7 +8,6 @@ import {
   ValidatorFn,
   Validators
 } from "@angular/forms";
-import {AuthService} from "../../api/auth.service";
 import {MatDialog} from "@angular/material/dialog";
 import {LoginComponent} from "../login/login.component";
 

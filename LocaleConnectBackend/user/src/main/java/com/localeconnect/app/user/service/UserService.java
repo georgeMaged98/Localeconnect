@@ -3,13 +3,9 @@ package com.localeconnect.app.user.service;
 import com.localeconnect.app.user.dto.UserDTO;
 import com.localeconnect.app.user.exception.UserAlreadyExistsException;
 import com.localeconnect.app.user.exception.UserDoesNotExistException;
+import com.localeconnect.app.user.mapper.UserMapper;
 import com.localeconnect.app.user.model.User;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.localeconnect.app.user.repository.UserRepository;
 
@@ -20,31 +16,28 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    @Autowired
-    private JavaMailSender mailSender;
-
-    @Autowired
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    private final UserConfirmationEmail userConfirmationEmail;
+    private final UserMapper userMapper;
 
     public List<UserDTO> getAllUsers() {
         List<User> allUsers = userRepository.findAll();
-        List<UserDTO> allUsersDTO = allUsers.stream()
-                .map(user -> convertToDTO(user))
-                .collect(Collectors.toList());
 
-        return allUsersDTO;
+        return allUsers.stream()
+                .map(userMapper::toDomain)
+                .collect(Collectors.toList());
     }
 
     public UserDTO getUserById(Long id) {
-        return convertToDTO(userRepository.findById(id)
-                .orElseThrow(() -> new UserDoesNotExistException("User with the given id does not exist")));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserDoesNotExistException("User with the given id does not exist"));
+        return userMapper.toDomain(user);
     }
-    public User registerUser(UserDTO userDTO) {
-        if (userRepository.existsByuserName(userDTO.getUserName())) {
+
+    public UserDTO registerUser(UserDTO userDTO) {
+        if (userRepository.existsByUserName(userDTO.getUserName())) {
             throw new UserAlreadyExistsException("A user with the given username already exists.");
         }
 
@@ -60,82 +53,65 @@ public class UserService {
             }
         }
 
-            sendConfirmationEmail(userDTO);
-            return userRepository.save(convertToUser(userDTO));
+        userConfirmationEmail.sendConfirmationEmail(userDTO);
+        userRepository.save(userMapper.toEntity(userDTO));
+
+        return userDTO;
     }
 
-    public UserDTO convertToDTO(User user) {
-        return UserDTO.builder()
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .userName(user.getUserName())
-                .email(user.getEmail())
-                .dateOfBirth(user.getDateOfBirth())
-                .bio(user.getBio())
-                .password(user.getPassword())
-                .visitedCountries(user.getVisitedCountries())
-                .registeredAsLocalGuide(user.isRegisteredAsLocalGuide())
-                .languages(user.getLanguages())
-                .build();
+    public void deleteUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserDoesNotExistException("User not found"));
+        userRepository.delete(user);
     }
-
-    public User convertToUser(UserDTO userDTO) {
-        return  User.builder()
-                .firstName(userDTO.getFirstName())
-                .lastName(userDTO.getLastName())
-                .userName(userDTO.getUserName())
-                .email(userDTO.getEmail())
-                .dateOfBirth(userDTO.getDateOfBirth())
-                .bio(userDTO.getBio())
-                .password(userDTO.getPassword())
-                .visitedCountries(userDTO.getVisitedCountries())
-                .registeredAsLocalGuide(userDTO.isRegisteredAsLocalGuide())
-                .languages(userDTO.getLanguages())
-                .build();
+    public void followUser(Long userId, Long followerId) {
+        User userToFollow = userRepository.findById(userId)
+                .orElseThrow(() -> new UserDoesNotExistException("User not found"));
+        User follower = userRepository.findById(followerId)
+                .orElseThrow(() -> new UserDoesNotExistException("Follower not found"));
+        if(userId.equals(followerId)) {
+            throw new IllegalArgumentException("User cannot unfollow themselves");
+        }
+        if (!userToFollow.getFollowers().contains(follower)) {
+            userToFollow.getFollowers().add(follower);
+            userRepository.save(userToFollow);
+            // ToDo Notify the user about the new follower
+        } else {
+            throw new IllegalStateException("Already following this user");
+        }
     }
+    public void unfollowUser(Long userId, Long followeeId) {
+        if(userId.equals(followeeId)) {
+            throw new IllegalArgumentException("User cannot unfollow themselves");
+        }
 
-    public void sendConfirmationEmail(UserDTO userDTO) {
-        sendEmail(userDTO.getEmail(),"Welcome to LocaleConnect!", getConfirmationMailBody(userDTO), true);
-    }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserDoesNotExistException("User not found"));
+        User followee = userRepository.findById(followeeId)
+                .orElseThrow(() -> new UserDoesNotExistException("Followee not found"));
 
-    public void sendEmail(String to, String subject, String body, boolean isHtml) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(to);
-        message.setSubject(subject);
-        try{
-            if (isHtml) {
-                MimeMessage mimeMessage = mailSender.createMimeMessage();
-                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
-                helper.setText(body, true); // true indicates HTML content
-                helper.setTo(to);
-                helper.setSubject(subject);
+        if(user.getFollowing().contains(followee)) {
+            user.getFollowing().remove(followee);
+            followee.getFollowers().remove(user);
 
-                mailSender.send(mimeMessage);
-            } else {
-                message.setText(body);
-                mailSender.send(message);
-            }
-        } catch (MessagingException e) {
-            log.error("Error sending email", e);
-            throw new RuntimeException("Error sending email", e);
+            userRepository.save(user);
+            userRepository.save(followee);
+        } else {
+            throw new IllegalStateException("User is not following the specified followee");
         }
     }
 
-    private String getConfirmationMailBody(UserDTO userDTO) {
-        return   "<html><body>"
-                + "<h1>Welcome to LocaleConnect, " + userDTO.getFirstName() + "!</h1>"
-                + "<p>We're excited to have you on board. Your account has been successfully created.</p>"
-                + "<p>Here are some next steps to get you started:</p>"
-                + "<ul>"
-                + "<li>Explore our <a href='URL_TO_FEATURES'>features</a>.</li>"
-                + "<li>Set up your <a href='URL_TO_PROFILE'>profile</a>.</li>"
-                + "</ul>"
-                + "<p>If you have any questions, feel free to contact our support team.</p>"
-                + "<p>Sincerely,<br>Your LocaleConnect Team</p>"
-                + "<hr>"
-                + "<footer>"
-                + "<p><a href='URL_TO_PRIVACY_POLICY'>Privacy Policy</a> | <a href='URL_TO_TERMS'>Terms of Service</a></p>"
-                + "</footer>"
-                + "</body></html>";
+    public UserDTO updateUser(UserDTO userDTO) {
+        User existingUser = userRepository.findByEmail(userDTO.getEmail())
+                .orElseThrow(() -> new UserDoesNotExistException("User with email " + userDTO.getEmail() + " does not exist"));
+
+        userMapper.updateUserFromDto(userDTO, existingUser);
+        User savedUser = userRepository.save(existingUser);
+        return userMapper.toDomain(savedUser);
     }
+
+    public boolean checkUserId(Long userId) {
+        return userRepository.findById(userId).isPresent();
+    }
+
 }

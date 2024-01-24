@@ -35,6 +35,8 @@ public class UserDTO {
     @NotBlank(message = "this is a required field")
     private boolean registeredAsLocalGuide;
     private List<String> languages;
+    private List<Long> followerIds;
+    private List<Long> followingIds;
 
     // Setter method for password with hash logic
     public void setPassword(String password) {
