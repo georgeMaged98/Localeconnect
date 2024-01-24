@@ -28,7 +28,7 @@ export class RegisterGuideComponent {
     'Nepali', 'Norwegian', 'Pashto', 'Persian', 'Polish', 'Portuguese', 'Punjabi', 'Romanian', 'Russian', 'Samoan', 'Scots Gaelic',
     'Serbian', 'Sesotho', 'Shona', 'Sindhi', 'Sinhala', 'Slovak', 'Slovenian', 'Somali', 'Spanish', 'Sundanese', 'Swahili', 'Swedish',
     'Tajik', 'Tamil', 'Telugu', 'Thai', 'Turkish', 'Ukrainian', 'Urdu', 'Uzbek', 'Vietnamese', 'Welsh', 'Xhosa', 'Yiddish', 'Yoruba', 'Zulu','Other'];
-  constructor(private fb: FormBuilder, /*private authService: AuthService,*/public dialog: MatDialog) {
+  constructor(private fb: FormBuilder, private authService: AuthService, public dialog: MatDialog) {
     this.registerForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
@@ -41,13 +41,11 @@ export class RegisterGuideComponent {
 
   onSubmit(): void {
     if (this.registerForm.valid) {
-      /*
-      this.authService.register(this.registerForm.value).subscribe(
+      this.authService.registerGuide(this.registerForm.value).subscribe(
         success => console.log('Registration successful', success),
         error => console.error('Registration error', error)
       );
 
-       */
     }
   }
   switchToLogin(): void {

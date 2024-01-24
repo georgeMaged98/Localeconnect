@@ -13,7 +13,7 @@ import {RegisterGuideComponent} from "../register-guide/register-guide.component
 export class RegisterComponent {
   registerForm: FormGroup;
 
-  constructor(private fb: FormBuilder,/*private authService: AuthService,*/public dialog: MatDialog) {
+  constructor(private fb: FormBuilder,private authService: AuthService,public dialog: MatDialog) {
     this.registerForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
@@ -23,13 +23,11 @@ export class RegisterComponent {
 
   onSubmit(): void {
     if (this.registerForm.valid) {
-      /*
-      this.authService.register(this.registerForm.value).subscribe(
+      this.authService.registerTraveler(this.registerForm.value).subscribe(
         success => console.log('Registration successful', success),
         error => console.error('Registration error', error)
       );
 
-       */
     }
   }
   switchToLogin(): void {
