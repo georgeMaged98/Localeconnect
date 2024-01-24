@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @ToString
 public class NotificationDTO {
 
-
     private Long id;
 
     @NotNull(message = "This is a required field")
