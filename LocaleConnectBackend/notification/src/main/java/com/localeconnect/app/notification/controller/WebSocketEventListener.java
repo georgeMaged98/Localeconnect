@@ -20,17 +20,17 @@ public class WebSocketEventListener {
     @EventListener
     public void handleSessionConnected(SessionConnectEvent event) {
         SimpMessageHeaderAccessor headers = SimpMessageHeaderAccessor.wrap(event.getMessage());
-        String username = headers.getUser().getName();
+//        String username = headers.getUser().getName();
         System.out.println("USER CONNECTED!! ");
-        System.out.println(username);
+//        System.out.println(username);
     }
 
     @EventListener
     public void handleSessionConnected2(SessionConnectedEvent event) {
         SimpMessageHeaderAccessor headers = SimpMessageHeaderAccessor.wrap(event.getMessage());
-        String username = headers.getUser().getName();
+//        String username = headers.getUser().getName();
         System.out.println("USER CONNECTED2222!! ");
-        System.out.println(username);
+//        System.out.println(username);
     }
 
     @EventListener

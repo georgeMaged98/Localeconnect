@@ -1,6 +1,7 @@
 package com.localeconnect.app.notification.config;
 
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.context.annotation.Bean;
@@ -43,14 +44,20 @@ public class NotificationRabbitConfig {
     }
 
     @Bean
-    public MessageConverter converter() {
-        return new Jackson2JsonMessageConverter();
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper().registerModule(new JavaTimeModule());
     }
 
     @Bean
-    public AmqpTemplate template(ConnectionFactory connectionFactory) {
+    public MessageConverter converter(ObjectMapper objectMapper) {
+        Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter(objectMapper);
+        return converter;
+    }
+
+    @Bean
+    public AmqpTemplate template(ConnectionFactory connectionFactory, MessageConverter converter) {
         final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
-        rabbitTemplate.setMessageConverter(converter());
+        rabbitTemplate.setMessageConverter(converter);
         return rabbitTemplate;
     }
 

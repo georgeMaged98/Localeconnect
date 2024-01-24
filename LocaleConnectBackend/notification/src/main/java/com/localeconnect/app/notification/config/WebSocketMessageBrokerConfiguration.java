@@ -12,30 +12,22 @@ public class WebSocketMessageBrokerConfiguration implements WebSocketMessageBrok
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/stomp-endpoint").setAllowedOrigins("*");
+        // Client can connect to this service using this endpoint over websocket connection.
+        registry.addEndpoint("/ws");
+        registry.addEndpoint("/ws")
+                .setAllowedOriginPatterns("*")
+                .withSockJS();
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
+
+//         This adds a message broker that clients can subscribe to and listen to the messages
+//         which our service(backend) is sending back.
         registry.enableSimpleBroker("/topic");
-        registry.setApplicationDestinationPrefixes("/app");
+
+        registry.setApplicationDestinationPrefixes("/api/notification");
 
     }
 
-//    @Override
-//    public void registerStompEndpoints(StompEndpointRegistry registry) {
-//        // Client can connect to this service using this endpoint over websocket connection.
-//        registry.addEndpoint("/stomp-endpoint").setAllowedOrigins("*").withSockJS();
-//    }
-//
-//    @Override
-//    public void configureMessageBroker(MessageBrokerRegistry registry) {
-//        // This adds a message broker that clients can subscribe to and listen to the messages
-//        // which our service(backend) is sending back.
-//
-//        // This
-//        registry.enableSimpleBroker("/topic");
-//        // When we register to any of the brokers for any topic, we have to add prefix "/app"
-//        registry.setApplicationDestinationPrefixes("/app");
-//    }
 }

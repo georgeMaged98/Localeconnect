@@ -5,6 +5,7 @@ import com.localeconnect.app.notification.dto.NotificationDTO;
 import com.localeconnect.app.notification.service.NotificationService;
 import lombok.AllArgsConstructor;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,10 +14,13 @@ public class NotificationConsumer {
 
     private final NotificationService notificationService;
 
+    private SimpMessagingTemplate messagingTemplate;
+
     @RabbitListener(queues = NotificationRabbitConfig.QUEUE)
     public void notificationConsumer(NotificationDTO notificationDTO){
 
         System.out.println("Notification " + notificationDTO);
+        messagingTemplate.convertAndSend("/topic/notification", notificationDTO);
     }
 
 }

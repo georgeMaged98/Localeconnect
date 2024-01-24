@@ -1,34 +1,38 @@
 package com.localeconnect.app.notification.controller;
 
-import com.localeconnect.app.notification.config.NotificationRabbitConfig;
 import com.localeconnect.app.notification.dto.NotificationDTO;
+import com.localeconnect.app.notification.response_handler.ResponseHandler;
 import com.localeconnect.app.notification.service.NotificationService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
-//@Slf4j
-@Controller
+@RestController
 public class NotificationController {
 
     private final NotificationService notificationService;
-    private final RabbitTemplate rabbitTemplate;
+    private SimpMessagingTemplate messagingTemplate;
 
-    @MessageMapping("/hello")
-    @SendTo("/topic/greetings")
-    public NotificationDTO greet(NotificationDTO message) throws InterruptedException {
-        Thread.sleep(2000);
-        return new NotificationDTO(23L, 1L, 2L, LocalDateTime.now(), "test");
+    @GetMapping("/notify")
+    public ResponseEntity<Object> getNotification() throws InterruptedException {
+        NotificationDTO notificationDTO = new NotificationDTO(23L, 1L, 2L, LocalDateTime.now(), "test", "TITLE");
+        messagingTemplate.convertAndSend("/topic/notification", notificationDTO);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, notificationDTO, null);
+    }
+
+    @PostMapping("/notify")
+    public ResponseEntity<Object> sendNotification(@RequestBody @Valid NotificationDTO incomingNotificationDTO)  {
+//        NotificationDTO notificationDTO = new NotificationDTO(23L, 1L, 2L, LocalDateTime.now(), "test");
+//        messagingTemplate.convertAndSend("/topic/notification", notificationDTO);
+
+//            rabbitMQMessageProducer.publish(incomingNotificationDTO, NotificationRabbitConfig.EXCHANGE, NotificationRabbitConfig.ROUTING_KEY);
+
+        NotificationDTO  newNotificationDTO = notificationService.handleIncomingNotification(incomingNotificationDTO);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, newNotificationDTO, null);
     }
 }

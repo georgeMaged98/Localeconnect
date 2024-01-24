@@ -1,9 +1,10 @@
 package com.localeconnect.app.notification.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class NotificationDTO {
+public class NotificationDTO implements Serializable {
 
     private Long id;
 
@@ -22,8 +23,12 @@ public class NotificationDTO {
     private Long receiverID;
 
     @NotNull(message = "This is a required field")
+    @JsonFormat
+            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime sentAt;
 
     @NotBlank(message = "This is a required field")
     private String message;
+
+    private String title;
 }
