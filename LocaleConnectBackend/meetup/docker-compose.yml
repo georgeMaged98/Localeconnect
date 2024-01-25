@@ -33,6 +33,15 @@ services:
       - localeconnect-network
     restart: unless-stopped
 
+  rabbitmq:
+    image: rabbitmq:3.9.11-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - localeconnect-network
+
   meetup-service:
     container_name: meetup-service
     build:
@@ -48,6 +57,7 @@ services:
       - "7001:7001"
     depends_on:
       - postgresqlDB
+      - rabbitmq
     networks:
       - localeconnect-network
 

@@ -44,7 +44,7 @@ public class MeetupDTO {
     private String endTime;
 
     @NotNull(message = "This is a required field", groups = {CreateValidation.class})
-    private double cost;
+    private Double cost;
 
     @NotBlank(message = "This is a required field", groups = {CreateValidation.class})
     private String location;

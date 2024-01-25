@@ -2,6 +2,7 @@ package com.localeconnect.app.meetup.controller;
 
 import com.localeconnect.app.meetup.dto.MeetupAttendDTO;
 import com.localeconnect.app.meetup.dto.MeetupDTO;
+import com.localeconnect.app.meetup.dto.MeetupEditDTO;
 import com.localeconnect.app.meetup.response_handler.ResponseHandler;
 import com.localeconnect.app.meetup.service.MeetupService;
 import jakarta.validation.UnexpectedTypeException;
@@ -32,7 +33,6 @@ public class MeetupController {
 
     @GetMapping("/")
     public ResponseEntity<Object> getAllMeetups() {
-
         List<MeetupDTO> meetupDTOS = meetupService.getAllMeetups();
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, meetupDTOS, null);
@@ -47,15 +47,10 @@ public class MeetupController {
 
 
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<MeetupDTO> updateMeetup(@PathVariable("id") Long id, MeetupDTO meetupDTO){
-        try {
-            MeetupDTO itinerary = meetupService.updateMeetup(meetupDTO, id);
-            return ResponseEntity.ok(itinerary);
+    public ResponseEntity<Object> updateMeetup(@PathVariable("id") Long id, @RequestBody MeetupEditDTO meetupEditDTO) {
+        MeetupDTO updatedMeetup = meetupService.updateMeetup(meetupEditDTO, id);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, updatedMeetup, null);
 
-        }catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
-        }
     }
 
     @PostMapping("/{id}/attend")

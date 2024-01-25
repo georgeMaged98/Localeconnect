@@ -31,7 +31,7 @@ public class Meetup {
     private LocalTime startTime;
     @Column(name = "end_time")
     private LocalTime endTime;
-    private double cost;
+    private Double cost;
     private String location;
 
     @ElementCollection
