@@ -71,7 +71,9 @@
 
             },
             "development": {
-              "browserTarget": "LocaleConnectFrontend:build:development"
+              "browserTarget": "LocaleConnectFrontend:build:development",
+              "proxyConfig": "src/proxy.conf.json"
+
             }
           },
           "defaultConfiguration": "development"
