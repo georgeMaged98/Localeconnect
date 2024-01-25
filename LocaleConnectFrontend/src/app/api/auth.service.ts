@@ -3,6 +3,7 @@ import {HttpClient, HttpErrorResponse, HttpHeaders} from "@angular/common/http";
 import {catchError, Observable, throwError} from "rxjs";
 import {User} from "../model/user";
 import {Traveler} from "../model/traveler";
+import {Guide} from "../model/guide";
 
 @Injectable({
   providedIn: 'root'
@@ -21,16 +22,19 @@ export class AuthService {
     return this.http.get<User>(`${this.apiUrl}/${userId}`);
   }
 
-  registerTraveler(user:User): Observable<User> {
+  registerTraveler(traveler:Traveler): Observable<Traveler> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json'});
-    return this.http.post<User>(`${this.apiUrl}/register`, user, { headers })
+    return this.http.post<Traveler>(`${this.apiUrl}/register`, traveler, { headers })
       .pipe(
-      catchError(this.handleError<User>('register user'))
+      catchError(this.handleError<Traveler>('register traveler'))
     );
   }
-  registerGuide(traveler:Traveler): Observable<any> {
+  registerGuide(guide:Guide): Observable<Guide> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post<User>(`${this.apiUrl}/register`, traveler, { headers });
+    return this.http.post<Guide>(`${this.apiUrl}/register`, guide, { headers })
+      .pipe(
+        catchError(this.handleError<Guide>('register guide'))
+      );
   }
   login(credentials: { username: string, password: string }): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });

@@ -30,7 +30,7 @@ export class LoginComponent {
   }
   openRegisterDialog(): void {
      this.dialog.open(RegisterComponent, {
-      width: '400px'
+      width: '400px', maxHeight:'600px'
     });
   }
 }
