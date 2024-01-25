@@ -24,7 +24,6 @@ public class MeetupController {
 
     @PostMapping("/")
     public ResponseEntity<Object> createMeetup(@RequestBody @Valid MeetupDTO meetupDTO) {
-        System.out.println("------------------------HHHHHHHHH------------------------");
         MeetupDTO createdMeetupDTO = meetupService.createMeetup(meetupDTO);
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.CREATED, createdMeetupDTO, null);
@@ -48,26 +47,18 @@ public class MeetupController {
 
     @PostMapping("/{id}/attend")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> attendMeetup(@PathVariable("id") Long meetupId, @RequestBody @Valid MeetupAttendDTO meetupAttendDTO){
-        try {
-            meetupService.attendMeetup(meetupId, meetupAttendDTO);
+    public ResponseEntity<Object> attendMeetup(@PathVariable("id") Long meetupId, @RequestBody @Valid MeetupAttendDTO meetupAttendDTO) {
 
-            return ResponseEntity.ok("Traveller added to meetup attendees successfully!");
-        }catch (IllegalArgumentException | UnexpectedTypeException e) {
-            return ResponseEntity.badRequest().body(null);
-        }
+        meetupService.attendMeetup(meetupId, meetupAttendDTO);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, "Traveller added to meetup attendees successfully!", null);
     }
 
     @PostMapping("/{id}/unattend")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> unattendMeetup(@PathVariable("id") Long meetupId, @RequestBody @Valid MeetupAttendDTO meetupAttendDTO){
-        try {
-            meetupService.unattendMeetup(meetupId, meetupAttendDTO);
+    public ResponseEntity<Object> unattendMeetup(@PathVariable("id") Long meetupId, @RequestBody @Valid MeetupAttendDTO meetupAttendDTO) {
 
-            return ResponseEntity.ok("Traveller removed from meetup attendees successfully!");
-        }catch (IllegalArgumentException | UnexpectedTypeException e) {
-            return ResponseEntity.badRequest().body(null);
-        }
+        meetupService.unattendMeetup(meetupId, meetupAttendDTO);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, "Traveller removed from meetup attendees successfully!", null);
     }
 
     @DeleteMapping(path = "/{id}")

@@ -2,6 +2,8 @@ package com.localeconnect.app.meetup.service;
 
 import com.localeconnect.app.meetup.dto.MeetupAttendDTO;
 import com.localeconnect.app.meetup.dto.MeetupDTO;
+//import com.localeconnect.app.meetup.dto.MeetupEditDTO;
+import com.localeconnect.app.meetup.exceptions.LogicException;
 import com.localeconnect.app.meetup.exceptions.ResourceNotFoundException;
 import com.localeconnect.app.meetup.mapper.MeetupMapper;
 import com.localeconnect.app.meetup.model.Meetup;
@@ -34,37 +36,34 @@ public class MeetupService {
         return meetupMapper.toDomain(createdMeetup);
     }
 
-    public void attendMeetup(Long meetupId, MeetupAttendDTO meetupAttendDTO){
+    public void attendMeetup(Long meetupId, MeetupAttendDTO meetupAttendDTO) {
 
         Optional<Meetup> meetup = meetupRepository.findById(meetupId);
-
-        if(meetup.isEmpty()){
-            throw new EntityNotFoundException("No Meetup Found with this meetupId!");
-        }
+        if (meetup.isEmpty())
+            throw new ResourceNotFoundException("No Meetup Found with id: " + meetupId + "!");
 
         Long travellerId = meetupAttendDTO.getTravellerId();
-
         Meetup actualMeetup = meetup.get();
 
-        actualMeetup.getMeetupAttendees().add(travellerId);
+        if (actualMeetup.getMeetupAttendees().contains(travellerId))
+            throw new LogicException("Traveller is ALREADY in meetup attendees!");
 
+        actualMeetup.getMeetupAttendees().add(travellerId);
         meetupRepository.save(actualMeetup);
     }
 
-    public void unattendMeetup(Long meetupId, MeetupAttendDTO meetupAttendDTO){
+    public void unattendMeetup(Long meetupId, MeetupAttendDTO meetupAttendDTO) {
 
         Optional<Meetup> meetup = meetupRepository.findById(meetupId);
-
-        if(meetup.isEmpty()){
-            throw new EntityNotFoundException("No Meetup Found with this meetupId!");
-        }
+        if (meetup.isEmpty())
+            throw new ResourceNotFoundException("No Meetup Found with id: " + meetupId + "!");
 
         Long travellerId = meetupAttendDTO.getTravellerId();
-
         Meetup actualMeetup = meetup.get();
+        if (!actualMeetup.getMeetupAttendees().contains(travellerId))
+            throw new LogicException("Traveller is NOT in meetup attendees!");
 
         actualMeetup.getMeetupAttendees().remove(travellerId);
-
         meetupRepository.save(actualMeetup);
     }
 
@@ -91,7 +90,7 @@ public class MeetupService {
         MeetupDTO meetupDTO = meetupMapper.toDomain(optional.get());
 
         meetupRepository.deleteById(id);
-
+        //TODO: NOTIFY ATTENDEES
         return meetupDTO;
     }
 

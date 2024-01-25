@@ -1,5 +1,6 @@
 package com.localeconnect.app.meetup.error_handler;
 
+import com.localeconnect.app.meetup.exceptions.LogicException;
 import com.localeconnect.app.meetup.exceptions.ResourceNotFoundException;
 import com.localeconnect.app.meetup.exceptions.ValidationException;
 import com.localeconnect.app.meetup.response_handler.ResponseHandler;
@@ -61,6 +62,22 @@ public class MeetupGlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 status,
                 errors
+        );
+        return ResponseHandler.generateResponse("Error!", status, null, errorResponse);
+    }
+
+    @ExceptionHandler(LogicException.class)
+    public ResponseEntity<Object> handleLogicExceptions(
+            Exception e
+    ) {
+        HttpStatus status = HttpStatus.BAD_REQUEST; // 400
+
+        List<String> errorMessages = Arrays.asList(e.getMessage());
+        System.out.println("LogicException: " + errorMessages);
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                status,
+                errorMessages
         );
         return ResponseHandler.generateResponse("Error!", status, null, errorResponse);
     }
