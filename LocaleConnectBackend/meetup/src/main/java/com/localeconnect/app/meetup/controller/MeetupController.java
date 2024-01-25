@@ -1,6 +1,8 @@
 package com.localeconnect.app.meetup.controller;
 
+import com.localeconnect.app.meetup.dto.MeetupAttendDTO;
 import com.localeconnect.app.meetup.dto.MeetupDTO;
+import com.localeconnect.app.meetup.response_handler.ResponseHandler;
 import com.localeconnect.app.meetup.service.MeetupService;
 import jakarta.validation.UnexpectedTypeException;
 import jakarta.validation.Valid;
@@ -8,8 +10,9 @@ import lombok.AllArgsConstructor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -20,32 +23,32 @@ public class MeetupController {
     private final MeetupService meetupService;
 
     @PostMapping("/")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<MeetupDTO> createMeetup(@RequestBody @Validated(MeetupDTO.CreateValidation.class) MeetupDTO meetupDTO){
-        try {
-            MeetupDTO createdMeetupDTO = meetupService.createMeetup(meetupDTO);
+    public ResponseEntity<Object> createMeetup(@RequestBody @Valid MeetupDTO meetupDTO) {
+        MeetupDTO createdMeetupDTO = meetupService.createMeetup(meetupDTO);
 
-            return ResponseEntity.ok(createdMeetupDTO);
-        }catch (IllegalArgumentException | UnexpectedTypeException e) {
-            return ResponseEntity.badRequest().body(null);
-        }
+        return ResponseHandler.generateResponse("Success!", HttpStatus.CREATED, createdMeetupDTO, null);
     }
 
 
     @GetMapping("/")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<String> getAllMeetups(){
-        try {
-            return ResponseEntity.ok("LOL");
-        }catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
-        }
+    public ResponseEntity<Object> getAllMeetups() {
+
+        List<MeetupDTO> meetupDTOS = meetupService.getAllMeetups();
+
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, meetupDTOS, null);
+    }
+
+    @GetMapping(path = "/{id}")
+    public ResponseEntity<Object> getMeetupById(@PathVariable("id") Long id) {
+
+        MeetupDTO meetupDTO = meetupService.getMeetupById(id);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, meetupDTO, null);
     }
 
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<MeetupDTO> updateMeetup(@PathVariable("id") Long id, @RequestBody @Validated(MeetupDTO.UpdateValidation.class) MeetupDTO meetupDTO){
+    public ResponseEntity<MeetupDTO> updateMeetup(@PathVariable("id") Long id, MeetupDTO meetupDTO){
         try {
             MeetupDTO itinerary = meetupService.updateMeetup(meetupDTO, id);
             return ResponseEntity.ok(itinerary);
@@ -55,5 +58,25 @@ public class MeetupController {
         }
     }
 
+    @PostMapping("/{id}/attend")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Object> attendMeetup(@PathVariable("id") Long meetupId, @RequestBody @Valid MeetupAttendDTO meetupAttendDTO) {
 
+        meetupService.attendMeetup(meetupId, meetupAttendDTO);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, "Traveller added to meetup attendees successfully!", null);
+    }
+
+    @PostMapping("/{id}/unattend")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Object> unattendMeetup(@PathVariable("id") Long meetupId, @RequestBody @Valid MeetupAttendDTO meetupAttendDTO) {
+
+        meetupService.unattendMeetup(meetupId, meetupAttendDTO);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, "Traveller removed from meetup attendees successfully!", null);
+    }
+
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity<Object> deleteMeetupById(@PathVariable("id") Long id) {
+        MeetupDTO deletedMeetupDTO = meetupService.deleteMeetupById(id);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, deletedMeetupDTO, null);
+    }
 }
