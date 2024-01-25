@@ -1,8 +1,10 @@
 package com.localeconnect.app.meetup.controller;
 
+import com.localeconnect.app.meetup.dto.MeetupAttendDTO;
 import com.localeconnect.app.meetup.dto.MeetupDTO;
 import com.localeconnect.app.meetup.response_handler.ResponseHandler;
 import com.localeconnect.app.meetup.service.MeetupService;
+import jakarta.validation.UnexpectedTypeException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
@@ -44,6 +46,29 @@ public class MeetupController {
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, meetupDTO, null);
     }
 
+    @PostMapping("/{id}/attend")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<String> attendMeetup(@PathVariable("id") Long meetupId, @RequestBody @Valid MeetupAttendDTO meetupAttendDTO){
+        try {
+            meetupService.attendMeetup(meetupId, meetupAttendDTO);
+
+            return ResponseEntity.ok("Traveller added to meetup attendees successfully!");
+        }catch (IllegalArgumentException | UnexpectedTypeException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @PostMapping("/{id}/unattend")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<String> unattendMeetup(@PathVariable("id") Long meetupId, @RequestBody @Valid MeetupAttendDTO meetupAttendDTO){
+        try {
+            meetupService.unattendMeetup(meetupId, meetupAttendDTO);
+
+            return ResponseEntity.ok("Traveller removed from meetup attendees successfully!");
+        }catch (IllegalArgumentException | UnexpectedTypeException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
 
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<Object> deleteMeetupById(@PathVariable("id") Long id) {

@@ -37,4 +37,6 @@ public class Meetup {
     @ElementCollection
     private List<String> spokenLanguages= new ArrayList<>();
 
+    @ElementCollection
+    private List<Long> meetupAttendees = new ArrayList<>();
 }

@@ -20,10 +20,10 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have as title 'LocaleConnectFrontend'`, () => {
+  it(`should have as title 'LocaleConnect'`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('LocaleConnectFrontend');
+    expect(app.title).toEqual('LocaleConnect');
   });
 
   it('should render title', () => {
