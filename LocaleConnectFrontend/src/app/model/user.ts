@@ -10,5 +10,7 @@ export interface User {
   visitedCountries: string[];
   registeredAsLocalGuide: boolean;
   languages: string[];
+   followerIds:number[] ;
+  followingIds: number[];
 
 }

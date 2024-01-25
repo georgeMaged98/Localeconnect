@@ -10,6 +10,7 @@ import {
 } from "@angular/forms";
 import {MatDialog} from "@angular/material/dialog";
 import {LoginComponent} from "../login/login.component";
+import {AuthService} from "../../api/auth.service";
 
 @Component({
   selector: 'app-register-guide',
