@@ -25,28 +25,28 @@ public class MeetupDTO {
 
     private Long id;
 
-    @NotNull(message = "This is a required field", groups = {CreateValidation.class})
+    @NotNull(message = "This is a required field")
     private Long creatorId;
 
-    @NotBlank(message = "This is a required field", groups = {CreateValidation.class})
+    @NotBlank(message = "This is a required field")
     private String name;
 
-    @NotBlank(message = "This is a required field", groups = {CreateValidation.class})
+    @NotBlank(message = "This is a required field")
     private String description;
 
-    @NotNull(message = "This is a required field", groups = {CreateValidation.class})
+    @NotNull(message = "This is a required field")
     private Date date;
 
-    @NotBlank(message = "This is a required field", groups = {CreateValidation.class})
+    @NotBlank(message = "This is a required field")
     private String startTime;
 
-    @NotBlank(message = "This is a required field", groups = {CreateValidation.class})
+    @NotBlank(message = "This is a required field")
     private String endTime;
 
-    @NotNull(message = "This is a required field", groups = {CreateValidation.class})
+    @NotNull(message = "This is a required field")
     private Double cost;
 
-    @NotBlank(message = "This is a required field", groups = {CreateValidation.class})
+    @NotBlank(message = "This is a required field")
     private String location;
 
     private List<String> spokenLanguages= new ArrayList<>();
