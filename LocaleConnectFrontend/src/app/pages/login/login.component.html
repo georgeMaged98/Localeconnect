@@ -13,6 +13,9 @@
         <mat-error *ngIf="loginForm.controls['username'].hasError('minlength')">
           Username must be at least 3 characters long
         </mat-error>
+        <mat-error *ngIf="loginForm.controls['username'].hasError('userDoesntExist')">
+          Username doesn't exist
+        </mat-error>
       </mat-form-field>
       <mat-form-field appearance="fill">
         <input matInput formControlName="password" type="password" placeholder="Enter your password">
@@ -21,6 +24,9 @@
         </mat-error>
         <mat-error *ngIf="loginForm.controls['password'].hasError('minlength')">
           Password must be at least 6 characters long
+        </mat-error>
+        <mat-error *ngIf="loginForm.controls['username'].hasError('wrongPassword')">
+          Password is wrong
         </mat-error>
         <mat-label>Password</mat-label>
       </mat-form-field>

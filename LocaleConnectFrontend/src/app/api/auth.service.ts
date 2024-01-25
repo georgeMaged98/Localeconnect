@@ -36,9 +36,12 @@ export class AuthService {
         catchError(this.handleError<Guide>('register guide'))
       );
   }
+  //TODO: handle login when the backend method is available
   login(credentials: { username: string, password: string }): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post(`${this.apiUrl}/login`, credentials, { headers });
+    return this.http.post(`${this.apiUrl}/login`, credentials, { headers }).pipe(
+      catchError(this.handleError('login user'))
+    );
   }
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: HttpErrorResponse): Observable<T> => {
@@ -54,7 +57,13 @@ export class AuthService {
             errorMessage = 'This username is already taken. Please try a different one.';
           } else if (error.error.includes('email already exists')) {
             errorMessage = 'This email is already in use. Please try a different one.';
-          } else {
+          }
+          else if (error.error.includes('username does not exist')) {
+            errorMessage = 'This username doesnt exist.';
+          }
+          else if (error.error.includes('wrong password')) {
+            errorMessage = 'This password is wrong.';
+          }else {
             errorMessage = 'Validation error. Please check your input.';
           }
         } else if (error.status >= 500) {

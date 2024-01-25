@@ -22,8 +22,15 @@ export class LoginComponent {
   onSubmit(): void {
     if (this.loginForm.valid) {
       this.authService.login(this.loginForm.value).subscribe(
-        success => console.log('Login successful', success),
-        error => console.error('Login error', error)
+        {
+          next: (user) => {
+            return user;
+          },
+          error: (errorMessage) => {
+            console.error("Login error", errorMessage);
+            this.handleError(errorMessage);
+          }
+        }
       );
 
     }
@@ -32,5 +39,14 @@ export class LoginComponent {
      this.dialog.open(RegisterComponent, {
       width: '400px', maxHeight:'600px'
     });
+  }
+
+  private handleError(errorMessage: string) {
+    if (errorMessage.includes('username not found')) {
+      this.loginForm.controls['username'].setErrors({userDoesntExist: true});
+    }
+    if (errorMessage.includes('wrong password')) {
+      this.loginForm.controls['password'].setErrors({wrongPassword: true});
+    }
   }
 }
