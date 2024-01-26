@@ -4,6 +4,7 @@ import {ItineraryService} from "../../api/itinerary.service";
 import {ItineraryDialogComponent} from "./itinerary-dialog/itinerary-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 import {Subscription} from "rxjs";
+import {UserService} from "../../api/user.service";
 
 @Component({
   selector: 'app-itinerary',
@@ -14,19 +15,24 @@ export class ItineraryComponent implements OnInit, OnDestroy {
   itineraries: Itinerary[] = [];
   subscription: Subscription = new Subscription();
 
-  constructor(private itineraryService: ItineraryService,public dialog: MatDialog, private cdr:ChangeDetectorRef
+  constructor(private userService: UserService, private itineraryService: ItineraryService, public dialog: MatDialog, private cdr: ChangeDetectorRef
   ) {
   }
 
   ngOnInit(): void {
     this.itineraries = this.itineraryService.getItinerariesMock();
+    this.itineraries.forEach((itinerary) => {
+      this.fetchUsername(itinerary);
+    });
     this.subscription = this.itineraryService.currentItinerary.subscribe(itinerary => {
       if (itinerary) {
         this.addItineraryMock(itinerary);
+        this.fetchUsername(itinerary);
         this.cdr.detectChanges();
       }
 
     });
+
 
     /*  this.itineraryService.getItineraries().subscribe({
         next: (data: Itinerary[]) => {
@@ -77,6 +83,19 @@ export class ItineraryComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
 
+  }
+
+  fetchUsername(itinerary: Itinerary): void {
+    this.userService.getUsername(itinerary.userId).subscribe({
+        next: (username: string) => {
+          itinerary.username = username;
+          this.cdr.markForCheck();
+        },
+        error: (error: any) => {
+          console.error('Error fetching username', error);
+        }
+      }
+    );
   }
 
 }

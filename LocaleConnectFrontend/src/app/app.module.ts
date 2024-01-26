@@ -21,6 +21,8 @@ import {MatDatepickerModule} from "@angular/material/datepicker";
 import {MAT_DATE_LOCALE, MatNativeDateModule} from "@angular/material/core";
 import { ItineraryComponent } from './pages/itinerary/itinerary.component';
 import { ItineraryDialogComponent } from './pages/itinerary/itinerary-dialog/itinerary-dialog.component';
+import {MatIconModule} from "@angular/material/icon";
+import {MatChipsModule} from "@angular/material/chips";
 
 @NgModule({
   declarations: [
@@ -34,25 +36,27 @@ import { ItineraryDialogComponent } from './pages/itinerary/itinerary-dialog/iti
 
 
   ],
-    imports: [
-        BrowserModule,
-        AppRoutingModule,
-        BrowserAnimationsModule,
-        CoreModule,
-        LandingPageModule,
-        MatCardModule,
-        MatInputModule,
-        MatDialogModule,
-        MatButtonModule,
-        ReactiveFormsModule,
-        HttpClientModule,
-        MatDatepickerModule,
-        MatSelectModule,
-        MatCheckboxModule,
-        MatNativeDateModule,
-        FormsModule,
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    BrowserAnimationsModule,
+    CoreModule,
+    LandingPageModule,
+    MatCardModule,
+    MatInputModule,
+    MatDialogModule,
+    MatButtonModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+    MatDatepickerModule,
+    MatSelectModule,
+    MatCheckboxModule,
+    MatNativeDateModule,
+    FormsModule,
+    MatIconModule,
+    MatChipsModule,
 
-    ],
+  ],
   providers: [   MatDatepickerModule,{provide: MAT_DATE_LOCALE, useValue: 'en-GB'}],
   bootstrap: [AppComponent]
 })
