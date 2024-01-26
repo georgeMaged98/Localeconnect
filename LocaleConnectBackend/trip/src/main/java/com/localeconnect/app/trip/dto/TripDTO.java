@@ -34,6 +34,10 @@ public class TripDTO {
     @Positive(message = "A trip must have at least one traveler")
     private Integer capacity;
 
+    @NotEmpty(message = "At least one traveler must be in the trip")
+    @ElementCollection
+    private List<Long> travelers = new ArrayList<>();
+
     @NotEmpty(message = "At least one language must be specified")
     @ElementCollection
     private List<String> languages = new ArrayList<>();

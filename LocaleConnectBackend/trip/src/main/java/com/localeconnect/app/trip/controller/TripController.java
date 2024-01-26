@@ -1,7 +1,6 @@
 package com.localeconnect.app.trip.controller;
 
 import com.localeconnect.app.trip.dto.TripDTO;
-import com.localeconnect.app.trip.model.Trip;
 import com.localeconnect.app.trip.response_handler.ResponseHandler;
 import com.localeconnect.app.trip.service.TripService;
 import lombok.AllArgsConstructor;
@@ -31,4 +30,12 @@ public class TripController {
         TripDTO trip = tripService.getById(tripId);
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, trip, null);
     }
+
+    @PutMapping("/update/{trip_id}")
+    public ResponseEntity<Object> updateTrip(@PathVariable ("trip_id") Long tripId,
+                                             @RequestBody TripDTO tripDTO) {
+        TripDTO trip = tripService.updateTrip(tripDTO, tripId);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, trip,null);
+    }
+
 }

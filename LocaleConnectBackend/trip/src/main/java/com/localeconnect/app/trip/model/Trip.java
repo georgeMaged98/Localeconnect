@@ -26,8 +26,13 @@ public class Trip {
     private String destination;
     private LocalDate duration;
     private Integer capacity;
+
+    @ElementCollection
+    private List<Long> travelers = new ArrayList<>();
+
     @ElementCollection
     private List<String> languages = new ArrayList<>();
+
     @ElementCollection
     private List<String> placesToVisit = new ArrayList<>();
 
