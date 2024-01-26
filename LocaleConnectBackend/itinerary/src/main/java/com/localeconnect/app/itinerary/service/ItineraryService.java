@@ -1,6 +1,7 @@
 package com.localeconnect.app.itinerary.service;
 
 import com.localeconnect.app.itinerary.dto.ItineraryDTO;
+import com.localeconnect.app.itinerary.dto.ItineraryShareDTO;
 import com.localeconnect.app.itinerary.dto.ReviewDTO;
 import com.localeconnect.app.itinerary.dto.Tag;
 import com.localeconnect.app.itinerary.exception.*;
@@ -15,13 +16,13 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 @Service
 @AllArgsConstructor
 public class ItineraryService {
@@ -31,6 +32,7 @@ public class ItineraryService {
     private final ItineraryMapper mapper;
     private final ReviewMapper reviewMapper;
     private final ReviewRepository reviewRepository;
+
 
     public ItineraryDTO createItinerary(ItineraryDTO itineraryDTO, Long userId) {
         Itinerary itinerary = mapper.toEntity(itineraryDTO);
@@ -181,12 +183,40 @@ public class ItineraryService {
                 .collect(Collectors.toList());
     }
 
-    // TODO. returns true for now, needs the user microservice to work properly
+
+    // TODO: add a shareItinerary method in the feed
+    public Mono<ItineraryShareDTO> shareItinerary(Long itineraryId) {
+        return Mono.just(itineraryRepository.findById(itineraryId))
+                .map(itinerary -> {
+                    ItineraryShareDTO shareDTO
+                            = new ItineraryShareDTO();
+                    if (itinerary.isPresent()) {
+                        shareDTO.setId(itinerary.get().getId());
+                        shareDTO.setName(itinerary.get().getName());
+                        shareDTO.setDescription(itinerary.get().getDescription());
+                    }
+                    return shareDTO;
+                })
+                .flatMap(this::postToFeed)
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Itinerary not found with id: " + itineraryId)));
+    }
+
+
     private Boolean checkUserId(Long userId) {
         Boolean check = this.webClient.get()
                 .uri("http://user-service/api/user/exists/{userId}", userId)
                 .retrieve().bodyToMono(Boolean.class).block();
         return check != null && check;
     }
+
+
+    private Mono<ItineraryShareDTO> postToFeed(ItineraryShareDTO itineraryShareDTO) {
+        return webClient.post()
+                .uri("http://feed-service/api/feed/share-itinerary")
+                .bodyValue(itineraryShareDTO)
+                .retrieve()
+                .bodyToMono(ItineraryShareDTO.class);
+    }
+
 }
 
