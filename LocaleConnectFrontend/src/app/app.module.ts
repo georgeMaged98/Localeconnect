@@ -13,12 +13,14 @@ import {MatDialogModule} from "@angular/material/dialog";
 import { RegisterComponent } from './pages/register/register.component';
 import {MatButtonModule} from "@angular/material/button";
 import {HttpClientModule} from "@angular/common/http";
-import {ReactiveFormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import { RegisterGuideComponent } from './pages/register-guide/register-guide.component';
 import {MatCheckboxModule} from "@angular/material/checkbox";
 import {MatSelectModule} from "@angular/material/select";
 import {MatDatepickerModule} from "@angular/material/datepicker";
 import {MAT_DATE_LOCALE, MatNativeDateModule} from "@angular/material/core";
+import { ItineraryComponent } from './pages/itinerary/itinerary.component';
+import { ItineraryDialogComponent } from './pages/itinerary/itinerary-dialog/itinerary-dialog.component';
 
 @NgModule({
   declarations: [
@@ -26,27 +28,31 @@ import {MAT_DATE_LOCALE, MatNativeDateModule} from "@angular/material/core";
     LoginComponent,
     RegisterComponent,
     RegisterGuideComponent,
+    ItineraryComponent,
+    ItineraryDialogComponent,
 
 
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    BrowserAnimationsModule,
-    CoreModule,
-    LandingPageModule,
-    MatCardModule,
-    MatInputModule,
-    MatDialogModule,
-    MatButtonModule,
-    ReactiveFormsModule,
-    HttpClientModule,
-    MatDatepickerModule,
-    MatSelectModule,
-    MatCheckboxModule,
-    MatNativeDateModule,
 
   ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        CoreModule,
+        LandingPageModule,
+        MatCardModule,
+        MatInputModule,
+        MatDialogModule,
+        MatButtonModule,
+        ReactiveFormsModule,
+        HttpClientModule,
+        MatDatepickerModule,
+        MatSelectModule,
+        MatCheckboxModule,
+        MatNativeDateModule,
+        FormsModule,
+
+    ],
   providers: [   MatDatepickerModule,{provide: MAT_DATE_LOCALE, useValue: 'en-GB'}],
   bootstrap: [AppComponent]
 })
