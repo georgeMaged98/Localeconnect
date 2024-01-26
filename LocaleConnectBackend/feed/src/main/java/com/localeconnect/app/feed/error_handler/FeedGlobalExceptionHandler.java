@@ -1,5 +1,6 @@
 package com.localeconnect.app.feed.error_handler;
 
+import com.localeconnect.app.feed.exceptions.LogicException;
 import com.localeconnect.app.feed.exceptions.ResourceNotFoundException;
 import com.localeconnect.app.feed.exceptions.ValidationException;
 import com.localeconnect.app.feed.response_handler.ResponseHandler;
@@ -65,6 +66,23 @@ public class FeedGlobalExceptionHandler {
         );
         return ResponseHandler.generateResponse("Error!", status, null, errorResponse);
     }
+
+    @ExceptionHandler(LogicException.class)
+    public ResponseEntity<Object> handleLogicExceptions(
+            Exception e
+    ) {
+        HttpStatus status = HttpStatus.BAD_REQUEST; // 400
+
+        List<String> errorMessages = Arrays.asList(e.getMessage());
+        System.out.println("LogicException: " + errorMessages);
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                status,
+                errorMessages
+        );
+        return ResponseHandler.generateResponse("Error!", status, null, errorResponse);
+    }
+
 
     @ExceptionHandler(Exception.class) // exception handled
     public ResponseEntity<Object> handleInternalServerErrorExceptions(
