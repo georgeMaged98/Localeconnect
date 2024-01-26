@@ -5,9 +5,9 @@ spring:
   application:
     name: itinerary
   datasource:
-    url: jdbc:postgresql://localhost:5432/itinerary_service_db
-    username: 'localeconnect'
-    password: 'lssa2324app'
+    url: jdbc:postgresql://localhost:5432/itinerary-DB
+    username: localeconnect
+    password: lssa2324app
     driver-class-name: org.postgresql.Driver
 
   jpa:
