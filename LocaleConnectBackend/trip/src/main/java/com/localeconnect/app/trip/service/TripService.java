@@ -34,7 +34,7 @@ public class TripService {
         return tripMapper.toDomain(optionalTrip.get());
     }
 
-    public TripDTO updateTrip(TripDTO tripDTO, Long tripId) {
+    public TripDTO updateTrip( Long tripId, TripDTO tripDTO) {
         Optional<Trip> optionalTrip = tripRepository.findById(tripId);
 
         if (optionalTrip.isEmpty())
@@ -54,5 +54,25 @@ public class TripService {
         }
         tripRepository.save(tripToUpdate);
         return tripMapper.toDomain(optionalTrip.get());
+    }
+
+    public void deleteTrip(Long tripId) {
+        Optional<Trip> optionalTrip = tripRepository.findById(tripId);
+
+        if (optionalTrip.isEmpty())
+            throw new ResourceNotFoundException("A trip with the id " + tripId + " does not exist!");
+        //update the trip
+        Trip tripToDelete = optionalTrip.get();
+        //send notifications to all travelers
+        List<Long> travelers = tripToDelete.getTravelers();
+        for (Long traveler : travelers) {
+            NotificationDTO newNotification = new NotificationDTO();
+            newNotification.setTitle("New Notification");
+            newNotification.setMessage("Meetup " + tripId +" Got Deleted!");
+            newNotification.setSentAt(LocalDateTime.now());
+            newNotification.setReceiver(traveler);
+            newNotification.setSender(tripToDelete.getLocalguideId());
+        }
+        tripRepository.delete(tripToDelete);
     }
 }
