@@ -18,8 +18,9 @@ public class Trip {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "localguide_id")
+    @Column(name = "localguide_id", nullable = false, unique = true)
     private Long localguideId;
+    @Column(nullable = false, unique = true)
     private String name;
     private String description;
     private LocalDate departureTime;
