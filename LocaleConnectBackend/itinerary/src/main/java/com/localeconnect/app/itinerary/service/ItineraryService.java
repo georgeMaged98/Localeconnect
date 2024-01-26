@@ -2,18 +2,23 @@ package com.localeconnect.app.itinerary.service;
 
 import com.localeconnect.app.itinerary.dto.ItineraryDTO;
 import com.localeconnect.app.itinerary.dto.ItineraryShareDTO;
-import com.localeconnect.app.itinerary.exception.ItineraryAlreadyExistsException;
-import com.localeconnect.app.itinerary.exception.ItineraryNotFoundException;
-import com.localeconnect.app.itinerary.exception.ResourceNotFoundException;
-import com.localeconnect.app.itinerary.exception.UnauthorizedUserException;
+import com.localeconnect.app.itinerary.dto.ReviewDTO;
+import com.localeconnect.app.itinerary.dto.Tag;
+import com.localeconnect.app.itinerary.exception.*;
 import com.localeconnect.app.itinerary.mapper.ItineraryMapper;
+import com.localeconnect.app.itinerary.mapper.ReviewMapper;
 import com.localeconnect.app.itinerary.model.Itinerary;
+import com.localeconnect.app.itinerary.model.Review;
 import com.localeconnect.app.itinerary.repository.ItineraryRepository;
+import com.localeconnect.app.itinerary.repository.ItinerarySpecification;
+import com.localeconnect.app.itinerary.repository.ReviewRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
