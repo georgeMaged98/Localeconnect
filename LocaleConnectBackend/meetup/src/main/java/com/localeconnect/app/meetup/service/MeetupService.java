@@ -155,7 +155,7 @@ public class MeetupService {
 
         Meetup actualMeetup = optional.get();
         meetupRepository.deleteById(id);
-        //TODO: NOTIFY ATTENDEES
+
         List<Long> attendees = actualMeetup.getMeetupAttendees();
         for (Long att:attendees
         ) {
