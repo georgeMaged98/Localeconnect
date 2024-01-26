@@ -153,10 +153,22 @@ public class MeetupService {
         if (optional.isEmpty())
             throw new ResourceNotFoundException("No Meetup Found with id: " + id + "!");
 
-        MeetupDTO meetupDTO = meetupMapper.toDomain(optional.get());
-
+        Meetup actualMeetup = optional.get();
         meetupRepository.deleteById(id);
         //TODO: NOTIFY ATTENDEES
+        List<Long> attendees = actualMeetup.getMeetupAttendees();
+        for (Long att:attendees
+        ) {
+            NotificationDTO newNotification = new NotificationDTO();
+            newNotification.setTitle("New Notification");
+            newNotification.setMessage("Meetup " + actualMeetup.getId() +" Got Updated!");
+            newNotification.setSentAt(LocalDateTime.now());
+            newNotification.setReceiverID(att);
+            newNotification.setSenderID(actualMeetup.getCreatorId());
+            rabbitMQMessageProducer.publish(newNotification, MeetupRabbitConfig.EXCHANGE, MeetupRabbitConfig.ROUTING_KEY);
+        }
+
+        MeetupDTO meetupDTO = meetupMapper.toDomain(optional.get());
         return meetupDTO;
     }
 
