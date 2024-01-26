@@ -1,0 +1,46 @@
+<mat-card class="itinerary-card">
+  <mat-card-header>
+    <mat-card-title>Add Itinerary</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <form [formGroup]="itineraryForm" (ngSubmit)="onSubmit()">
+      <mat-form-field appearance="fill">
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name">
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description"></textarea>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Number of Days</mat-label>
+        <input matInput formControlName="numberOfDays">
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Places to Visit</mat-label>
+        <input matInput formControlName="placesToVisit" placeholder="Place1, Place2, Place3">
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Daily Activities</mat-label>
+        <input matInput formControlName="dailyActivities" placeholder="Activity1, Activity2, Activity3">
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Tags</mat-label>
+        <mat-select formControlName="tags" [multiple]="true">
+          <mat-option *ngFor="let tag of tagOptions" [value]="tag">{{ tag }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <input type="file" (change)="onFileSelected($event)" multiple>
+      <div *ngFor="let image of images">
+        <img [src]="image" alt="Uploaded Image">
+      </div>
+      <mat-card-actions class="itinerary-actions">
+        <button mat-button type="submit" [disabled]="itineraryForm.invalid">Submit</button>
+      </mat-card-actions>
+    </form>
+    <button mat-button (click)="onNoClick()">Cancel</button>
+
+  </mat-card-content>
+</mat-card>
