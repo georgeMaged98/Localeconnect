@@ -14,6 +14,7 @@ import com.localeconnect.app.meetup.rabbit.RabbitMQMessageProducer;
 import com.localeconnect.app.meetup.repository.MeetupRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,15 +29,17 @@ public class MeetupService {
 
     private final MeetupRepository meetupRepository;
     private final MeetupMapper meetupMapper;
-
+    private final WebClient webClient;
     private final RabbitMQMessageProducer rabbitMQMessageProducer;
 
     public MeetupDTO createMeetup(MeetupDTO meetupDTO) {
+        Meetup meetup = meetupMapper.toEntity(meetupDTO);
 
         // check creatorId is valid
+        if (!checkUserId(meetup.getCreatorId()))
+            throw new ResourceNotFoundException("No User Found with id: " + meetup.getCreatorId() + "!");
 
         // Save meetup in DATABASE
-        Meetup meetup = meetupMapper.toEntity(meetupDTO);
         Meetup createdMeetup = meetupRepository.save(meetup);
         // return saved meetup
         return meetupMapper.toDomain(createdMeetup);
@@ -97,6 +100,11 @@ public class MeetupService {
             throw new ResourceNotFoundException("No Meetup Found with id: " + meetupId + "!");
 
         Long travellerId = meetupAttendDTO.getTravellerId();
+
+        // check traverllerId is valid
+        if (!checkUserId(travellerId))
+            throw new ResourceNotFoundException("No User Found with id: " + travellerId + "!");
+
         Meetup actualMeetup = meetup.get();
 
         if (actualMeetup.getMeetupAttendees().contains(travellerId))
@@ -113,6 +121,10 @@ public class MeetupService {
             throw new ResourceNotFoundException("No Meetup Found with id: " + meetupId + "!");
 
         Long travellerId = meetupAttendDTO.getTravellerId();
+        // check traverllerId is valid
+        if (!checkUserId(travellerId))
+            throw new ResourceNotFoundException("No User Found with id: " + travellerId + "!");
+
         Meetup actualMeetup = meetup.get();
         if (!actualMeetup.getMeetupAttendees().contains(travellerId))
             throw new LogicException("Traveller is NOT in meetup attendees!");
@@ -122,8 +134,8 @@ public class MeetupService {
     }
 
     public List<MeetupDTO> getAllMeetups() {
-        List<Meetup> itineraries = meetupRepository.findAll();
-        return itineraries.stream().map(
+        List<Meetup> meetups = meetupRepository.findAll();
+        return meetups.stream().map(
                         meetupMapper::toDomain)
                 .collect(Collectors.toList());
     }
@@ -143,7 +155,7 @@ public class MeetupService {
 
         Meetup actualMeetup = optional.get();
         meetupRepository.deleteById(id);
-        //TODO: NOTIFY ATTENDEES
+
         List<Long> attendees = actualMeetup.getMeetupAttendees();
         for (Long att:attendees
         ) {
@@ -158,6 +170,13 @@ public class MeetupService {
 
         MeetupDTO meetupDTO = meetupMapper.toDomain(optional.get());
         return meetupDTO;
+    }
+
+    private Boolean checkUserId(Long userId) {
+        Boolean check = this.webClient.get()
+                .uri("http://user-service/api/user/exists/{userId}", userId)
+                .retrieve().bodyToMono(Boolean.class).block();
+        return check != null && check;
     }
 
 }
