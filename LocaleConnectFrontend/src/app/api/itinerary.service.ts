@@ -30,6 +30,7 @@ export class ItineraryService {
     const itinerary1: Itinerary = {
       id: 1,
       userId: 100,
+      username:'',
       name: "Explore the Alps",
       description: "A thrilling adventure in the Alps exploring nature and enjoying winter sports.",
       numberOfDays: 7,
@@ -42,13 +43,14 @@ export class ItineraryService {
     const itinerary2: Itinerary = {
       id: 2,
       userId: 101,
+      username:'',
       name: "Cultural Tour of Japan",
       description: "Immersive experience into the rich culture and history of Japan.",
       numberOfDays: 10,
       tags: [Tag.CULTURAL, Tag.FOODIE, Tag.HISTORICAL],
       placesToVisit: ["Kyoto", "Tokyo", "Osaka"],
       dailyActivities: ["Visit Kinkaku-ji", "Tour of Akihabara", "Osaka street food tour"],
-      imageUrls:["url.jpg"],expand:false
+      imageUrls:[],expand:false
     };
     return [itinerary1,itinerary2];
   }
@@ -57,7 +59,8 @@ export class ItineraryService {
     return this.http.post<Itinerary>(`${this.apiUrl}/create`, itinerary);
   }
   addItineraryMock(itinerary: Itinerary): Itinerary{
-
     return itinerary;
   }
+
+
 }
