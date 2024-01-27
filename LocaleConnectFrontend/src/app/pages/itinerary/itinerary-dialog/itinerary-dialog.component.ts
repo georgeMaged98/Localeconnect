@@ -21,7 +21,7 @@ export class ItineraryDialogComponent {
     private formBuilder: FormBuilder, private itineraryService: ItineraryService
   ) {
     this.itineraryForm = this.formBuilder.group({
-      name: ['', Validators.required],
+         name: ['', Validators.required],
       description: ['', Validators.required],
       numberOfDays: ['',[Validators.required, Validators.min(1)]],
       tags:[''],
@@ -50,7 +50,7 @@ export class ItineraryDialogComponent {
         username:'',
         description: formData.description,
         numberOfDays: formData.numberOfDays,
-        tags:formData.tags,
+        tags:this.itineraryService.mapTags(formData.tags),
         placesToVisit:formData.placesToVisit,
         dailyActivities:formData.dailyActivities,
         expand:false,

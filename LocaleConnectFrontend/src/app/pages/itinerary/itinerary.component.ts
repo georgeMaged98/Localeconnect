@@ -1,5 +1,5 @@
 import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
-import {Itinerary} from "../../model/itinerary";
+import {Itinerary, Tag} from "../../model/itinerary";
 import {ItineraryService} from "../../api/itinerary.service";
 import {ItineraryDialogComponent} from "./itinerary-dialog/itinerary-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
@@ -14,7 +14,6 @@ import {UserService} from "../../api/user.service";
 export class ItineraryComponent implements OnInit, OnDestroy {
   itineraries: Itinerary[] = [];
   subscription: Subscription = new Subscription();
-
   constructor(private userService: UserService, private itineraryService: ItineraryService, public dialog: MatDialog, private cdr: ChangeDetectorRef
   ) {
   }
@@ -23,6 +22,7 @@ export class ItineraryComponent implements OnInit, OnDestroy {
     this.itineraries = this.itineraryService.getItinerariesMock();
     this.itineraries.forEach((itinerary) => {
       this.fetchUsername(itinerary);
+
     });
     this.subscription = this.itineraryService.currentItinerary.subscribe(itinerary => {
       if (itinerary) {
@@ -84,6 +84,7 @@ export class ItineraryComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
 
   }
+
 
   fetchUsername(itinerary: Itinerary): void {
     this.userService.getUsername(itinerary.userId).subscribe({

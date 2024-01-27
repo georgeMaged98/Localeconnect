@@ -34,7 +34,7 @@ export class ItineraryService {
       name: "Explore the Alps",
       description: "A thrilling adventure in the Alps exploring nature and enjoying winter sports.",
       numberOfDays: 7,
-      tags: [Tag.ADVENTURE, Tag.WINTER_SPORTS, Tag.NATURE],
+      tags: this.mapTags([Tag.ADVENTURE, Tag.WINTER_SPORTS, Tag.NATURE]),
       placesToVisit: ["Mount Blanc", "Zermatt", "Jungfrau Region"],
       dailyActivities: ["Skiing in Zermatt", "Hiking in Jungfrau", "Visit to Ice Caves"],
       imageUrls: ["assets/pictures/background-landing-page.png"], expand:false
@@ -47,7 +47,7 @@ export class ItineraryService {
       name: "Cultural Tour of Japan",
       description: "Immersive experience into the rich culture and history of Japan.",
       numberOfDays: 10,
-      tags: [Tag.CULTURAL, Tag.FOODIE, Tag.HISTORICAL],
+      tags: this.mapTags([Tag.CULTURAL, Tag.FOODIE, Tag.HISTORICAL]),
       placesToVisit: ["Kyoto", "Tokyo", "Osaka"],
       dailyActivities: ["Visit Kinkaku-ji", "Tour of Akihabara", "Osaka street food tour"],
       imageUrls:[],expand:false
@@ -61,6 +61,8 @@ export class ItineraryService {
   addItineraryMock(itinerary: Itinerary): Itinerary{
     return itinerary;
   }
-
+mapTags(tags: Tag[]): string[]{
+    return  tags.map(tag =>Tag[tag]);
+}
 
 }

@@ -1,6 +1,6 @@
 
 <div class="search-container">
-  <input matInput placeholder="Search" class="search-bar" />
+  <input matInput placeholder="Search" class="search-bar"/>
   <button mat-icon-button class="search-button">
     <mat-icon>search</mat-icon>
   </button>
@@ -24,11 +24,10 @@
         <mat-card-content *ngIf="itinerary.expand" class="itinerary-details">
           <p>{{ itinerary.description }}</p>
           <div *ngIf="itinerary.numberOfDays">
-            <h4>Days:</h4>
-            <p>{{ itinerary.numberOfDays }}</p>
+            <h4>Duration:</h4>
+            <p>{{ itinerary.numberOfDays }}  Days</p>
           </div>
           <div *ngIf="itinerary.tags?.length">
-            <h4>Tags:</h4>
             <mat-chip-listbox>
               <mat-chip *ngFor="let tag of itinerary.tags">{{ tag }}</mat-chip>
             </mat-chip-listbox>

@@ -5,11 +5,11 @@ export interface Itinerary {
   name: string,
   description: string,
   numberOfDays: number,
-  tags:Tag[],
+  tags:string[],
   placesToVisit: string[],
   dailyActivities: string[],
   imageUrls:string[],
-  expand:boolean
+  expand:boolean,
 }
 
 export enum Tag{
