@@ -1,10 +1,12 @@
 import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
 import {Itinerary, Tag} from "../../model/itinerary";
-import {ItineraryService} from "../../api/itinerary.service";
+import {ItineraryService} from "../../service/itinerary.service";
 import {ItineraryDialogComponent} from "./itinerary-dialog/itinerary-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 import {Subscription} from "rxjs";
-import {UserService} from "../../api/user.service";
+import {UserService} from "../../service/user.service";
+import {Review} from "../../model/review";
+import {ReviewService} from "../../service/review.service";
 
 @Component({
   selector: 'app-itinerary',
@@ -14,7 +16,7 @@ import {UserService} from "../../api/user.service";
 export class ItineraryComponent implements OnInit, OnDestroy {
   itineraries: Itinerary[] = [];
   subscription: Subscription = new Subscription();
-  constructor(private userService: UserService, private itineraryService: ItineraryService, public dialog: MatDialog, private cdr: ChangeDetectorRef
+  constructor(private userService: UserService, private itineraryService: ItineraryService,private reviewService: ReviewService, public dialog: MatDialog, private cdr: ChangeDetectorRef
   ) {
   }
 
@@ -22,8 +24,8 @@ export class ItineraryComponent implements OnInit, OnDestroy {
     this.itineraries = this.itineraryService.getItinerariesMock();
     this.itineraries.forEach((itinerary) => {
       this.fetchUsername(itinerary);
-
     });
+
     this.subscription = this.itineraryService.currentItinerary.subscribe(itinerary => {
       if (itinerary) {
         this.addItineraryMock(itinerary);
@@ -97,6 +99,24 @@ export class ItineraryComponent implements OnInit, OnDestroy {
         }
       }
     );
+  }
+  submitRating(itineraryId: number, rating: number): void {
+    // Construct the ReviewDTO
+    const review: Review = {
+      itineraryId,
+      //TODO: get user id
+      userId: 0, // Replace with the actual user ID
+      rating,
+    };
+    this.reviewService.createReview(review).subscribe({
+      next: (review) => {
+        console.log('Review submitted successfully', review);
+        // Update local state if necessary
+      },
+      error: (error) => {
+        console.error('Error submitting review', error);
+      }
+    });
   }
 
 }

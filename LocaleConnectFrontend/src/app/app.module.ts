@@ -23,6 +23,7 @@ import { ItineraryComponent } from './pages/itinerary/itinerary.component';
 import { ItineraryDialogComponent } from './pages/itinerary/itinerary-dialog/itinerary-dialog.component';
 import {MatIconModule} from "@angular/material/icon";
 import {MatChipsModule} from "@angular/material/chips";
+import { ReviewComponent } from './pages/review/review.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import {MatChipsModule} from "@angular/material/chips";
     RegisterGuideComponent,
     ItineraryComponent,
     ItineraryDialogComponent,
+    ReviewComponent,
 
 
 

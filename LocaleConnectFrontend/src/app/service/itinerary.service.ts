@@ -37,7 +37,8 @@ export class ItineraryService {
       tags: this.mapTags([Tag.ADVENTURE, Tag.WINTER_SPORTS, Tag.NATURE]),
       placesToVisit: ["Mount Blanc", "Zermatt", "Jungfrau Region"],
       dailyActivities: ["Skiing in Zermatt", "Hiking in Jungfrau", "Visit to Ice Caves"],
-      imageUrls: ["assets/pictures/background-landing-page.png"], expand:false
+      imageUrls: ["assets/pictures/background-landing-page.png"], expand:false,
+      rating:0
     };
 
     const itinerary2: Itinerary = {
@@ -50,7 +51,8 @@ export class ItineraryService {
       tags: this.mapTags([Tag.CULTURAL, Tag.FOODIE, Tag.HISTORICAL]),
       placesToVisit: ["Kyoto", "Tokyo", "Osaka"],
       dailyActivities: ["Visit Kinkaku-ji", "Tour of Akihabara", "Osaka street food tour"],
-      imageUrls:[],expand:false
+      imageUrls:[],expand:false,
+      rating:0
     };
     return [itinerary1,itinerary2];
   }

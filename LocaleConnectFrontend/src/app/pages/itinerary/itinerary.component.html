@@ -20,26 +20,31 @@
         <mat-card-header>
           <mat-card-title>{{ itinerary.name }}</mat-card-title>
           <mat-card-subtitle>Organized by: {{ itinerary.username }}</mat-card-subtitle>
+          <div class="reviews-container">
+            <app-review  [(rating)]="itinerary.rating" (ratingChange)="submitRating(itinerary.id, $event)"></app-review>
+          </div>
         </mat-card-header>
+
         <mat-card-content *ngIf="itinerary.expand" class="itinerary-details">
           <p>{{ itinerary.description }}</p>
+          <div *ngIf="itinerary.tags.length">
+          <mat-chip-listbox>
+            <mat-chip *ngFor="let tag of itinerary.tags">{{ tag }}</mat-chip>
+          </mat-chip-listbox>
+        </div>
           <div *ngIf="itinerary.numberOfDays">
             <h4>Duration:</h4>
             <p>{{ itinerary.numberOfDays }}  Days</p>
           </div>
-          <div *ngIf="itinerary.tags?.length">
-            <mat-chip-listbox>
-              <mat-chip *ngFor="let tag of itinerary.tags">{{ tag }}</mat-chip>
-            </mat-chip-listbox>
-          </div>
-          <div *ngIf="itinerary.placesToVisit?.length">
+
+          <div *ngIf="itinerary.placesToVisit.length">
             <h4>Places to Visit:</h4>
             <ul>
               <li *ngFor="let place of itinerary.placesToVisit">{{ place }}</li>
             </ul>
           </div>
-          <div *ngIf="itinerary.dailyActivities?.length">
-            <h4>Daily Activities:</h4>
+          <div *ngIf="itinerary.dailyActivities.length">
+            <h4>Activities:</h4>
             <ul>
               <li *ngFor="let activity of itinerary.dailyActivities">{{ activity }}</li>
             </ul>

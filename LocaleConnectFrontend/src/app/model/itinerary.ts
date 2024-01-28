@@ -10,6 +10,7 @@ export interface Itinerary {
   dailyActivities: string[],
   imageUrls:string[],
   expand:boolean,
+  rating:number;
 }
 
 export enum Tag{

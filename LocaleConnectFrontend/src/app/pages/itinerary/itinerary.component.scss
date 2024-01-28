@@ -24,6 +24,13 @@ mat-icon {
 mat-card-header {
   justify-content: space-between;
   align-items: center;
+  .reviews-container {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 10px;
+  }
+
 }
 
 mat-card-actions {
@@ -88,12 +95,12 @@ mat-card-actions {
 
       .mat-chip {
         margin: 2px;
+background-color: #8085AD;
       }
 
-      .mat-chip-list {
+      .mat-chip-listbox {
         display: flex;
         flex-wrap: wrap;
-        padding: 0;
         list-style-type: none;
       }
 
