@@ -16,18 +16,32 @@ import {ReviewService} from "../../service/review.service";
 export class ItineraryComponent implements OnInit, OnDestroy {
   itineraries: Itinerary[] = [];
   subscription: Subscription = new Subscription();
-  constructor(private userService: UserService, private itineraryService: ItineraryService,private reviewService: ReviewService, public dialog: MatDialog, private cdr: ChangeDetectorRef
+
+  constructor(private userService: UserService, private itineraryService: ItineraryService, private reviewService: ReviewService, public dialog: MatDialog, private cdr: ChangeDetectorRef
   ) {
   }
 
   ngOnInit(): void {
     this.itineraries = this.itineraryService.getItinerariesMock();
+    //TODO: replace mock with api
+    /*this.itineraryService.getItineraries().subscribe({
+        next: (data: Itinerary[]) => {
+          this.itineraries = data;
+        },
+        error: (errorMessage: any) => console.error(errorMessage)
+      }
+    );
+
+     */
     this.itineraries.forEach((itinerary) => {
+      itinerary.mappedTags = this.itineraryService.mapTags(itinerary.tags);
       this.fetchUsername(itinerary);
     });
 
     this.subscription = this.itineraryService.currentItinerary.subscribe(itinerary => {
       if (itinerary) {
+        //TODO: replace mock with backend
+       // this.addItinerary(itinerary);
         this.addItineraryMock(itinerary);
         this.fetchUsername(itinerary);
         this.cdr.detectChanges();
@@ -35,17 +49,6 @@ export class ItineraryComponent implements OnInit, OnDestroy {
 
     });
 
-
-    /*  this.itineraryService.getItineraries().subscribe({
-        next: (data: Itinerary[]) => {
-          this.itineraries = data;
-        },
-     //   error: (errorMessage: any) => console.error(errorMessage)
-      }
-
-      );
-
-     */
 
   }
 
@@ -55,21 +58,20 @@ export class ItineraryComponent implements OnInit, OnDestroy {
 
   }
 
-  /* addItinerary(newItinerary: Itinerary): void {
-     this.itineraryService.addItinerary(newItinerary).subscribe({
+  addItinerary(newItinerary: Itinerary): void {
+    this.itineraryService.addItinerary(newItinerary).subscribe({
 
-         next: (itinerary: Itinerary) => {
-           this.itineraries.push(itinerary);
-         },
-         error: (error: any) => {
-           console.error('Error adding itinerary', error);
-         }
+        next: (itinerary: Itinerary) => {
+          this.itineraries.push(itinerary);
+        },
+        error: (error: any) => {
+          console.error('Error adding itinerary', error);
+        }
 
-       }
-     );
-   }
+      }
+    );
+  }
 
-   */
 
   toggleDetails(itinerary: Itinerary): void {
     itinerary.expand = !itinerary.expand;
@@ -77,7 +79,7 @@ export class ItineraryComponent implements OnInit, OnDestroy {
 
   openAddItineraryDialog(): void {
     const dialogRef = this.dialog.open(ItineraryDialogComponent, {
-      width: '400px',
+      width: '600px',
       height: '600px'
     });
   }
@@ -100,18 +102,17 @@ export class ItineraryComponent implements OnInit, OnDestroy {
       }
     );
   }
+
   submitRating(itineraryId: number, rating: number): void {
-    // Construct the ReviewDTO
     const review: Review = {
       itineraryId,
       //TODO: get user id
-      userId: 0, // Replace with the actual user ID
+      userId: 0,
       rating,
     };
     this.reviewService.createReview(review).subscribe({
       next: (review) => {
         console.log('Review submitted successfully', review);
-        // Update local state if necessary
       },
       error: (error) => {
         console.error('Error submitting review', error);

@@ -3,7 +3,7 @@ import {MatDialogRef} from '@angular/material/dialog';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Itinerary, Tag} from "../../../model/itinerary";
 import {ItineraryService} from "../../../service/itinerary.service";
-
+import * as DataHelper from 'src/app/helper/DataHelper';
 @Component({
   selector: 'app-itinerary-dialog',
   templateUrl: 'itinerary-dialog.component.html',
@@ -13,7 +13,7 @@ import {ItineraryService} from "../../../service/itinerary.service";
 export class ItineraryDialogComponent {
   itineraryForm: FormGroup;
   images: string[] = [];
-  tagOptions :string[]= Object.keys(Tag).filter(key => isNaN(Number(key)));
+  tagOptions :Tag[]= Object.values(Tag).filter(key => isNaN(Number(key))) as Tag[];
 
 
   constructor(
@@ -38,8 +38,9 @@ export class ItineraryDialogComponent {
   onSubmit(): void {
     if (this.itineraryForm.valid) {
       const formData = this.itineraryForm.value;
-      formData.placesToVisit = formData.placesToVisit.split(',').map((place: string) => place.trim());
-      formData.dailyActivities = formData.dailyActivities.split(',').map((place: string) => place.trim());
+      formData.placesToVisit = DataHelper.dataToList(formData.placesToVisit);
+      formData.dailyActivities = DataHelper.dataToList(formData.dailyActivities);
+
 
 
       const itinerary: Itinerary = {
@@ -50,13 +51,15 @@ export class ItineraryDialogComponent {
         username: '',
         description: formData.description,
         numberOfDays: formData.numberOfDays,
-        tags: formData.tags,
+        tags:formData.tags,
+        mappedTags:formData.tags,
         placesToVisit: formData.placesToVisit,
         dailyActivities: formData.dailyActivities,
         expand: false,
         imageUrls: formData.image,
         rating: 0
       };
+
       this.itineraryService.changeItinerary(itinerary);
       this.dialogRef.close();
     }
@@ -76,4 +79,6 @@ export class ItineraryDialogComponent {
       }
     }
   }
+
+
 }
