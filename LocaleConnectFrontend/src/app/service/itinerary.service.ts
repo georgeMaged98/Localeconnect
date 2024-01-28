@@ -1,6 +1,6 @@
 // itinerary.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {Itinerary, Tag} from "../model/itinerary";
 
@@ -64,6 +64,17 @@ export class ItineraryService {
   }
   addItineraryMock(itinerary: Itinerary): Itinerary{
     return itinerary;
+  }
+  searchItineraries(name: string): Observable<Itinerary[]> {
+    return this.http.get<Itinerary[]>('/api/search', { params: { name } });
+  }
+
+  filterItineraries(place?: string, tag?: Tag, days?: string): Observable<Itinerary[]> {
+    let params = new HttpParams();
+    if (place) params = params.set('place', place);
+    if (tag) params = params.set('tag', tag);
+    if (days) params = params.set('days', days.toString());
+    return this.http.get<Itinerary[]>('/api/filter', { params });
   }
 mapTags(tags: Tag[]): string[]{
     return  tags.map(tag =>Tag[tag]);

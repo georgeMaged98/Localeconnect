@@ -3,10 +3,11 @@ import {Itinerary, Tag} from "../../model/itinerary";
 import {ItineraryService} from "../../service/itinerary.service";
 import {ItineraryDialogComponent} from "./itinerary-dialog/itinerary-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
-import {Subscription} from "rxjs";
+import {debounceTime, distinctUntilChanged, of, Subscription, switchMap} from "rxjs";
 import {UserService} from "../../service/user.service";
 import {Review} from "../../model/review";
 import {ReviewService} from "../../service/review.service";
+import {FormControl} from "@angular/forms";
 
 @Component({
   selector: 'app-itinerary',
@@ -16,6 +17,7 @@ import {ReviewService} from "../../service/review.service";
 export class ItineraryComponent implements OnInit, OnDestroy {
   itineraries: Itinerary[] = [];
   subscription: Subscription = new Subscription();
+  searchControl = new FormControl('');
 
   constructor(private userService: UserService, private itineraryService: ItineraryService, private reviewService: ReviewService, public dialog: MatDialog, private cdr: ChangeDetectorRef
   ) {
@@ -38,18 +40,31 @@ export class ItineraryComponent implements OnInit, OnDestroy {
       this.fetchUsername(itinerary);
     });
 
+
     this.subscription = this.itineraryService.currentItinerary.subscribe(itinerary => {
       if (itinerary) {
         //TODO: replace mock with backend
-       // this.addItinerary(itinerary);
+        // this.addItinerary(itinerary);
         this.addItineraryMock(itinerary);
         this.fetchUsername(itinerary);
         this.cdr.detectChanges();
       }
 
     });
-
-
+    this.searchControl.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(searchTerm =>searchTerm? this.itineraryService.searchItineraries(searchTerm): of([]))
+    ).subscribe(itineraries => {
+      // Handle the itineraries returned from the search
+      // Update your itineraries list
+    });
+  }
+    performFilter(place?: string, tag?: Tag, days?: string): void {
+      this.itineraryService.filterItineraries(place, tag, days).subscribe(itineraries => {
+        // Handle the itineraries returned from the filter
+        // Update your itineraries list
+      });
   }
 
   addItineraryMock(itinerary: Itinerary) {

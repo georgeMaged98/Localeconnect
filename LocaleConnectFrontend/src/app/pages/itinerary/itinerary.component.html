@@ -1,10 +1,12 @@
 
 <div class="search-container">
-  <input matInput placeholder="Search" class="search-bar"/>
+  <input matInput [formControl]="searchControl" placeholder="Search" class="search-bar"/>
   <button mat-icon-button class="search-button">
     <mat-icon>search</mat-icon>
   </button>
 </div>
+
+
 
 <ng-container class="main-container" *ngFor="let itinerary of itineraries">
   <mat-card class="itinerary-card" >
