@@ -1,0 +1,46 @@
+<div class="locale-connect">
+  <aside class="profile-sidebar">
+    <div class="profile-header">
+      <img src="assets/pictures/not_available.png" alt="Profile Image" class="profile-image">
+      <h2 class="profile-name">John Doe</h2>
+      <p class="profile-handle">@johndoe</p>
+    </div>
+    <nav class="profile-nav">
+      <a href="#" class="nav-link active">Messages</a>
+      <a href="#" class="nav-link">Profile</a>
+    </nav>
+  </aside>
+
+  <section class="feed-content">
+    <div class="post-container">
+      <mat-card *ngFor="let post of posts" class="post-card">
+        <mat-card-header>
+          <div mat-card-avatar class="post-avatar"></div>
+          <mat-card-title>{{ post.authorID }}</mat-card-title>
+          <mat-card-subtitle>{{ post.date | date: 'medium' }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>{{ post.content }}</p>
+          <div class="post-images" *ngIf="post.images">
+            <img *ngFor="let image of post.images" [src]="image" alt="Post Image">
+          </div>
+          <div class="post-comments" *ngIf="post.comments">
+            <div *ngFor="let comment of post.comments" class="comment">
+              <strong>{{ comment.authorID }}:</strong> {{ comment.text }}
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </section>
+
+  <aside class="followers-sidebar">
+    <div class="followers-header">
+      <h2>Followers</h2>
+    </div>
+    <div class="follower" *ngFor="let follower of followers">
+      <div class="follower-avatar"></div>
+      <div class="follower-name">{{ follower.name }}</div>
+    </div>
+  </aside>
+</div>

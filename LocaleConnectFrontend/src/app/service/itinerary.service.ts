@@ -12,7 +12,6 @@ export class ItineraryService {
   currentItinerary = this.itinerarySource.asObservable();
 
 
-  //TODO: CONFIGURE PROXY
   private apiUrl = '/api/itinerary';
 
   constructor(private http: HttpClient) {}

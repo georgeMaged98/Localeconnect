@@ -1,0 +1,128 @@
+.locale-connect {
+  display: grid;
+  grid-template-columns: 1fr 3fr 1fr;
+  grid-gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+
+  .profile-sidebar,
+  .followers-sidebar {
+    background-color: #f0f0f7;
+    padding: 16px;
+  }
+
+  .profile-header {
+    .profile-image {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background-color: #ccc; // Placeholder for the image
+    }
+
+    .profile-name {
+      margin: 8px 0;
+      font-size: 24px;
+    }
+
+    .profile-handle {
+      color: #666;
+    }
+  }
+
+  .profile-nav {
+    .nav-link {
+      display: block;
+      padding: 8px;
+      color: #333;
+      text-decoration: none;
+
+      &.active {
+        color: #000;
+        font-weight: bold;
+      }
+    }
+  }
+
+  .feed-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+
+    .app-title {
+      font-size: 32px;
+    }
+
+    .tab-nav {
+      .tab-link {
+        margin-right: 16px;
+        color: #333;
+        text-decoration: none;
+
+        &.active {
+          color: #000;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+
+  .post-container {
+    .post-card {
+      margin-bottom: 16px;
+
+      .post-avatar {
+        // Placeholder for avatar
+        background-color: #ccc;
+      }
+
+      mat-card-title,
+      mat-card-subtitle {
+        margin-left: 8px;
+      }
+
+      .post-images {
+        margin-top: 16px;
+
+        img {
+          max-width: 100%;
+          height: auto;
+          margin-right: 8px;
+        }
+      }
+
+      .post-comments {
+        margin-top: 16px;
+
+        .comment {
+          margin-bottom: 8px;
+        }
+      }
+    }
+  }
+
+  .followers-sidebar {
+    .followers-header {
+      margin-bottom: 16px;
+    }
+
+    .follower {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+
+      .follower-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #ccc; // Placeholder for avatar
+        margin-right: 8px;
+      }
+
+      .follower-name {
+        font-size: 16px;
+      }
+    }
+  }
+}

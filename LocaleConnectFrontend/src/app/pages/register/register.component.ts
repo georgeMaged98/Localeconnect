@@ -3,7 +3,7 @@ import {LoginComponent} from "../login/login.component";
 import {MatDialog} from "@angular/material/dialog";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {RegisterGuideComponent} from "../register-guide/register-guide.component";
-import {AuthService} from "../../api/auth.service";
+import {AuthService} from "../../service/auth.service";
 import {Traveler} from "../../model/traveler";
 
 @Component({
