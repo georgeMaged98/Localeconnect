@@ -37,8 +37,6 @@ public class User {
     private String password;
     @ElementCollection
     private List<String> visitedCountries = new ArrayList<>();
-    @Column
-    private boolean registeredAsLocalGuide;
     @ElementCollection
     private List<String> languages;
     @ManyToMany

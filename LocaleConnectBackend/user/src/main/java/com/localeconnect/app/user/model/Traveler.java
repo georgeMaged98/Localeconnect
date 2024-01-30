@@ -13,11 +13,6 @@ import java.util.List;
 @Getter
 @Setter
 public class Traveler extends User {
-    @ElementCollection
-    private List<String> interests = new ArrayList<>();
-    @Column
-    private String travelStyle;
-
     public Traveler() {
         super();
     }
