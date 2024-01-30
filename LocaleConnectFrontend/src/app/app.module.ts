@@ -24,6 +24,7 @@ import { ItineraryDialogComponent } from './pages/itinerary/itinerary-dialog/iti
 import {MatIconModule} from "@angular/material/icon";
 import {MatChipsModule} from "@angular/material/chips";
 import { ReviewComponent } from './pages/review/review.component';
+import { FeedComponent } from './pages/feed/feed.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { ReviewComponent } from './pages/review/review.component';
     ItineraryComponent,
     ItineraryDialogComponent,
     ReviewComponent,
+    FeedComponent,
 
 
 
