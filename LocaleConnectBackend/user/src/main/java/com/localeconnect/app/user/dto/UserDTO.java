@@ -32,8 +32,6 @@ public class UserDTO {
     @NotBlank(message = "This is a required field")
     private String password;
     private List<String> visitedCountries;
-    @NotBlank(message = "this is a required field")
-    private boolean registeredAsLocalGuide;
     private List<String> languages;
     private List<Long> followerIds;
     private List<Long> followingIds;
