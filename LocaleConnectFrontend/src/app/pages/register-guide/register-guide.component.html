@@ -3,7 +3,22 @@
     <mat-card-title>Register as guide</mat-card-title>
   </mat-card-header>
   <mat-card-content>
-    <form [formGroup]="registerForm">
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+      <mat-form-field appearance="fill">
+        <mat-label>First Name</mat-label>
+        <input matInput  formControlName="firstname" placeholder="Enter your first name">
+        <mat-error *ngIf="registerForm.controls['firstname'].hasError('required')">
+          First Name is required
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Last Name</mat-label>
+        <input matInput  formControlName="lastname" placeholder="Enter your last name">
+        <mat-error *ngIf="registerForm.controls['lastname'].hasError('required')">
+          Last Name is required
+        </mat-error>
+      </mat-form-field>
       <mat-form-field appearance="fill">
         <mat-label>Username</mat-label>
         <input matInput  formControlName="username" placeholder="Enter your username">
@@ -12,6 +27,9 @@
         </mat-error>
         <mat-error *ngIf="registerForm.controls['username'].hasError('minlength')">
           Username must be at least 3 characters long
+        </mat-error>
+        <mat-error *ngIf="registerForm.controls['username'].hasError('userExists')">
+          This username is already taken.
         </mat-error>
       </mat-form-field>
       <mat-form-field appearance="fill">
@@ -22,6 +40,9 @@
         </mat-error>
         <mat-error *ngIf="registerForm.controls['email'].hasError('email')">
           This is not a valid email format
+        </mat-error>
+        <mat-error *ngIf="registerForm.controls['email'].hasError('emailExists')">
+          This email is already taken.
         </mat-error>
       </mat-form-field>
       <mat-form-field appearance="fill">
