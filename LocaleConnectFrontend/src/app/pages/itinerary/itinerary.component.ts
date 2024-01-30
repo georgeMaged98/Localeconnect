@@ -56,14 +56,13 @@ export class ItineraryComponent implements OnInit, OnDestroy {
       distinctUntilChanged(),
       switchMap(searchTerm =>searchTerm? this.itineraryService.searchItineraries(searchTerm): of([]))
     ).subscribe(itineraries => {
-      // Handle the itineraries returned from the search
-      // Update your itineraries list
+this.itineraries=itineraries;
     });
   }
     performFilter(place?: string, tag?: Tag, days?: string): void {
       this.itineraryService.filterItineraries(place, tag, days).subscribe(itineraries => {
-        // Handle the itineraries returned from the filter
-        // Update your itineraries list
+        this.itineraries = itineraries;
+
       });
   }
 
