@@ -7,13 +7,16 @@ import {MatDialog} from "@angular/material/dialog";
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
-export class HeaderComponent {
-  constructor(public dialog: MatDialog) {}
+export class HeaderComponent{
+  title = 'LocaleConnect';
+
+  constructor(public dialog: MatDialog) {
+
+  }
 
   openLoginDialog(): void {
     this.dialog.open(LoginComponent, {
       width: '400px'
     });
   }
-
 }

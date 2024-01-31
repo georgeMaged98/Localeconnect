@@ -1,0 +1,17 @@
+<mat-toolbar>
+  <img class="logo" src="/assets/pictures/logo.png" alt="Logo" height="50">
+  <span class="title">LocaleConnect</span>
+  <span class="spacer"></span>
+
+  <span class="nav-links">
+    <a mat-button routerLink="/home">Home</a>
+    <a mat-button routerLink="/meetups">Meetups</a>
+    <a mat-button routerLink="/itineraries">Itineraries</a>
+    <a mat-button routerLink="/guides">Guides</a>
+    <a mat-button routerLink="/trips">Trips</a>
+  </span>
+
+  <button mat-icon-button (click)="openAccountMenu()">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+</mat-toolbar>

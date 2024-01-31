@@ -66,10 +66,14 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "LocaleConnectFrontend:build:production"
+              "browserTarget": "LocaleConnectFrontend:build:production",
+              "proxyConfig": "src/proxy.conf.json"
+
             },
             "development": {
-              "browserTarget": "LocaleConnectFrontend:build:development"
+              "browserTarget": "LocaleConnectFrontend:build:development",
+              "proxyConfig": "src/proxy.conf.json"
+
             }
           },
           "defaultConfiguration": "development"
