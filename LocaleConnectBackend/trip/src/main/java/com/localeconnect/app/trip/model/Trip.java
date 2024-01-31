@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class Trip {
     private String description;
     private LocalDate departureTime;
     private String destination;
-    private LocalDate duration;
+    private Double travelTime;
     private Integer capacity;
 
     @ElementCollection
@@ -33,9 +34,6 @@ public class Trip {
 
     @ElementCollection
     private List<String> languages = new ArrayList<>();
-
-    @ElementCollection
-    private List<String> placesToVisit = new ArrayList<>();
 
     @ElementCollection
     private List<String> dailyActivities = new ArrayList<>();

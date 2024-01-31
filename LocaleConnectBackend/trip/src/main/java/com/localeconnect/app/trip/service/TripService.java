@@ -8,9 +8,12 @@ import com.localeconnect.app.trip.exceptions.LogicException;
 import com.localeconnect.app.trip.mapper.TripMapper;
 import com.localeconnect.app.trip.model.Trip;
 import com.localeconnect.app.trip.repository.TripRepository;
+import com.localeconnect.app.trip.repository.TripSpecification;
 import lombok.AllArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -41,7 +44,7 @@ public class TripService {
 
     public List<TripDTO> getAllTrips() {
        return tripRepository.findAll().stream()
-               .map(trip -> tripMapper.toDomain(trip))
+               .map(tripMapper::toDomain)
                .collect(Collectors.toList());
     }
 
@@ -56,7 +59,7 @@ public class TripService {
     public List<TripDTO> getAllTripsByLocalguide(Long localguideId) {
 
         Optional<List<Trip>> trips = tripRepository.findByLocalguideId(localguideId);
-        return trips.isPresent() ? trips.get().stream().map(tripMapper::toDomain).collect(Collectors.toList()) : new ArrayList<>();
+        return trips.map(tripList -> tripList.stream().map(tripMapper::toDomain).collect(Collectors.toList())).orElseGet(ArrayList::new);
     }
 
     public TripDTO updateTrip( Long tripId, TripDTO tripDTO) {
@@ -99,6 +102,25 @@ public class TripService {
             newNotification.setSender(tripToDelete.getLocalguideId());
         }
         tripRepository.delete(tripToDelete);
+    }
+
+    public TripDTO searchTrip(String tripName) {
+        Optional<Trip> trip = tripRepository.findByName(tripName);
+
+        if(trip.isEmpty())
+            throw new ResourceNotFoundException("A trip with the name " + tripName + " does not exist!");
+
+        return tripMapper.toDomain(trip.get());
+    }
+
+    public List<TripDTO> filter(String destination, Double traveltime, List<String> languages) {
+        if (destination == null && traveltime <= 0 && languages == null)
+            return null;
+
+        Specification<Trip> specif = Specification.where(TripSpecification.getDestination(destination))
+                .and(TripSpecification.maxDuration(traveltime)).and(TripSpecification.hasLanguages(languages));
+        List<Trip> trips = tripRepository.findAll(specif);
+        return trips.stream().map(tripMapper::toDomain).collect(Collectors.toList());
     }
 
     private Boolean checkUserId(Long userId) {
