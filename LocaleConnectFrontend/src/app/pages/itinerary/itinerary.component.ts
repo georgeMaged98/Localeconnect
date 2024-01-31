@@ -3,11 +3,11 @@ import {Itinerary, Tag} from "../../model/itinerary";
 import {ItineraryService} from "../../service/itinerary.service";
 import {ItineraryDialogComponent} from "./itinerary-dialog/itinerary-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
-import {debounceTime, distinctUntilChanged, of, Subscription, switchMap} from "rxjs";
+import {debounceTime, distinctUntilChanged, Subscription} from "rxjs";
 import {UserService} from "../../service/user.service";
 import {Review} from "../../model/review";
 import {ReviewService} from "../../service/review.service";
-import {FormControl} from "@angular/forms";
+import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 
 @Component({
   selector: 'app-itinerary',
@@ -15,16 +15,28 @@ import {FormControl} from "@angular/forms";
   styleUrls: ['./itinerary.component.scss']
 })
 export class ItineraryComponent implements OnInit, OnDestroy {
+  allItineraries: Itinerary[] = [];
   itineraries: Itinerary[] = [];
+  filterItineraries: Itinerary[] = [];
+
   subscription: Subscription = new Subscription();
   searchControl = new FormControl('');
+  filterForm: FormGroup;
+  tagOptions: Tag[] = Object.values(Tag).filter(key => isNaN(Number(key))) as Tag[];
 
-  constructor(private userService: UserService, private itineraryService: ItineraryService, private reviewService: ReviewService, public dialog: MatDialog, private cdr: ChangeDetectorRef
+  constructor(private userService: UserService, private itineraryService: ItineraryService, private reviewService: ReviewService, public dialog: MatDialog, private cdr: ChangeDetectorRef, private formBuilder: FormBuilder
   ) {
+    this.filterForm = this.formBuilder.group({
+      place: [''],
+      days: [''],
+      tag: ['']
+    })
   }
 
   ngOnInit(): void {
-    this.itineraries = this.itineraryService.getItinerariesMock();
+    this.allItineraries = this.itineraryService.getItinerariesMock();
+    this.itineraries = [...this.allItineraries];
+    this.filterItineraries=[...this.allItineraries];
     //TODO: replace mock with api
     /*this.itineraryService.getItineraries().subscribe({
         next: (data: Itinerary[]) => {
@@ -35,7 +47,7 @@ export class ItineraryComponent implements OnInit, OnDestroy {
     );
 
      */
-    this.itineraries.forEach((itinerary) => {
+    this.allItineraries.forEach((itinerary) => {
       itinerary.mappedTags = this.itineraryService.mapTags(itinerary.tags);
       this.fetchUsername(itinerary);
     });
@@ -54,21 +66,30 @@ export class ItineraryComponent implements OnInit, OnDestroy {
     this.searchControl.valueChanges.pipe(
       debounceTime(300),
       distinctUntilChanged(),
-      switchMap(searchTerm =>searchTerm? this.itineraryService.searchItineraries(searchTerm): of([]))
-    ).subscribe(itineraries => {
-this.itineraries=itineraries;
+    ).subscribe(searchTerm => {
+      this.performSearch(searchTerm);
     });
-  }
-    performFilter(place?: string, tag?: Tag, days?: string): void {
-      this.itineraryService.filterItineraries(place, tag, days).subscribe(itineraries => {
-        this.itineraries = itineraries;
 
-      });
+  }
+
+  performSearch(searchTerm: string | null = ''): void {
+    this.allItineraries = searchTerm
+      ? this.itineraryService.searchItineraries(searchTerm, this.itineraries)
+      : [...this.itineraries];
+  }
+//TODO: fix filters
+  performFilter(): void {
+    const filterValues = this.filterForm.value;
+    const place = filterValues.place || null;
+    const tag = filterValues.tag||null;
+    const days = filterValues.days ? parseInt(filterValues.days, 10) : null;
+
+    this.allItineraries = this.itineraryService.filterItineraries(this.itineraries, place, tag, days);
   }
 
   addItineraryMock(itinerary: Itinerary) {
     this.itineraryService.addItinerary(itinerary);
-    this.itineraries.push(itinerary);
+    this.allItineraries.push(itinerary);
 
   }
 
@@ -76,7 +97,7 @@ this.itineraries=itineraries;
     this.itineraryService.addItinerary(newItinerary).subscribe({
 
         next: (itinerary: Itinerary) => {
-          this.itineraries.push(itinerary);
+          this.allItineraries.push(itinerary);
         },
         error: (error: any) => {
           console.error('Error adding itinerary', error);

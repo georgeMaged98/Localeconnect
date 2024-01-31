@@ -37,7 +37,10 @@
   padding: 10px 20px;
   border: 1px solid #ccc;
   border-radius: 20px;
-  width: 100%;
+  min-width: 100px;
+}
+.filter-container mat-select{
+  min-width:120px;
 }
 
 .filter-container button {
