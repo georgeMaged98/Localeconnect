@@ -72,7 +72,7 @@ export class ItineraryService {
       const matchesTag = tag ? itinerary.tags.includes(tag) : true;
       const matchesDays = days ? itinerary.numberOfDays <= days : true;
 
-      return matchesPlace || matchesTag || matchesDays;
+      return matchesPlace && matchesTag && matchesDays;
     });
   }
 mapTags(tags: Tag[]): string[]{

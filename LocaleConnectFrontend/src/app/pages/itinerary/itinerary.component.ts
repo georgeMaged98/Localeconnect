@@ -77,7 +77,6 @@ export class ItineraryComponent implements OnInit, OnDestroy {
       ? this.itineraryService.searchItineraries(searchTerm, this.itineraries)
       : [...this.itineraries];
   }
-//TODO: fix filters
   performFilter(): void {
     const filterValues = this.filterForm.value;
     const place = filterValues.place || null;
