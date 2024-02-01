@@ -7,7 +7,7 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface TripMapper {
-    public Trip toEntity(TripDTO tripDTO);
-    public TripDTO toDomain(Trip trip);
+    Trip toEntity(TripDTO tripDTO);
+    TripDTO toDomain(Trip trip);
     void updateTripFromDto(TripDTO tripDTO, @MappingTarget Trip entity);
 }
