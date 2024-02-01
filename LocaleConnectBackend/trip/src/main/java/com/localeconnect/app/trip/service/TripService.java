@@ -75,6 +75,7 @@ public class TripService {
             throw new ResourceNotFoundException("A trip with the id " + tripId + " does not exist!");
         //update the trip
         Trip tripToUpdate = optionalTrip.get();
+        tripToUpdate.setId(tripId);
         tripMapper.updateTripFromDto(tripDTO, tripToUpdate);
         //send notifications to all travelers
         List<Long> travelers = tripToUpdate.getTravelers();
@@ -130,7 +131,7 @@ public class TripService {
     }
 
     public TripReviewDTO createReview(TripReviewDTO tripReviewDTO, Long userId, Long tripId) {
-        if(!checkUserId(userId))
+        if(!this.checkUserId(userId))
             throw new ValidationException("Register to create a Review");
         if(tripId == null || !tripRepository.existsById(tripId))
             throw new ResourceNotFoundException("Trip with this ID does not exist");
@@ -142,6 +143,44 @@ public class TripService {
         return tripReviewMapper.toDomain(tripReview);
     }
 
+    public TripReviewDTO updateReview(TripReviewDTO tripReviewDTO, Long id) {
+        TripReview existingTripReview = tripReviewRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Review not found with id: " + id));
+
+        if (!this.checkUserId(tripReviewDTO.getUserId())) {
+            throw new ValidationException("Only registered users can edit their reviews");
+        }
+
+        if (!existingTripReview.getUserId().equals(tripReviewDTO.getUserId())) {
+            throw new ValidationException("Users can only edit their own reviews");
+        }
+
+        TripReview reviewToUpdate = tripReviewMapper.toEntity(tripReviewDTO);
+        reviewToUpdate.setTripReviewId(id);
+        reviewToUpdate.setTimestamp(LocalDateTime.now());
+        tripReviewMapper.updateTripReviewFromDto(tripReviewDTO, reviewToUpdate);
+        TripReview updatedReview = tripReviewRepository.save(reviewToUpdate);
+        return tripReviewMapper.toDomain(updatedReview);
+    }
+
+    public void deleteReview(Long id) {
+        TripReview review = tripReviewRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Review not found with id: " + id));
+
+        if (!this.checkUserId(review.getUserId())) {
+            throw new ValidationException("Only registered users can delete their reviews");
+        }
+
+        tripReviewRepository.delete(review);
+    }
+
+    public List<TripReviewDTO> getAllReviewsForTrip(Long tripId) {
+        List<TripReview> reviews = tripReviewRepository.findByTripId(tripId);
+
+        return reviews.stream().map(
+                        tripReviewMapper::toDomain)
+                .collect(Collectors.toList());
+    }
     private Boolean checkUserId(Long userId) {
         Boolean check = this.webClient.get()
                 .uri("http://user-service/api/user/exists/{userId}", userId)

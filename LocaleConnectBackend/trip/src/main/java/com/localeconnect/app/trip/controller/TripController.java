@@ -78,4 +78,21 @@ public class TripController {
         TripReviewDTO review = tripService.createReview(tripReviewDto, tripReviewDto.getUserId(), tripReviewDto.getTripId());
         return ResponseHandler.generateResponse("success!", HttpStatus.OK, review, null);
     }
+    @PutMapping(path = "/update-review/{id}")
+    public ResponseEntity<Object> updateReview(@PathVariable("id") Long id, @RequestBody @Valid TripReviewDTO tripReviewDTO) {
+        TripReviewDTO review = tripService.updateReview(tripReviewDTO, id);
+        return ResponseHandler.generateResponse("success!", HttpStatus.OK, review, null);
+    }
+
+    @DeleteMapping(path = "/delete-review/{id}")
+    public ResponseEntity<Object> deleteReview(@PathVariable("id") Long id) {
+        tripService.deleteReview(id);
+        return ResponseHandler.generateResponse("success!", HttpStatus.OK, null, null);
+    }
+
+    @GetMapping(path = "/all-reviews/{tripId}")
+    public ResponseEntity<Object> getAllReviews(@PathVariable("tripId") Long tripId) {
+        List<TripReviewDTO> reviews = tripService.getAllReviewsForTrip(tripId);
+        return ResponseHandler.generateResponse("success!", HttpStatus.OK, reviews, null);
+    }
 }
