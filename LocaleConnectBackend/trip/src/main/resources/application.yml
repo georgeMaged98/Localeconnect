@@ -5,7 +5,7 @@ spring:
   application:
     name: trip
   datasource:
-    url: jdbc:postgresql://localhost:5432/trip-DB
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/trip-DB
     username: localeconnect
     password: lssa2324app
     driver-class-name: org.postgresql.Driver
@@ -21,7 +21,7 @@ spring:
 
 eureka:
   client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka
     register-with-eureka: true
     fetch-registry: true
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER_ADDRESS:http://localhost:8761/eureka}

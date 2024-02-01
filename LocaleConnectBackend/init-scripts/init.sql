@@ -1,0 +1,3 @@
+CREATE DATABASE "meetupDB";
+CREATE DATABASE "itineraryDB";
+CREATE DATABASE "userDB";
