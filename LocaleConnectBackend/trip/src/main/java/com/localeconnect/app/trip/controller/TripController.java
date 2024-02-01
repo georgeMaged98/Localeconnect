@@ -1,6 +1,7 @@
 package com.localeconnect.app.trip.controller;
 
 import com.localeconnect.app.trip.dto.TripDTO;
+import com.localeconnect.app.trip.dto.TripReviewDTO;
 import com.localeconnect.app.trip.response_handler.ResponseHandler;
 import com.localeconnect.app.trip.service.TripService;
 import feign.Response;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -60,7 +62,7 @@ public class TripController {
     @GetMapping("/search")
     public ResponseEntity<Object> searchTrip(@RequestParam("name") String tripName) {
         TripDTO trip = tripService.searchTrip(tripName);
-        return ResponseHandler.generateResponse("success!", HttpStatus.OK, null, null);
+        return ResponseHandler.generateResponse("success!", HttpStatus.OK, trip, null);
     }
 
     @GetMapping("/filter")
@@ -68,7 +70,12 @@ public class TripController {
                                              @RequestParam(value = "traveltime", required = false) Double traveltime,
                                              @RequestParam(value = "language", required = false) List<String> languages) {
         List<TripDTO> tripsFiltered = tripService.filter(destination, traveltime, languages);
-        return ResponseHandler.generateResponse("success!", HttpStatus.OK, null, null);
+        return ResponseHandler.generateResponse("success!", HttpStatus.OK, tripsFiltered, null);
     }
-
+    @PostMapping("/create-review")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<Object> createReview(@RequestBody @Valid TripReviewDTO tripReviewDto) {
+        TripReviewDTO review = tripService.createReview(tripReviewDto, tripReviewDto.getUserId(), tripReviewDto.getTripId());
+        return ResponseHandler.generateResponse("success!", HttpStatus.OK, review, null);
+    }
 }

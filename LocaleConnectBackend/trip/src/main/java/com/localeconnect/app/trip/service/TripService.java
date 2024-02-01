@@ -2,12 +2,16 @@ package com.localeconnect.app.trip.service;
 
 import com.localeconnect.app.trip.dto.NotificationDTO;
 import com.localeconnect.app.trip.dto.TripDTO;
+import com.localeconnect.app.trip.dto.TripReviewDTO;
 import com.localeconnect.app.trip.exceptions.ResourceNotFoundException;
 import com.localeconnect.app.trip.exceptions.ValidationException;
 import com.localeconnect.app.trip.exceptions.LogicException;
 import com.localeconnect.app.trip.mapper.TripMapper;
+import com.localeconnect.app.trip.mapper.TripReviewMapper;
 import com.localeconnect.app.trip.model.Trip;
+import com.localeconnect.app.trip.model.TripReview;
 import com.localeconnect.app.trip.repository.TripRepository;
+import com.localeconnect.app.trip.repository.TripReviewRepository;
 import com.localeconnect.app.trip.repository.TripSpecification;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -26,7 +30,9 @@ import java.util.stream.Collectors;
 public class TripService {
     private final TripRepository tripRepository;
     private final TripMapper tripMapper;
+    private final TripReviewMapper tripReviewMapper;
     private final WebClient webClient;
+    private final TripReviewRepository tripReviewRepository;
 
     public TripDTO createTrip(TripDTO tripDTO) {
         //check if creator (localguide) exists
@@ -121,6 +127,19 @@ public class TripService {
                 .and(TripSpecification.maxDuration(traveltime)).and(TripSpecification.hasLanguages(languages));
         List<Trip> trips = tripRepository.findAll(specif);
         return trips.stream().map(tripMapper::toDomain).collect(Collectors.toList());
+    }
+
+    public TripReviewDTO createReview(TripReviewDTO tripReviewDTO, Long userId, Long tripId) {
+        if(!checkUserId(userId))
+            throw new ValidationException("Register to create a Review");
+        if(tripId == null || !tripRepository.existsById(tripId))
+            throw new ResourceNotFoundException("Trip with this ID does not exist");
+        TripReview tripReview = tripReviewMapper.toEntity(tripReviewDTO);
+        tripReview.setTripId(tripId);
+        tripReview.setUserId(userId);
+        tripReview.setTimestamp(LocalDateTime.now());
+        tripReview = tripReviewRepository.save(tripReview);
+        return tripReviewMapper.toDomain(tripReview);
     }
 
     private Boolean checkUserId(Long userId) {
