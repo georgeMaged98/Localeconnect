@@ -3,6 +3,7 @@ package com.localeconnect.app.trip.service;
 import com.localeconnect.app.trip.dto.NotificationDTO;
 import com.localeconnect.app.trip.dto.TripDTO;
 import com.localeconnect.app.trip.dto.TripReviewDTO;
+import com.localeconnect.app.trip.dto.TripShareDTO;
 import com.localeconnect.app.trip.exceptions.ResourceNotFoundException;
 import com.localeconnect.app.trip.exceptions.ValidationException;
 import com.localeconnect.app.trip.exceptions.LogicException;
@@ -17,6 +18,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 
 import java.time.LocalDateTime;
@@ -180,6 +182,29 @@ public class TripService {
         return reviews.stream().map(
                         tripReviewMapper::toDomain)
                 .collect(Collectors.toList());
+    }
+    // TODO: add shareTrip method in feed
+    public Mono<TripShareDTO> shareTrip(Long tripId) {
+        return Mono.just(tripRepository.findById(tripId))
+                .map(trip -> {
+                    TripShareDTO shareDTO
+                            = new TripShareDTO();
+                    if (trip.isPresent()) {
+                        shareDTO.setId(trip.get().getId());
+                        shareDTO.setName(trip.get().getName());
+                        shareDTO.setDescription(trip.get().getDescription());
+                    }
+                    return shareDTO;
+                })
+                .flatMap(this::postToFeed)
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Trip not found with id: " + tripId)));
+    }
+    private Mono<TripShareDTO> postToFeed(TripShareDTO tripShareDTO) {
+        return webClient.post()
+                .uri("http://feed-service/api/feed/share-trip")
+                .bodyValue(tripShareDTO)
+                .retrieve()
+                .bodyToMono(TripShareDTO.class);
     }
     private Boolean checkUserId(Long userId) {
         Boolean check = this.webClient.get()
