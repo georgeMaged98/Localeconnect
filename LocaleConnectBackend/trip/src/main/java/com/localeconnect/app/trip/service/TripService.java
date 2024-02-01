@@ -42,9 +42,8 @@ public class TripService {
             throw new ValidationException("Register as a Localguide to create a Trip");
 
         //check if this Trip already exists
-        Optional<Trip> optionalTrip = tripRepository.findByLocalguideIdAndName(tripDTO.getLocalguideId(), tripDTO.getName());
-        if (optionalTrip.isEmpty())
-            throw new LogicException("A Trip with this name already exists");
+        if (tripRepository.findByLocalguideIdAndName(tripDTO.getLocalguideId(), tripDTO.getName()).isPresent())
+                throw new LogicException("A Trip with this name already exists");
 
         tripRepository.save(tripMapper.toEntity(tripDTO));
         return tripDTO;
@@ -57,11 +56,10 @@ public class TripService {
     }
 
     public TripDTO getById(Long tripId) {
-        Optional<Trip> optionalTrip = tripRepository.findById(tripId);
+        Trip optionalTrip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new ResourceNotFoundException("A trip with the id " + tripId + " does not exist!"));
 
-        if (optionalTrip.isEmpty())
-            throw new ResourceNotFoundException("A trip with the id " + tripId + " does not exist!");
-        return tripMapper.toDomain(optionalTrip.get());
+        return tripMapper.toDomain(optionalTrip);
     }
 
     public List<TripDTO> getAllTripsByLocalguide(Long localguideId) {
@@ -71,12 +69,9 @@ public class TripService {
     }
 
     public TripDTO updateTrip( Long tripId, TripDTO tripDTO) {
-        Optional<Trip> optionalTrip = tripRepository.findById(tripId);
+        Trip tripToUpdate = tripRepository.findById(tripId)
+                .orElseThrow(() -> new ResourceNotFoundException("A trip with the id " + tripId + " does not exist!"));
 
-        if (optionalTrip.isEmpty())
-            throw new ResourceNotFoundException("A trip with the id " + tripId + " does not exist!");
-        //update the trip
-        Trip tripToUpdate = optionalTrip.get();
         tripToUpdate.setId(tripId);
         tripMapper.updateTripFromDto(tripDTO, tripToUpdate);
         //send notifications to all travelers
@@ -90,16 +85,13 @@ public class TripService {
             newNotification.setSender(tripToUpdate.getLocalguideId());
         }
         tripRepository.save(tripToUpdate);
-        return tripMapper.toDomain(optionalTrip.get());
+        return tripMapper.toDomain(tripToUpdate);
     }
 
     public void deleteTrip(Long tripId) {
-        Optional<Trip> optionalTrip = tripRepository.findById(tripId);
+        Trip tripToDelete = tripRepository.findById(tripId)
+                .orElseThrow(() -> new ResourceNotFoundException("A trip with the id " + tripId + " does not exist!"));
 
-        if (optionalTrip.isEmpty())
-            throw new ResourceNotFoundException("A trip with the id " + tripId + " does not exist!");
-        //update the trip
-        Trip tripToDelete = optionalTrip.get();
         //send notifications to all travelers
         List<Long> travelers = tripToDelete.getTravelers();
         for (Long traveler : travelers) {
@@ -114,12 +106,10 @@ public class TripService {
     }
 
     public TripDTO searchTrip(String tripName) {
-        Optional<Trip> trip = tripRepository.findByName(tripName);
+        Trip trip = tripRepository.findByName(tripName)
+                .orElseThrow(() -> new ResourceNotFoundException("A trip with the name " + tripName + " does not exist!"));
 
-        if(trip.isEmpty())
-            throw new ResourceNotFoundException("A trip with the name " + tripName + " does not exist!");
-
-        return tripMapper.toDomain(trip.get());
+        return tripMapper.toDomain(trip);
     }
 
     public List<TripDTO> filter(String destination, Double traveltime, List<String> languages) {

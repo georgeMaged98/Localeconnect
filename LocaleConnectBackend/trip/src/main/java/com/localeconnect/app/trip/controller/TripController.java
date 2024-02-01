@@ -2,6 +2,7 @@ package com.localeconnect.app.trip.controller;
 
 import com.localeconnect.app.trip.dto.TripDTO;
 import com.localeconnect.app.trip.dto.TripReviewDTO;
+import com.localeconnect.app.trip.dto.TripShareDTO;
 import com.localeconnect.app.trip.response_handler.ResponseHandler;
 import com.localeconnect.app.trip.service.TripService;
 import feign.Response;
@@ -94,5 +95,11 @@ public class TripController {
     public ResponseEntity<Object> getAllReviews(@PathVariable("tripId") Long tripId) {
         List<TripReviewDTO> reviews = tripService.getAllReviewsForTrip(tripId);
         return ResponseHandler.generateResponse("success!", HttpStatus.OK, reviews, null);
+    }
+    @PostMapping("/share/{tripId}")
+    public Mono<ResponseEntity<TripShareDTO>> shareItinerary(@PathVariable("tripId") Long tripId) {
+        return tripService.shareTrip(tripId)
+                .map(sharedItinerary -> ResponseEntity.ok().body(sharedItinerary))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 }
