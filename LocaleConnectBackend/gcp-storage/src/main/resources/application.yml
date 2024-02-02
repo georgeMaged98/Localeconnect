@@ -1,0 +1,12 @@
+server:
+  port: 5005
+
+spring:
+  application:
+    name: gcp-storage
+
+gcs-resource-bucket: localeconnect_bucket
+
+gcp:
+  credentials:
+    path: /Users/georgemaged/.config/gcloud/legacy_credentials/g.maged327@gmail.com/adc.json

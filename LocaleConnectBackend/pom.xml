@@ -19,6 +19,7 @@
     <module>notification</module>
     <module>discovery-server</module>
     <module>api-gateway</module>
+      <module>gcp-storage</module>
   </modules>
 
   <name>localeconnect</name>
