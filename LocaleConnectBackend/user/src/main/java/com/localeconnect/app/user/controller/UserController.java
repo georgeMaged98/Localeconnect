@@ -42,7 +42,7 @@ public class UserController {
 
     @PostMapping("/register/traveler")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> registerUser(@RequestBody TravelerDTO travelerDTO) {
+    public ResponseEntity<?> registerTraveler(@RequestBody TravelerDTO travelerDTO) {
         try {
             return new ResponseEntity<>(userService.registerTraveler(travelerDTO), HttpStatus.CREATED);
         } catch (UserAlreadyExistsException | IllegalArgumentException e) {
@@ -53,7 +53,7 @@ public class UserController {
     }
     @PostMapping("/register/localguide")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> registerUser(@RequestBody LocalguideDTO localguideDTO) {
+    public ResponseEntity<?> registerLocalGuide(@RequestBody LocalguideDTO localguideDTO) {
         try {
             return new ResponseEntity<>(userService.registerLocalguide(localguideDTO), HttpStatus.CREATED);
         } catch (UserAlreadyExistsException | IllegalArgumentException e) {

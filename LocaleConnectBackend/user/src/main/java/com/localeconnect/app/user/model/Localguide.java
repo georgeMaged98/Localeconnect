@@ -2,13 +2,14 @@ package com.localeconnect.app.user.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 
 @Entity
 @Getter
 @Setter
+@SuperBuilder
 public class Localguide extends User {
     @Column
     private String city;
