@@ -8,6 +8,7 @@ import {UserService} from "../../service/user.service";
 import {Review} from "../../model/review";
 import {ReviewService} from "../../service/review.service";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
+import {ImagesService} from "../../service/image.service";
 
 @Component({
   selector: 'app-itinerary',
@@ -18,13 +19,14 @@ export class ItineraryComponent implements OnInit, OnDestroy {
   allItineraries: Itinerary[] = [];
   itineraries: Itinerary[] = [];
   filterItineraries: Itinerary[] = [];
+  images: string[] = [];
 
   subscription: Subscription = new Subscription();
   searchControl = new FormControl('');
   filterForm: FormGroup;
   tagOptions: Tag[] = Object.values(Tag).filter(key => isNaN(Number(key))) as Tag[];
 
-  constructor(private userService: UserService, private itineraryService: ItineraryService, private reviewService: ReviewService, public dialog: MatDialog, private cdr: ChangeDetectorRef, private formBuilder: FormBuilder
+  constructor(private imageService: ImagesService, private userService: UserService, private itineraryService: ItineraryService, private reviewService: ReviewService, public dialog: MatDialog, private cdr: ChangeDetectorRef, private formBuilder: FormBuilder
   ) {
     this.filterForm = this.formBuilder.group({
       place: [''],
@@ -51,18 +53,22 @@ export class ItineraryComponent implements OnInit, OnDestroy {
       itinerary.mappedTags = this.itineraryService.mapTags(itinerary.tags);
       this.fetchUsername(itinerary);
     });
-
+    this.imageService.currentImages.subscribe(images => {
+      this.images = images;
+    });
 
     this.subscription = this.itineraryService.currentItinerary.subscribe(itinerary => {
       if (itinerary) {
         //TODO: replace mock with backend
-        // this.addItinerary(itinerary);
+        // this.addItinerary(itinerary)
+        itinerary.imageUrls=this.images;
         this.addItineraryMock(itinerary);
         this.fetchUsername(itinerary);
         this.cdr.detectChanges();
       }
 
     });
+
     this.searchControl.valueChanges.pipe(
       debounceTime(300),
       distinctUntilChanged(),
