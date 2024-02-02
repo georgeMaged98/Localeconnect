@@ -25,6 +25,7 @@ import {MatIconModule} from "@angular/material/icon";
 import {MatChipsModule} from "@angular/material/chips";
 import { ReviewComponent } from './pages/review/review.component';
 import { FeedComponent } from './pages/feed/feed.component';
+import {MatListModule} from "@angular/material/list";
 
 @NgModule({
   declarations: [
@@ -40,27 +41,28 @@ import { FeedComponent } from './pages/feed/feed.component';
 
 
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    BrowserAnimationsModule,
-    CoreModule,
-    LandingPageModule,
-    MatCardModule,
-    MatInputModule,
-    MatDialogModule,
-    MatButtonModule,
-    ReactiveFormsModule,
-    HttpClientModule,
-    MatDatepickerModule,
-    MatSelectModule,
-    MatCheckboxModule,
-    MatNativeDateModule,
-    FormsModule,
-    MatIconModule,
-    MatChipsModule,
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        CoreModule,
+        LandingPageModule,
+        MatCardModule,
+        MatInputModule,
+        MatDialogModule,
+        MatButtonModule,
+        ReactiveFormsModule,
+        HttpClientModule,
+        MatDatepickerModule,
+        MatSelectModule,
+        MatCheckboxModule,
+        MatNativeDateModule,
+        FormsModule,
+        MatIconModule,
+        MatChipsModule,
+        MatListModule,
 
-  ],
+    ],
   providers: [   MatDatepickerModule,{provide: MAT_DATE_LOCALE, useValue: 'en-GB'}],
   bootstrap: [AppComponent]
 })

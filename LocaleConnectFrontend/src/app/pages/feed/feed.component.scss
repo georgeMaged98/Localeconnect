@@ -1,23 +1,37 @@
 .locale-connect {
   display: grid;
-  grid-template-columns: 1fr 3fr 1fr;
+  grid-template-columns: 250px auto 250px;
   grid-gap: 16px;
-  max-width: 1200px;
+  max-width: max-content;
   margin: 0 auto;
   padding: 16px;
 
   .profile-sidebar,
   .followers-sidebar {
-    background-color: #f0f0f7;
+    background-color: #e0d0f1;
     padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .profile-header {
+
     .profile-image {
       width: 100px;
       height: 100px;
       border-radius: 50%;
-      background-color: #ccc; // Placeholder for the image
+    }
+
+    .profile-image-upload {
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      border: 2px dashed gray;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 1rem;
     }
 
     .profile-name {
@@ -31,98 +45,169 @@
   }
 
   .profile-nav {
-    .nav-link {
-      display: block;
-      padding: 8px;
-      color: #333;
-      text-decoration: none;
+    padding-top: 40px;
 
-      &.active {
-        color: #000;
-        font-weight: bold;
-      }
+    .make-post {
+      cursor: pointer;
+      background-color: #8085AD;
+      color: white;
+      font-size: 12px;
+      border-radius: 20px;
+      padding: 10px 20px;
+      min-width: 100px;
+      border: none;
+
     }
   }
 
-  .feed-header {
+  .feed-wrapper {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
+    flex-direction: column;
+    min-width: 1000px;
 
-    .app-title {
-      font-size: 32px;
-    }
-
-    .tab-nav {
-      .tab-link {
-        margin-right: 16px;
-        color: #333;
-        text-decoration: none;
-
-        &.active {
-          color: #000;
-          font-weight: bold;
-        }
-      }
-    }
-  }
-
-  .post-container {
     .post-card {
-      margin-bottom: 16px;
+      margin-bottom: 20px;
 
-      .post-avatar {
-        // Placeholder for avatar
-        background-color: #ccc;
+      .avatar {
+        background-color: #757575;
+        border-radius: 50%;
       }
 
       mat-card-title,
       mat-card-subtitle {
-        margin-left: 8px;
+        margin-left: 12px;
       }
 
-      .post-images {
-        margin-top: 16px;
+      mat-icon.liked {
+        color: #8085AD;
+      }
 
-        img {
-          max-width: 100%;
-          height: auto;
-          margin-right: 8px;
+      .post-content {
+        padding: 20px;
+        position: relative;
+
+
+img {
+    width: 30%;
+    height: auto;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    margin-right: 10px;
+
+
+  }
+  button {
+    position: absolute;
+    right: 20px;
+    bottom: 0;
+    background-color: #594E78;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 14px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+
+
+
+        p {
+          font-size: 18px;
         }
       }
 
-      .post-comments {
-        margin-top: 16px;
 
-        .comment {
-          margin-bottom: 8px;
+      .comment {
+        border-top: 1px solid #eeeeee;
+        padding: 16px;
+
+
+        .comment-author {
+          font-weight: bold;
+        }
+
+        .comment-date {
+          margin-left: 10px;
+          font-size: 0.85em;
+          color: #757575;
+        }
+
+        .comment-text {
+          margin-top: 5px;
         }
       }
+
+      .add-comment-section {
+        display: flex;
+        align-items: center;
+        padding: 16px;
+
+        .comment-input {
+          width: 100%;
+
+          mat-form-field {
+            width: 100%;
+
+            input {
+              padding: 4px 8px;
+              font-size: 0.9em;
+            }
+          }
+        }
+
+        button {
+          margin-left: 8px;
+        }
+      }
+
     }
   }
 
   .followers-sidebar {
-    .followers-header {
-      margin-bottom: 16px;
+    .sidebar-title {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
     }
 
-    .follower {
+    .follower-item {
       display: flex;
-      align-items: center;
-      margin-bottom: 8px;
+      flex-direction: row;
 
-      .follower-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background-color: #ccc; // Placeholder for avatar
-        margin-right: 8px;
+      .avatar {
+        margin-right: 20px;
+
+        mat-icon {
+          color: #594E78;
+          width: 30px;
+          height: 30px;
+        }
       }
 
-      .follower-name {
-        font-size: 16px;
+      .follower-details {
+        display: flex;
+        flex-direction: column;
+
+        .follower-name,
+        .follower-handle {
+          margin: 0;
+        }
+
+        .follower-name {
+          font-weight: bold;
+        }
+
+        .follower-handle {
+          font-size: 0.85em;
+          color: #757575;
+        }
       }
     }
   }
+
+
 }

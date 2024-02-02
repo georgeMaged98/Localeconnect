@@ -5,6 +5,8 @@ export interface Post {
   date: Date;
   content: string;
   images: string[];
+  likes?: number;
+  likedByUser?: boolean;
   comments: Comment[];
 }
 
@@ -13,5 +15,10 @@ export interface Comment {
   authorID: number;
   date: Date;
   text: string;
-  post?: Post;
+}
+export interface Follower{
+  id: number,
+  name: string,
+  handle: string,
+  isFollowing: boolean
 }
