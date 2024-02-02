@@ -1,17 +1,12 @@
 package com.localeconnect.app.user.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 @Entity
 @Getter
 @Setter
+@SuperBuilder
 public class Traveler extends User {
     public Traveler() {
         super();

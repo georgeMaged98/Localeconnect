@@ -43,7 +43,7 @@ public class UserService {
         return userMapper.toDomain(user);
     }
 
-    public UserDTO registerTraveler(TravelerDTO travelerDTO) {
+    public TravelerDTO registerTraveler(TravelerDTO travelerDTO) {
         if (userRepository.existsByUserName(travelerDTO.getUserName())) {
             throw new UserAlreadyExistsException("A user with the given username already exists.");
         }
@@ -58,7 +58,7 @@ public class UserService {
         return travelerDTO;
     }
 
-    public UserDTO registerLocalguide(LocalguideDTO localguideDTO) {
+    public LocalguideDTO registerLocalguide(LocalguideDTO localguideDTO) {
         if (userRepository.existsByUserName(localguideDTO.getUserName())) {
             throw new UserAlreadyExistsException("A user with the given username already exists.");
         }

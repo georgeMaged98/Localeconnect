@@ -1,12 +1,11 @@
 package com.localeconnect.app.user.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
 @Getter
 @Setter
+@SuperBuilder
 public class TravelerDTO extends UserDTO {
     public TravelerDTO() {
         super();
