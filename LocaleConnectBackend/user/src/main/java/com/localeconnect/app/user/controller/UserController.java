@@ -4,6 +4,7 @@ import com.localeconnect.app.user.dto.UserDTO;
 import com.localeconnect.app.user.exception.UserAlreadyExistsException;
 import com.localeconnect.app.user.exception.UserDoesNotExistException;
 import com.localeconnect.app.user.service.UserService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,11 @@ public class UserController {
     @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<String> test() {
+        return new ResponseEntity<>("sssss", HttpStatus.OK);
     }
 
     @GetMapping("/all")
@@ -44,7 +50,7 @@ public class UserController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> registerUser(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<?> registerUser(@RequestBody @Valid UserDTO userDTO) {
         try {
             return new ResponseEntity<>(userService.registerUser(userDTO), HttpStatus.CREATED);
         } catch (UserAlreadyExistsException | IllegalArgumentException e) {

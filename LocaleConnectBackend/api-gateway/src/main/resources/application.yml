@@ -2,53 +2,36 @@
 # Example: eureka -> localhost:8080/eureka/web
 server:
   port: 8080
+
 spring:
   application:
     name: api-gateway
+
   cloud:
     gateway:
-     routes:
-        - id: chat
-          uri: lb://chat
+      routes:
+        - id: chat-service
+          uri: http://chat-service:8003
           predicates:
-            - Path=/api/chat
-        - id: user-service
-          uri: lb://user
-          predicates:
-            - Path=/api/user
-        - id: feed-service
-          uri: lb://feed
-          predicates:
-            - Path=/api/feed
-        - id: itinerary
-          uri: lb://itinerary
-          predicates:
-            - Path=/api/itinerary
+            - Path=/api/chat/**
+
         - id: meetup-service
-          uri: lb://meetup
+          uri: http://meetup-service:7001
           predicates:
-             - Path=/api/meetup
-        - id: trip-service
-          uri: lb://trip
+            - Path=/api/meetup/**
+
+        - id: user-service
+          uri: http://user-service:8084
           predicates:
-            - Path=/api/trip
-        - id: notification
-          uri: lb://notification
+            - Path=/api/user/**
+
+        - id: itinerary-service
+          uri: http://itinerary-service:8082
           predicates:
-            - Path=/api/notification
-        - id: eureka-server
-          uri: http://localhost:8761
-          predicates:
-            - Path=/eureka/web
-          filters:
-            - SetPath=/
-        - id: eureka-server-static
-          uri: http://localhost:8761
-          predicates:
-            - Path=/eureka/**
+            - Path=/api/itinerary/**
 
 eureka:
- client:
+  client:
     serviceUrl:
       defaultZone: ${EUREKA_SERVER_ADDRESS:http://localhost:8761/eureka}
     register-with-eureka: true
@@ -59,4 +42,6 @@ logging:
     org.springframework.cloud.gateway: DEBUG
     org.springframework.cloud.loadbalancer: DEBUG
     reactor.netty.http.client: DEBUG
+
+management.endpoints.web.exposure.include: "*"
 
