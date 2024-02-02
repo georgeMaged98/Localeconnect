@@ -25,9 +25,9 @@
 
     .profile-image-upload {
       border-radius: 50%;
-      width: 100px;
-      height: 100px;
-      border: 2px dashed gray;
+      width: 110px;
+      height: 110px;
+      border: #594E78;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -68,10 +68,30 @@
     .post-card {
       margin-bottom: 20px;
 
-      .avatar {
-        background-color: #757575;
-        border-radius: 50%;
+      .post-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+
+        .author-details {
+          display: flex;
+          align-items: center;
+
+          .profile-image {
+            background-color: #594E78;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+          }
+        }
+
+        .follow-btn {
+          margin-left: auto;
+          color: #594E78;
+        }
       }
+
 
       mat-card-title,
       mat-card-subtitle {
@@ -87,33 +107,32 @@
         position: relative;
 
 
-img {
-    width: 30%;
-    height: auto;
-    border: 1px solid #ccc;
-    border-radius: 20px;
-    margin-bottom: 20px;
-    margin-right: 10px;
+        img {
+          width: 30%;
+          height: auto;
+          border: 1px solid #ccc;
+          border-radius: 20px;
+          margin-bottom: 20px;
+          margin-right: 10px;
 
 
-  }
-  button {
-    position: absolute;
-    right: 20px;
-    bottom: 0;
-    background-color: #594E78;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    font-size: 14px;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-  }
+        }
 
-
+        button {
+          position: absolute;
+          right: 20px;
+          bottom: 0;
+          background-color: #594E78;
+          color: white;
+          border: none;
+          border-radius: 50%;
+          width: 50px;
+          height: 50px;
+          font-size: 14px;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+        }
 
 
         p {

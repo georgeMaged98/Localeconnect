@@ -26,6 +26,7 @@ import {MatChipsModule} from "@angular/material/chips";
 import { ReviewComponent } from './pages/review/review.component';
 import { FeedComponent } from './pages/feed/feed.component';
 import {MatListModule} from "@angular/material/list";
+import { AddPostDialogComponent } from './pages/feed/add-post-dialog/add-post-dialog.component';
 
 @NgModule({
   declarations: [
@@ -37,6 +38,7 @@ import {MatListModule} from "@angular/material/list";
     ItineraryDialogComponent,
     ReviewComponent,
     FeedComponent,
+    AddPostDialogComponent,
 
 
 

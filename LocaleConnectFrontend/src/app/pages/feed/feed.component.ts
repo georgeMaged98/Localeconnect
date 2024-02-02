@@ -10,7 +10,7 @@ import {Comment, Follower, Post} from "../../model/feed";
 export class FeedComponent implements OnInit {
   posts: Post[] = [];
   followers: any[] = [];
-  profileImageSrc = 'assets/pictures/not_available.png';
+  profileImageSrc = 'assets/pictures/profil.png';
   newCommentTexts: { [key: number]: string } = {};
   showAllImages = false;
 
@@ -49,23 +49,30 @@ export class FeedComponent implements OnInit {
     );
   }
 
-  //TODO: replace with api call
+  //TODO: add api call
   likePost(post: Post): void {
     if (post.likedByUser) {
-      // If already liked, unlike it and decrement the likes counter
       post.likes = (post.likes || 1) - 1;
       post.likedByUser = false;
     } else {
-      // If not liked, like it and increment the likes counter
       post.likes = (post.likes || 0) + 1;
       post.likedByUser = true;
     }
-    // Here, you would also call the service method to update the backend
   }
 
   //TODO: replace with api call
-  toggleFollow(follower: any): void {
-    follower.isFollowing = !follower.isFollowing;
+  toggleFollow(post: Post): void {
+    post.isFollowingAuthor = !post.isFollowingAuthor;
+    /*  if (post.isFollowingAuthor) {
+        this.feedService.unfollowUser(post.authorID).subscribe(() => {
+          post.isFollowingAuthor = false;
+        });
+      } else {
+        this.feedService.followUser(post.authorID).subscribe(() => {
+          post.isFollowingAuthor = true;
+        });
+      }
+     */
   }
 
   addComment(postId: number): void {
@@ -92,7 +99,7 @@ export class FeedComponent implements OnInit {
   toggleImagesDisplay() {
     this.showAllImages = !this.showAllImages;
   }
-
+//TODO: configure image storage
   changeProfilePicture(event: any): void {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];

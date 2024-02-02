@@ -7,6 +7,8 @@ export interface Post {
   images: string[];
   likes?: number;
   likedByUser?: boolean;
+  isFollowingAuthor?: boolean;
+
   comments: Comment[];
 }
 
