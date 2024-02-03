@@ -5,7 +5,7 @@ spring:
   application:
     name: trip
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:5432/trip-DB
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/tripDB
     username: localeconnect
     password: lssa2324app
     driver-class-name: org.postgresql.Driver

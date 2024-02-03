@@ -30,6 +30,11 @@ spring:
           predicates:
             - Path=/api/itinerary/**
 
+        - id: feed-service
+          uri: http://feed-service:8081
+          predicates:
+            - Path=/api/feed/**
+
 eureka:
   client:
     serviceUrl:
