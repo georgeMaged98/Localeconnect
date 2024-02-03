@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-@CrossOrigin(origins = "http://localhost:4200")
+
 @RestController
 @AllArgsConstructor
 @Slf4j
@@ -40,28 +40,6 @@ public class UserController {
         }
     }
 
-    @PostMapping("/register/traveler")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> registerTraveler(@RequestBody TravelerDTO travelerDTO) {
-        try {
-            return new ResponseEntity<>(userService.registerTraveler(travelerDTO), HttpStatus.CREATED);
-        } catch (UserAlreadyExistsException | IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity<>("An internal error has  occured", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-    @PostMapping("/register/localguide")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> registerLocalGuide(@RequestBody LocalguideDTO localguideDTO) {
-        try {
-            return new ResponseEntity<>(userService.registerLocalguide(localguideDTO), HttpStatus.CREATED);
-        } catch (UserAlreadyExistsException | IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity<>("An internal error has  occured", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
     @PutMapping("/update")
     public ResponseEntity<?> updateUser(@RequestBody UserDTO userDTO) {
         try {
