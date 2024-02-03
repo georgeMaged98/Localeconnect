@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/chat")
 public class ChatController {
 
-    @GetMapping("/red")
+    @GetMapping("/test")
     public ResponseEntity<String> testRed(){
         return new ResponseEntity("RED", HttpStatus.OK);
     }
-    @GetMapping("/blue")
-    public ResponseEntity<String> testBlue(){
-        return new ResponseEntity("BLUE", HttpStatus.OK);
-    }
+//    @GetMapping("/blue")
+//    public ResponseEntity<String> testBlue(){
+//        return new ResponseEntity("BLUE", HttpStatus.OK);
+//    }
 }
