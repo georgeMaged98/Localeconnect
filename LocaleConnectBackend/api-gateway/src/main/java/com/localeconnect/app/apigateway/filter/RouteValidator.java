@@ -11,8 +11,6 @@ public class RouteValidator {
 
     // endpoints that will be ignored
     public static final List<String> openApiEndpoints = List.of(
-            "/api/auth/registerTraveler",
-            "/api/auth/registerLocalGuide",
             "/api/auth/login",
             "/eureka"
     );
