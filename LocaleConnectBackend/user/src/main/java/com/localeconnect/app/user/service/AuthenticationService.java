@@ -1,15 +1,24 @@
 package com.localeconnect.app.user.service;
 
+import com.localeconnect.app.user.auth.AuthenticationResponse;
+import com.localeconnect.app.user.dto.AuthenticationRequestDTO;
+import com.localeconnect.app.user.dto.AuthenticationResponseDTO;
 import com.localeconnect.app.user.dto.LocalguideDTO;
 import com.localeconnect.app.user.dto.TravelerDTO;
 import com.localeconnect.app.user.exception.UserAlreadyExistsException;
+import com.localeconnect.app.user.exception.UserDoesNotExistException;
 import com.localeconnect.app.user.mapper.LocalguideMapper;
 import com.localeconnect.app.user.mapper.TravelerMapper;
+import com.localeconnect.app.user.model.User;
 import com.localeconnect.app.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +32,7 @@ public class AuthenticationService {
     private final UserConfirmationEmail userConfirmationEmail;
     private final TravelerMapper travelerMapper;
     private final LocalguideMapper localguideMapper;
-    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
     public TravelerDTO registerTraveler(TravelerDTO travelerDTO) {
@@ -61,5 +70,15 @@ public class AuthenticationService {
 
         return localguideDTO;
     }
-
+    public AuthenticationResponseDTO login(AuthenticationRequestDTO request) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()));
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UserDoesNotExistException("User with the given Email does not exist!"));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String token = jwtService.generateToken(authentication);
+        return new AuthenticationResponseDTO(token);
+    }
 }

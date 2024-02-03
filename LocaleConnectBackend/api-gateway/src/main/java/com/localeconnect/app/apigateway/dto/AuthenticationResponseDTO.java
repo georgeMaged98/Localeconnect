@@ -15,6 +15,4 @@ public class AuthenticationResponseDTO {
     private String accessToken;
     @JsonProperty("access_token")
     private String refreshToken;
-    private String tokenType = "Bearer ";
-
 }

@@ -1,8 +1,12 @@
 package com.localeconnect.app.user.controller;
 
+import com.localeconnect.app.user.dto.AuthenticationRequestDTO;
+import com.localeconnect.app.user.dto.AuthenticationResponseDTO;
 import com.localeconnect.app.user.dto.LocalguideDTO;
 import com.localeconnect.app.user.dto.TravelerDTO;
 import com.localeconnect.app.user.exception.UserAlreadyExistsException;
+import com.localeconnect.app.user.exception.UserDoesNotExistException;
+import com.localeconnect.app.user.model.User;
 import com.localeconnect.app.user.repository.UserRepository;
 import com.localeconnect.app.user.service.AuthenticationService;
 import com.localeconnect.app.user.service.UserService;
@@ -11,6 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,5 +51,9 @@ public class AuthController {
         } catch (Exception e) {
             return new ResponseEntity<>("An internal error has  occured", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+    @PostMapping("/login")
+    public ResponseEntity<AuthenticationResponseDTO> login(@RequestBody AuthenticationRequestDTO request){
+            return new ResponseEntity<>(authenticationService.login(request), HttpStatus.CREATED);
     }
 }
