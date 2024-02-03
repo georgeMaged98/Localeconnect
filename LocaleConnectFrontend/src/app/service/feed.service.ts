@@ -1,13 +1,17 @@
 import {Injectable} from '@angular/core';
 import {Follower, Post} from "../model/feed";
-import {Observable, of} from "rxjs";
+import {BehaviorSubject, Observable, of} from "rxjs";
 import {HttpClient} from "@angular/common/http";
-
+import {Itinerary} from "../model/itinerary";
+//todo: NOTIFICATIONS
 @Injectable({
   providedIn: 'root'
 })
 export class FeedService {
   private apiUrl = '/api/feed';
+  private postSource = new BehaviorSubject<Post | null>(null);
+  currentPost = this.postSource.asObservable();
+
   private mockPosts: Post[] = [
     {
       id: 1,
@@ -70,6 +74,12 @@ export class FeedService {
   constructor(private http: HttpClient) {
   }
 
+  changePost(post: any) {
+    if(post){
+      this.postSource.next(post);
+
+    }
+  }
   getPosts(): Observable<Post[]> {
     return this.http.get<Post[]>(this.apiUrl);
   }

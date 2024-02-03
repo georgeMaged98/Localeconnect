@@ -1,6 +1,11 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {FeedService} from "../../service/feed.service";
 import {Comment, Follower, Post} from "../../model/feed";
+import {AddPostDialogComponent} from "./add-post-dialog/add-post-dialog.component";
+import {MatDialog} from "@angular/material/dialog";
+import {Subscription} from "rxjs";
+import {ImagesService} from "../../service/image.service";
+import {Itinerary} from "../../model/itinerary";
 
 @Component({
   selector: 'app-feed',
@@ -13,14 +18,27 @@ export class FeedComponent implements OnInit {
   profileImageSrc = 'assets/pictures/profil.png';
   newCommentTexts: { [key: number]: string } = {};
   showAllImages = false;
+  subscription: Subscription = new Subscription();
+  images: string[] = [];
 
 
-  constructor(private feedService: FeedService) {
+  constructor(public dialog: MatDialog, private feedService: FeedService, private imageService: ImagesService) {
   }
 
   ngOnInit(): void {
     this.fetchPosts();
     this.fetchFollowers();
+    this.subscription = this.feedService.currentPost.subscribe(post => {
+      if (post) {
+        //TODO: replace mock with backend
+        // this.addPost()
+        this.addPostMock(post);
+      }
+
+    });
+    this.imageService.currentImages.subscribe(images => {
+      this.images = images;
+    });
   }
 
   fetchPosts(): void {
@@ -59,7 +77,11 @@ export class FeedComponent implements OnInit {
       post.likedByUser = true;
     }
   }
+  addPostMock(post: Post) {
+    this.feedService.createPost(post);
+    this.posts.push(post);
 
+  }
   //TODO: replace with api call
   toggleFollow(post: Post): void {
     post.isFollowingAuthor = !post.isFollowingAuthor;
@@ -99,6 +121,18 @@ export class FeedComponent implements OnInit {
   toggleImagesDisplay() {
     this.showAllImages = !this.showAllImages;
   }
+
+  openAddPostDialog(): void {
+    const dialogRef = this.dialog.open(AddPostDialogComponent, {
+      width: '500px',
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      // Handle dialog close result, if necessary
+      console.log('The dialog was closed');
+    });
+  }
+
 //TODO: configure image storage
   changeProfilePicture(event: any): void {
     if (event.target.files && event.target.files[0]) {
