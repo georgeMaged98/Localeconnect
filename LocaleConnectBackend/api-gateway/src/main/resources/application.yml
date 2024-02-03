@@ -35,6 +35,11 @@ spring:
           predicates:
             - Path=/api/feed/**
 
+        - id: trip-service
+          uri: http://trip-service:8083
+          predicates:
+            - Path=/api/trip/**
+
 eureka:
   client:
     serviceUrl:
