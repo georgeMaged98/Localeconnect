@@ -8,9 +8,8 @@
         <mat-label>Post Content</mat-label>
         <textarea  matInput formControlName="content" required></textarea>
         <button type="button" (click)="toggleEmojiPicker()">😊</button>
-
       </mat-form-field>
-      <div class="emoji">
+      <div class="emoji" *ngIf="showEmojiPicker">
         <emoji-mart (emojiClick)="addEmoji($event)"></emoji-mart>
       </div>
 

@@ -56,6 +56,7 @@ export class AddPostDialogComponent {
     const emoji = event.emoji.native;
     const currentContent: string= this.postForm.value.content;
     this.postForm.controls['content'].setValue(currentContent + emoji);
+    this.showEmojiPicker=false;
     this.cdr.detectChanges();
   }
 
