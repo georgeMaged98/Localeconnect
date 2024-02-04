@@ -1,4 +1,4 @@
-import {NgModule} from '@angular/core';
+import {LOCALE_ID, NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 
 import {AppRoutingModule} from './app-routing.module';
@@ -28,6 +28,7 @@ import {FeedComponent} from './pages/feed/feed.component';
 import {MatListModule} from "@angular/material/list";
 import {AddPostDialogComponent} from './pages/feed/add-post-dialog/add-post-dialog.component';
 import {PickerModule} from "@ctrl/ngx-emoji-mart";
+import { MeetupComponent } from './pages/meetup/meetup.component';
 
 
 @NgModule({
@@ -41,6 +42,7 @@ import {PickerModule} from "@ctrl/ngx-emoji-mart";
     ReviewComponent,
     FeedComponent,
     AddPostDialogComponent,
+    MeetupComponent,
 
 
 
@@ -68,7 +70,7 @@ import {PickerModule} from "@ctrl/ngx-emoji-mart";
     PickerModule
 
   ],
-  providers: [MatDatepickerModule, {provide: MAT_DATE_LOCALE, useValue: 'en-GB'}],
+  providers: [MatDatepickerModule, {provide: MAT_DATE_LOCALE, useValue: 'de-DE'}],
   bootstrap: [AppComponent]
 })
 export class AppModule {

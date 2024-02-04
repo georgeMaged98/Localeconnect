@@ -43,7 +43,7 @@
           <p>{{ itinerary.description }}</p>
           <div *ngIf="itinerary.tags.length">
             <mat-chip-listbox>
-              <mat-chip *ngFor="let tag of itinerary.mappedTags">{{ tag }}</mat-chip>
+              <mat-chip class="tag" *ngFor="let tag of itinerary.mappedTags">{{ tag }}</mat-chip>
             </mat-chip-listbox>
           </div>
           <div *ngIf="itinerary.numberOfDays">

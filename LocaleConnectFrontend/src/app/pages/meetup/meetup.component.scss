@@ -25,34 +25,6 @@
   cursor: pointer;
 }
 
-.filter-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  max-width: 400px;
-}
-
-.filter-container input {
-  padding: 10px 20px;
-  border: 1px solid #ccc;
-  border-radius: 20px;
-  min-width: 100px;
-}
-.filter-container mat-select{
-  min-width:120px;
-}
-
-.filter-container button {
-  cursor: pointer;
-  background-color: #8085AD;
-  color: white;
-  font-size: 12px;
-  border-radius: 20px;
-  padding: 10px 20px;
-  min-width: 100px;
-  border: none;
-}
 
 mat-icon {
   color: #555555;
@@ -89,7 +61,7 @@ mat-card-actions {
 
 }
 
-.itinerary-card {
+.meetup-card {
   display: flex;
   margin: 16px;
   transition: box-shadow 0.3s;
@@ -124,19 +96,19 @@ mat-card-actions {
       flex-direction: column;
       justify-content: space-between;
 
-      .itinerary-details {
+      .meetup-details {
         padding: 15px;
         border-radius: 5px;
         margin-top: 15px;
       }
 
-      .itinerary-details h4 {
+      .meetup-details h4 {
         margin-bottom: 5px;
         color: #333;
         font-weight: bold;
       }
 
-      .tag {
+      .lang {
         margin: 2px;
         background-color: #e0d0f1;
       }

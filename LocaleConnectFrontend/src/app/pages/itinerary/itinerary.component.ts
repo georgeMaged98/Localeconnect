@@ -143,11 +143,11 @@ export class ItineraryComponent implements OnInit, OnDestroy {
     );
   }
 
-  submitRating(itineraryId: number, rating: number): void {
+  submitRating(id: number, rating: number): void {
     const review: Review = {
-      itineraryId,
-      //TODO: get user id
-      userId: 0,
+      entityId:id,
+      entityType: "itinerary",
+      userId: 0,  //TODO: get current user id
       rating,
     };
     this.reviewService.createReview(review).subscribe({

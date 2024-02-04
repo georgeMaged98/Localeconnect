@@ -10,7 +10,7 @@ import {ReviewService} from "../../service/review.service";
 export class ReviewComponent implements OnInit {
  @Input() itineraryId: number=0;
   reviews: Review[] = [];
-  @Input() rating = 0;
+  @Input() rating: number = 0;
   @Output() ratingChange = new EventEmitter<number>();
 
 
