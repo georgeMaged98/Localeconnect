@@ -1,6 +1,6 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {FeedService} from "../../service/feed.service";
-import {Comment, Follower, Post} from "../../model/feed";
+import {Comment, Profile, Post} from "../../model/feed";
 import {AddPostDialogComponent} from "./add-post-dialog/add-post-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 import {Subscription} from "rxjs";
@@ -57,7 +57,7 @@ export class FeedComponent implements OnInit {
   fetchFollowers(): void {
     //TODO: replace with api call
     this.feedService.getFollowersMock().subscribe({
-        next: (data: Follower[]) => {
+        next: (data: Profile[]) => {
           this.followers = data;
         },
         error: (err) => {
@@ -84,14 +84,14 @@ export class FeedComponent implements OnInit {
   }
   //TODO: replace with api call
   toggleFollow(post: Post): void {
-    post.isFollowingAuthor = !post.isFollowingAuthor;
-    /*  if (post.isFollowingAuthor) {
-        this.feedService.unfollowUser(post.authorID).subscribe(() => {
-          post.isFollowingAuthor = false;
+    post.author.isFollowing = !post.author.isFollowing;
+    /*  if (post.author.isFollowing) {
+        this.feedService.unfollowUser(post.author.userId).subscribe(() => {
+          post.author.isFollowing = false;
         });
       } else {
-        this.feedService.followUser(post.authorID).subscribe(() => {
-          post.isFollowingAuthor = true;
+        this.feedService.followUser(post.author.userId).subscribe(() => {
+          post.author.isFollowing = true;
         });
       }
      */
@@ -102,7 +102,13 @@ export class FeedComponent implements OnInit {
       const newComment: Comment = {
         // TODO: get comment from backend
         id: 0,
-        authorID: 1,
+        author:{
+          userId: 1,
+          name: 'Alice Johnson',
+          username: 'alicej',
+          isFollowing: true,
+          profileImage: 'path/to/alice.jpg',
+        },
         date: new Date(),
         text: this.newCommentTexts[postId],
       };

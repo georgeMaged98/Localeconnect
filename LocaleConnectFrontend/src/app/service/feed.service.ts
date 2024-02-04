@@ -1,8 +1,9 @@
 import {Injectable} from '@angular/core';
-import {Follower, Post} from "../model/feed";
+import {Profile, Post} from "../model/feed";
 import {BehaviorSubject, Observable, of} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {Itinerary} from "../model/itinerary";
+
 //todo: NOTIFICATIONS
 @Injectable({
   providedIn: 'root'
@@ -12,10 +13,55 @@ export class FeedService {
   private postSource = new BehaviorSubject<Post | null>(null);
   currentPost = this.postSource.asObservable();
 
+  private mockFollowers: Profile[] = [
+    {
+      userId: 1,
+      name: 'Alice Johnson',
+      username: 'alicej',
+      isFollowing: true,
+      profileImage: 'https://www.profilebakery.com/wp-content/uploads/2023/04/AI-Profile-Picture.jpg',
+    },
+    {
+      userId: 2,
+      name: 'Bob Smith',
+      username: 'bobsmith',
+      isFollowing: false,
+      profileImage: 'https://www.profilebakery.com/wp-content/uploads/2023/04/Profile-Image-AI.jpg',
+    },
+    {
+      userId: 3,
+      name: 'Charlie Brown',
+      username: 'charlieb',
+      isFollowing: true,
+      profileImage: 'https://i.pinimg.com/originals/c2/6d/91/c26d912eb43a85ca51ecb81804f36dc4.jpg',
+    },
+    {
+      userId: 4,
+      name: 'Diana Prince',
+      username: 'dianap',
+      isFollowing: false,
+      profileImage: 'assets/pictures/profil.png',
+    },
+    {
+      userId: 5,
+      name: 'Edward Norton',
+      username: 'edwardn',
+      isFollowing: true,
+      profileImage: 'https://cdn2.unrealengine.com/egs-evil-dead-featured-carousel-desktop-image-01-1248x702-0f90c4bf044e.jpg?h=1080&resize=1&w=1920',
+    },
+    {
+      userId: 6,
+      name: 'Fiona Gallagher',
+      username: 'fionag',
+      isFollowing: false,
+      profileImage: 'assets/pictures/profil.png',
+    },
+  ];
+
   private mockPosts: Post[] = [
     {
       id: 1,
-      authorID: 100,
+      author: this.mockFollowers[0],
       date: new Date('2024-02-01T08:45:00'),
       content: 'Just had a fantastic trip to New Zealand! 🏞️ #travel #adventure',
       likes: 3,
@@ -23,13 +69,13 @@ export class FeedService {
       comments: [
         {
           id: 101,
-          authorID: 201,
+          author: this.mockFollowers[3],
           date: new Date('2024-02-01T09:00:00'),
           text: 'Wow, looks amazing! Glad you had a great time.',
         },
         {
           id: 102,
-          authorID: 202,
+          author: this.mockFollowers[1],
           date: new Date('2024-02-01T09:30:00'),
           text: 'New Zealand is on my bucket list too!',
         }
@@ -37,7 +83,7 @@ export class FeedService {
     },
     {
       id: 2,
-      authorID: 101,
+      author: this.mockFollowers[1],
       date: new Date('2024-02-02T10:20:00'),
       content: 'Exploring the local market scenes. So much to see and taste! 🍲🥘',
       images: ['https://imgs.search.brave.com/9BBcHP36m3hbc0nG8qPoaP1TCvla5FZAUocLypeJ43Y/rs:fit:860:0:0/g:ce/aHR0cHM6Ly9idXJz/dC5zaG9waWZ5Y2Ru/LmNvbS9waG90b3Mv/bWFya2V0LXBlcHBl/cnMuanBnP3dpZHRo/PTEwMDAmZm9ybWF0/PXBqcGcmZXhpZj0w/JmlwdGM9MA',
@@ -49,7 +95,7 @@ export class FeedService {
     },
     {
       id: 3,
-      authorID: 102,
+      author: this.mockFollowers[2],
       date: new Date('2024-02-03T14:35:00'),
       content: 'Nothing beats the feeling of reaching the summit! ⛰️ #hiking #mountains',
       images: [
@@ -58,28 +104,24 @@ export class FeedService {
       comments: [
         {
           id: 103,
-          authorID: 203,
+          author: this.mockFollowers[0],
           date: new Date('2024-02-03T15:15:00'),
           text: 'Incredible view! Which trail did you take?',
         }
       ],
     }
   ];
-  private mockFollowers = [
-    {id: 1, name: 'Jane Doe', handle: '@janedoe', isFollowing: false},
-    {id: 2, name: 'Sam Smith', handle: '@samsmith', isFollowing: true},
-  ];
-
 
   constructor(private http: HttpClient) {
   }
 
   changePost(post: any) {
-    if(post){
+    if (post) {
       this.postSource.next(post);
 
     }
   }
+
   getPosts(): Observable<Post[]> {
     return this.http.get<Post[]>(this.apiUrl);
   }
@@ -89,7 +131,7 @@ export class FeedService {
     return of(this.mockPosts);
   }
 
-  getFollowersMock(): Observable<Follower[]> {
+  getFollowersMock(): Observable<Profile[]> {
     return of(this.mockFollowers);
   }
 

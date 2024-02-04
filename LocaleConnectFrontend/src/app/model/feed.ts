@@ -1,26 +1,26 @@
-//TODO: handle the followers
+
 export interface Post {
   id: number;
-  authorID: number;
+  author: Profile;
   date: Date;
   content: string;
   images: string[];
   likes?: number;
   likedByUser?: boolean;
-  isFollowingAuthor?: boolean;
 
   comments: Comment[];
 }
 
 export interface Comment {
   id: number;
-  authorID: number;
+  author: Profile;
   date: Date;
   text: string;
 }
-export interface Follower{
-  id: number,
+export interface Profile {
+  userId: number,
   name: string,
-  handle: string,
-  isFollowing: boolean
+  username: string,
+  isFollowing: boolean,
+  profileImage: string;
 }

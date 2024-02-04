@@ -35,8 +35,14 @@ export class AddPostDialogComponent {
     if (this.postForm.valid) {
       const postData = { ...this.postForm.value, images: this.images };
       const post: Post={
-        id:0,// generate from backend
-        authorID: 0,// get current user
+        id:0,//TODO: generate from backend
+        author:{
+          userId: 1,
+          name: 'Alice Johnson',
+          username: 'alicej',
+          isFollowing: true,
+          profileImage: 'https://www.profilebakery.com/wp-content/uploads/2023/04/AI-Profile-Picture.jpg',
+        } ,//TODO: get current user
         content:postData.content,
         images: this.images,
         comments:[],
