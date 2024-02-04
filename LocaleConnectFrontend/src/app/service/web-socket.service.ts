@@ -26,10 +26,12 @@ export class WebSocketService {
       message: 'Your profile has been updated successfully.',
       title: 'Profile Update',
     },
+
   ]);
+
   constructor() {
     //TODO: Add websocket logic
-   // this.initializeWebSocketConnection();
+    // this.initializeWebSocketConnection();
   }
 
   /*  initializeWebSocketConnection() {
@@ -64,9 +66,13 @@ export class WebSocketService {
     return this.notificationsMock.asObservable();
   }
 
-  // Method to simulate adding a new notification
+//TODO: replace with api call
   addNotification(notification: Notification) {
     const currentNotifications = this.notificationsMock.value;
     this.notificationsMock.next([...currentNotifications, notification]);
+  }
+//TODO: replace with api call
+  deleteAllNotifications() {
+    this.notificationsMock.next([]);
   }
 }

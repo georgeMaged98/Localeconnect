@@ -57,7 +57,7 @@ small{
   background-color: white;
   box-shadow: 0 2px 4px rgba(0,0,0,.2);
   width: 300px;
-  max-height: 600px;
+  min-height: 200px;
   overflow-y: auto;
   z-index: 100;
   .title{

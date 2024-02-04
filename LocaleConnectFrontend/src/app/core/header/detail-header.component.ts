@@ -27,6 +27,9 @@ export class DetailHeaderComponent implements OnInit {
     this.showNotifications = !this.showNotifications;
     this.hasNewNotifications = false;
 
-  }
+    if (!this.showNotifications) {
+      this.webSocketService.deleteAllNotifications();
+      this.notifications = [];
+  }}
 
 }
