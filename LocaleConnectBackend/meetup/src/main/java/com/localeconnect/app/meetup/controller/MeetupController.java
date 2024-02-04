@@ -5,7 +5,6 @@ import com.localeconnect.app.meetup.dto.MeetupDTO;
 import com.localeconnect.app.meetup.dto.MeetupEditDTO;
 import com.localeconnect.app.meetup.response_handler.ResponseHandler;
 import com.localeconnect.app.meetup.service.MeetupService;
-import jakarta.validation.UnexpectedTypeException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
@@ -18,7 +17,7 @@ import java.util.List;
 @RestController
 @AllArgsConstructor
 @CrossOrigin
-@RequestMapping("/api/meetup")
+@RequestMapping("api/meetup")
 public class MeetupController {
 
     private final MeetupService meetupService;
