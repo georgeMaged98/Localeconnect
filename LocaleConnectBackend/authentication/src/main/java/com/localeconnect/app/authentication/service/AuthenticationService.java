@@ -1,18 +1,15 @@
-package com.localeconnect.app.user.service;
+package com.localeconnect.app.authentication.service;
 
-import com.localeconnect.app.user.auth.AuthenticationRequest;
-import com.localeconnect.app.user.auth.AuthenticationResponse;
-import com.localeconnect.app.user.dto.LocalguideDTO;
-import com.localeconnect.app.user.dto.TravelerDTO;
-import com.localeconnect.app.user.exception.UserDoesNotExistException;
-import com.localeconnect.app.user.model.User;
-import com.localeconnect.app.user.repository.UserRepository;
+import com.localeconnect.app.authentication.auth.AuthenticationRequest;
+import com.localeconnect.app.authentication.auth.AuthenticationResponse;
+import com.localeconnect.app.authentication.dto.LocalguideDTO;
+import com.localeconnect.app.authentication.dto.TravelerDTO;
+import com.localeconnect.app.authentication.dto.UserDTO;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -23,7 +20,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Slf4j
 @AllArgsConstructor
 public class AuthenticationService {
-    private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final WebClient webClient;
@@ -46,6 +42,7 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse registerLocalguide(LocalguideDTO localguide) {
+
         localguide.setPassword(BCrypt.hashpw(localguide.getPassword(), BCrypt.gensalt()));
         LocalguideDTO registeredLocalGuide  = webClient.post()
                 .uri("http://user-service/api/user/register-localguide")
@@ -62,14 +59,20 @@ public class AuthenticationService {
     }
 
      public AuthenticationResponse login(AuthenticationRequest request) {
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
                         request.getPassword()));
-        User loggedInUser = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UserDoesNotExistException("User with the given Email does not exist!"));
+        UserDTO loggedInUser = webClient.post()
+                .uri("http://user-service/api/user/login")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(UserDTO.class)
+                .block();
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = jwtUtil.generateToken(loggedInUser.getUsername(), loggedInUser.getEmail());
+        String token = jwtUtil.generateToken(loggedInUser.getUserName(), loggedInUser.getEmail());
         return new AuthenticationResponse(token);
+
     }
 }

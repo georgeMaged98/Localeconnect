@@ -28,10 +28,6 @@ spring:
        auth: true
        starttls.enable: true
 
-jwt:
-  secret: 6EB8F0418D5AE34CA2C60A1446F466F2C50074D7762DD6F969C551DB011411C8
-  expiration: 3600000
-
 eureka:
   client:
     register-with-eureka: true

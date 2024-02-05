@@ -1,11 +1,10 @@
-package com.localeconnect.app.user.service;
+package com.localeconnect.app.authentication.service;
 
-import com.localeconnect.app.user.security.SecurityConstants;
+import com.localeconnect.app.authentication.security.SecurityConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 

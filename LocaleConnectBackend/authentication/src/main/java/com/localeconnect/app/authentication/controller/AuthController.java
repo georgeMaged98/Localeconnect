@@ -1,10 +1,10 @@
-package com.localeconnect.app.user.controller;
+package com.localeconnect.app.authentication.controller;
 
-import com.localeconnect.app.user.auth.AuthenticationRequest;
-import com.localeconnect.app.user.auth.AuthenticationResponse;
-import com.localeconnect.app.user.dto.LocalguideDTO;
-import com.localeconnect.app.user.dto.TravelerDTO;
-import com.localeconnect.app.user.service.AuthenticationService;
+import com.localeconnect.app.authentication.auth.AuthenticationRequest;
+import com.localeconnect.app.authentication.auth.AuthenticationResponse;
+import com.localeconnect.app.authentication.dto.LocalguideDTO;
+import com.localeconnect.app.authentication.dto.TravelerDTO;
+import com.localeconnect.app.authentication.service.AuthenticationService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

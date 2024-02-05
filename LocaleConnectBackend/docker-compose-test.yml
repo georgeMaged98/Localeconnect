@@ -85,6 +85,13 @@ services:
     ports:
       - '8761:8761'
 
+  authentication-service:
+    image: george/user-service:latest
+    pull_policy: always
+    environment:
+      - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
+    ports:
+      - '8500:8500'
 
 volumes:
   postgres:

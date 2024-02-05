@@ -1,4 +1,4 @@
-package com.localeconnect.app.user.auth;
+package com.localeconnect.app.authentication.auth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

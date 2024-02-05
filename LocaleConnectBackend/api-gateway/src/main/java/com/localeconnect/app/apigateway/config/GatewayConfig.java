@@ -21,7 +21,7 @@ public class GatewayConfig {
                 .route("meetup-service", r -> r.path("/api/meetup/**")
                         .filters(f -> f.filter(filter))
                         .uri("http://meetup-service:7001"))
-                .route("user-service", r -> r.path("/api/user/**")
+                .route("user-service", r -> r.path("/api/user/**", "/api/auth/**")
                         .filters(f -> f.filter(filter))
                         .uri("http://user-service:8084"))
                 .route("itinerary-service", r -> r.path("/api/itinerary/**")

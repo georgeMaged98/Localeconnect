@@ -1,4 +1,4 @@
-package com.localeconnect.app.user.config;
+package com.localeconnect.app.authentication.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

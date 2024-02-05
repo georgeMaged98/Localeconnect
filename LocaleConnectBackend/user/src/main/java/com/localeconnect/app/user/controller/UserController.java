@@ -5,11 +5,10 @@ import com.localeconnect.app.user.dto.TravelerDTO;
 import com.localeconnect.app.user.dto.UserDTO;
 import com.localeconnect.app.user.exception.UserAlreadyExistsException;
 import com.localeconnect.app.user.exception.UserDoesNotExistException;
+import com.localeconnect.app.user.request.AuthenticationRequest;
 import com.localeconnect.app.user.service.UserService;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +37,17 @@ public class UserController {
     public ResponseEntity<?> registerLocalGuide(@RequestBody LocalguideDTO localguideDTO) {
         try {
             return new ResponseEntity<>(userService.registerLocalguide(localguideDTO), HttpStatus.CREATED);
+        } catch (UserAlreadyExistsException | IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>("An internal error has  occured", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> registerLocalGuide(@RequestBody AuthenticationRequest request) {
+        try {
+            return new ResponseEntity<>(userService.login(request), HttpStatus.CREATED);
         } catch (UserAlreadyExistsException | IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
