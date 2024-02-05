@@ -15,10 +15,6 @@ import {ReviewService} from "../../service/review.service";
 export class MeetupComponent implements OnInit {
   meetups: Meetup[] = [];
   searchMeetups: Meetup[] = [];
-  private reviews: Review[] = [];
-  isRatingSubmitted: boolean = false;
-  selectedRating: number = 0;
-
   searchControl = new FormControl('');
 
 
@@ -65,14 +61,11 @@ export class MeetupComponent implements OnInit {
   toggleDetails(meetup: Meetup): void {
     meetup.expand = !meetup.expand;
   }
-  onSelectRating(rating: number): void {
-    this.selectedRating = rating;
-  }
 
   submitRating(meetup: Meetup, rating: number): void {
-    if (meetup.rating !==0) {
+    if (meetup.rating !== 0) {
       meetup.ratingSubmitted = true;
-      meetup.rating=rating;
+      meetup.rating = rating;
       if (meetup.averageRating && meetup.totalRatings && meetup.totalRatings > 0) {
         meetup.averageRating = ((meetup.averageRating * meetup.totalRatings) + rating) / (meetup.totalRatings + 1);
       } else {

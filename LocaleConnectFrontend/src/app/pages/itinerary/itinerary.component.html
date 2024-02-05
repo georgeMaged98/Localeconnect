@@ -35,7 +35,22 @@
           <mat-card-title>{{ itinerary.name }}</mat-card-title>
           <mat-card-subtitle>Organized by: {{ itinerary.username }}</mat-card-subtitle>
           <div class="reviews-container">
-            <app-review [(rating)]="itinerary.rating" (ratingChange)="submitRating(itinerary.id, $event)"></app-review>
+            <div class="rating-details">
+              <div *ngIf="itinerary.averageRating">
+                <app-review  [(rating)]="itinerary.averageRating"></app-review>
+                <span
+                  class="average-rating">{{ itinerary.totalRatings }}
+                  ratings</span>
+
+              </div>
+              <div *ngIf="!itinerary.averageRating">
+                <app-review  [rating]="0"></app-review>
+                <span
+                  class="average-rating"> No
+                ratings yet</span>
+              </div>
+
+            </div>
           </div>
         </mat-card-header>
 
@@ -62,6 +77,12 @@
             <ul>
               <li *ngFor="let activity of itinerary.dailyActivities">{{ activity }}</li>
             </ul>
+          </div>
+          <div class="rating">
+            <div *ngIf="!itinerary.ratingSubmitted"> <b>Rate this Meetup! </b></div>
+            <app-review *ngIf="!itinerary.ratingSubmitted" [(rating)]="itinerary.rating"
+                        (ratingChange)="submitRating(itinerary,$event)"></app-review>
+            <div *ngIf="itinerary.ratingSubmitted"> <b>Review submitted successfully!</b></div>
           </div>
         </mat-card-content>
         <mat-card-actions>

@@ -9,6 +9,7 @@ import {Review} from "../../model/review";
 import {ReviewService} from "../../service/review.service";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {ImagesService} from "../../service/image.service";
+import {Meetup} from "../../model/meetup";
 
 @Component({
   selector: 'app-itinerary',
@@ -143,21 +144,32 @@ export class ItineraryComponent implements OnInit, OnDestroy {
     );
   }
 
-  submitRating(id: number, rating: number): void {
-    const review: Review = {
-      entityId:id,
-      entityType: "itinerary",
-      userId: 0,  //TODO: get current user id
-      rating,
-    };
-    this.reviewService.createReview(review).subscribe({
-      next: (review) => {
-        console.log('Review submitted successfully', review);
-      },
-      error: (error) => {
-        console.error('Error submitting review', error);
+  submitRating(itinerary: Itinerary, rating: number): void {
+    if (itinerary.rating !==0) {
+      itinerary.ratingSubmitted = true;
+      itinerary.rating=rating;
+      if (itinerary.averageRating && itinerary.totalRatings && itinerary.totalRatings > 0) {
+        itinerary.averageRating = ((itinerary.averageRating * itinerary.totalRatings) + rating) / (itinerary.totalRatings + 1);
+      } else {
+        itinerary.averageRating = rating;
       }
-    });
-  }
+      itinerary.totalRatings = (itinerary.totalRatings || 0) + 1;
+      //TODO: uncomment for api call
+      /*
+      const review: Review = { userId: this.getTravellerId(), rating, entityId: itinerary.id, entityType: "itinerary" };
+      this.reviewService.createReview(review).subscribe({
+        next: () => {
+          if (itinerary.averageRating && itinerary.totalRatings && itinerary.totalRatings > 0) {
+            itinerary.averageRating = ((itinerary.averageRating * itinerary.totalRatings) + rating) / (itinerary.totalRatings + 1);
+          } else {
+            itinerary.averageRating = rating;
+          }
+          itinerary.totalRatings = (itinerary.totalRatings || 0) + 1;
+        },
+        error: (error) => console.error('Error submitting review', error)
+      });
 
+       */
+    }
+  }
 }
