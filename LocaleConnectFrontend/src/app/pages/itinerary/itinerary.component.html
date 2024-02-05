@@ -37,14 +37,14 @@
           <div class="reviews-container">
             <div class="rating-details">
               <div *ngIf="itinerary.averageRating">
-                <app-review  [(rating)]="itinerary.averageRating"></app-review>
+                <app-review [readOnly]="true" [rating]="itinerary.averageRating"></app-review>
                 <span
                   class="average-rating">{{ itinerary.totalRatings }}
                   ratings</span>
 
               </div>
               <div *ngIf="!itinerary.averageRating">
-                <app-review  [rating]="0"></app-review>
+                <app-review [readOnly]="true" [rating]="0"></app-review>
                 <span
                   class="average-rating"> No
                 ratings yet</span>

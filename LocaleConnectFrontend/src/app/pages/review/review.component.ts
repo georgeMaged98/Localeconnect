@@ -11,6 +11,7 @@ export class ReviewComponent implements OnInit {
  @Input() itineraryId: number=0;
   reviews: Review[] = [];
   @Input() rating: number = 0;
+  @Input() readOnly: boolean = false;
   @Output() ratingChange = new EventEmitter<number>();
 
 
@@ -20,8 +21,11 @@ export class ReviewComponent implements OnInit {
 
   }
   onSelect(rating: number): void {
-    this.rating = rating;
-    this.ratingChange.emit(this.rating);
+    if(!this.readOnly){
+      this.rating = rating;
+      this.ratingChange.emit(this.rating);
+    }
+
   }
 
   array(num: number): any[] {
