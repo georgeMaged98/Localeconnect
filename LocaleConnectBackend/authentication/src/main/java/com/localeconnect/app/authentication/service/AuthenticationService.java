@@ -8,11 +8,9 @@ import com.localeconnect.app.authentication.dto.UserDTO;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -26,7 +24,6 @@ public class AuthenticationService {
 
     public AuthenticationResponse registerTraveler(TravelerDTO traveler) {
 
-        traveler.setPassword(BCrypt.hashpw(traveler.getPassword(), BCrypt.gensalt()));
         TravelerDTO registeredTraveler  = webClient.post()
                 .uri("http://user-service/api/user/register-traveler")
                 .bodyValue(traveler)
@@ -34,16 +31,12 @@ public class AuthenticationService {
                 .bodyToMono(TravelerDTO.class)
                 .block();
 
-        if (registeredTraveler != null) {
-            String accessToken = jwtUtil.generateToken(registeredTraveler.getUserName(), registeredTraveler.getEmail());
-            return new AuthenticationResponse(accessToken);
-        }
-        throw new InternalAuthenticationServiceException("error during registration");
+        String accessToken = jwtUtil.generateToken(registeredTraveler.getUserName(), registeredTraveler.getEmail());
+        return new AuthenticationResponse(accessToken);
     }
 
     public AuthenticationResponse registerLocalguide(LocalguideDTO localguide) {
 
-        localguide.setPassword(BCrypt.hashpw(localguide.getPassword(), BCrypt.gensalt()));
         LocalguideDTO registeredLocalGuide  = webClient.post()
                 .uri("http://user-service/api/user/register-localguide")
                 .bodyValue(localguide)
@@ -51,11 +44,9 @@ public class AuthenticationService {
                 .bodyToMono(LocalguideDTO.class)
                 .block();
 
-        if (registeredLocalGuide != null) {
-            String accessToken = jwtUtil.generateToken(registeredLocalGuide.getUserName(), registeredLocalGuide.getEmail());
-            return new AuthenticationResponse(accessToken);
-        }
-        throw new InternalAuthenticationServiceException("error during registration");
+        String accessToken = jwtUtil.generateToken(registeredLocalGuide.getUserName(), registeredLocalGuide.getEmail());
+        return new AuthenticationResponse(accessToken);
+
     }
 
      public AuthenticationResponse login(AuthenticationRequest request) {

@@ -33,6 +33,9 @@ public class GatewayConfig {
                 .route("trip-service", r -> r.path("/api/trip/**")
                         .filters(f -> f.filter(filter))
                         .uri("http://trip-service:8083"))
+                .route("authentication-service", r -> r.path("/api/auth/**")
+                        .filters(f -> f.filter(filter))
+                        .uri("lb://localhost:8500"))
                 .build();
     }
 }

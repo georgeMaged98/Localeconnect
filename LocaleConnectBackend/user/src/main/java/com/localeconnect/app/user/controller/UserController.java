@@ -7,6 +7,7 @@ import com.localeconnect.app.user.exception.UserAlreadyExistsException;
 import com.localeconnect.app.user.exception.UserDoesNotExistException;
 import com.localeconnect.app.user.request.AuthenticationRequest;
 import com.localeconnect.app.user.service.UserService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ public class UserController {
     private final UserService userService;
     @PostMapping("/register-traveler")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> registerTraveler(@RequestBody TravelerDTO travelerDTO) {
+    public ResponseEntity<?> registerTraveler(@RequestBody @Valid TravelerDTO travelerDTO) {
         try {
             return new ResponseEntity<>(userService.registerTraveler(travelerDTO), HttpStatus.CREATED);
         } catch (UserAlreadyExistsException | IllegalArgumentException e) {
@@ -34,7 +35,7 @@ public class UserController {
     }
     @PostMapping("/register-localguide")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> registerLocalGuide(@RequestBody LocalguideDTO localguideDTO) {
+    public ResponseEntity<?> registerLocalGuide(@RequestBody @Valid LocalguideDTO localguideDTO) {
         try {
             return new ResponseEntity<>(userService.registerLocalguide(localguideDTO), HttpStatus.CREATED);
         } catch (UserAlreadyExistsException | IllegalArgumentException e) {
@@ -45,7 +46,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> registerLocalGuide(@RequestBody AuthenticationRequest request) {
+    public ResponseEntity<?> registerLocalGuide(@RequestBody @Valid AuthenticationRequest request) {
         try {
             return new ResponseEntity<>(userService.login(request), HttpStatus.CREATED);
         } catch (UserAlreadyExistsException | IllegalArgumentException e) {
@@ -73,7 +74,7 @@ public class UserController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateUser(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<?> updateUser(@RequestBody @Valid UserDTO userDTO) {
         try {
             return new ResponseEntity<>(userService.updateUser(userDTO), HttpStatus.OK);
         }

@@ -8,8 +8,6 @@ import java.util.function.Predicate;
 
 @Component
 public class RouteValidator {
-
-    // endpoints that will be ignored
     public static final List<String> openApiEndpoints = List.of(
             "/api/auth/login",
             "/api/auth/register-traveler",
