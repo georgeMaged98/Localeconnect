@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
+import { Router, NavigationEnd, Event as RouterEvent } from '@angular/router';
+import {filter} from "rxjs";
 
 @Component({
   selector: 'app-root',
@@ -7,4 +9,15 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'LocaleConnect';
+
+  shouldShowDefaultHeader = true;
+
+  constructor(private router: Router) {
+    this.router.events.pipe(
+      filter((event: RouterEvent): event is NavigationEnd => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      // Update the flag based on the current URL
+      this.shouldShowDefaultHeader = !event.urlAfterRedirects.startsWith('/pages');
+    });
+  }
 }

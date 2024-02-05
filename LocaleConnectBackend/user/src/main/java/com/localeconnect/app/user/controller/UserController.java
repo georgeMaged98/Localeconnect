@@ -1,9 +1,13 @@
 package com.localeconnect.app.user.controller;
 
+import com.localeconnect.app.user.dto.LocalguideDTO;
+import com.localeconnect.app.user.dto.TravelerDTO;
 import com.localeconnect.app.user.dto.UserDTO;
 import com.localeconnect.app.user.exception.UserAlreadyExistsException;
 import com.localeconnect.app.user.exception.UserDoesNotExistException;
 import com.localeconnect.app.user.service.UserService;
+import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,18 +15,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@CrossOrigin
 @RestController
+@AllArgsConstructor
 @Slf4j
 @RequestMapping("/api/user")
 public class UserController {
-
     private final UserService userService;
-
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @GetMapping("/all")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
@@ -42,11 +41,22 @@ public class UserController {
         }
     }
 
-    @PostMapping("/register")
+    @PostMapping("/register/traveler")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> registerUser(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<?> registerTraveler(@RequestBody TravelerDTO travelerDTO) {
         try {
-            return new ResponseEntity<>(userService.registerUser(userDTO), HttpStatus.CREATED);
+            return new ResponseEntity<>(userService.registerTraveler(travelerDTO), HttpStatus.CREATED);
+        } catch (UserAlreadyExistsException | IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>("An internal error has  occured", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PostMapping("/register/localguide")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<?> registerLocalGuide(@RequestBody LocalguideDTO localguideDTO) {
+        try {
+            return new ResponseEntity<>(userService.registerLocalguide(localguideDTO), HttpStatus.CREATED);
         } catch (UserAlreadyExistsException | IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {

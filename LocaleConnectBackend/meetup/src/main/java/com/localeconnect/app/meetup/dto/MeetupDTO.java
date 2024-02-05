@@ -19,6 +19,10 @@ import java.util.List;
 @AllArgsConstructor
 public class MeetupDTO {
 
+    public interface CreateValidation {}
+
+    public interface UpdateValidation{}
+
     private Long id;
 
     @NotNull(message = "This is a required field")
@@ -40,7 +44,7 @@ public class MeetupDTO {
     private String endTime;
 
     @NotNull(message = "This is a required field")
-    private double cost;
+    private Double cost;
 
     @NotBlank(message = "This is a required field")
     private String location;

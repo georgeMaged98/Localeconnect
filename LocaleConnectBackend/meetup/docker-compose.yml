@@ -33,11 +33,20 @@ services:
       - localeconnect-network
     restart: unless-stopped
 
+  rabbitmq:
+    image: rabbitmq:3.9.11-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - localeconnect-network
+
   meetup-service:
     container_name: meetup-service
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ../
+      dockerfile: meetup/Dockerfile
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresqlDB:5432/meetup-DB
       - SPRING_DATASOURCE_USERNAME=localeconnect
@@ -48,6 +57,7 @@ services:
       - "7001:7001"
     depends_on:
       - postgresqlDB
+      - rabbitmq
     networks:
       - localeconnect-network
 

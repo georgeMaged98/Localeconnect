@@ -1,9 +1,12 @@
 package com.localeconnect.app.user.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
 import java.time.LocalDate;
@@ -13,7 +16,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class UserDTO {
 
     @NotBlank(message = "This is a required field")
@@ -25,14 +28,15 @@ public class UserDTO {
     @NotBlank(message = "This is a required field")
     @Email(message = "Invalid email format")
     private String email;
-    @NotBlank(message = "This is a required field")
+    @NotNull(message = "This is a required field")
+    @JsonFormat(pattern="yyyy-MM-dd")
     private LocalDate dateOfBirth;
     private String bio;
     @Setter(AccessLevel.NONE)
     @NotBlank(message = "This is a required field")
     private String password;
     private List<String> visitedCountries;
-    @NotBlank(message = "this is a required field")
+    @NotNull(message = "This is a required field")
     private boolean registeredAsLocalGuide;
     private List<String> languages;
     private List<Long> followerIds;

@@ -3,6 +3,7 @@ package com.localeconnect.app.user.model;
 import jakarta.persistence.*;
 import lombok.*;
 import jakarta.persistence.Id;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class User {
 
     @Id
@@ -37,8 +38,6 @@ public class User {
     private String password;
     @ElementCollection
     private List<String> visitedCountries = new ArrayList<>();
-    @Column
-    private boolean registeredAsLocalGuide;
     @ElementCollection
     private List<String> languages;
     @ManyToMany

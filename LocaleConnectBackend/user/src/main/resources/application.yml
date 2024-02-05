@@ -5,7 +5,7 @@ spring:
   application:
     name: user
   datasource:
-    url: jdbc:postgresql://localhost:5432/user-DB
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/userDB
     username: localeconnect
     password: lssa2324app
     driver-class-name: org.postgresql.Driver
@@ -13,11 +13,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    show-sql: true
     properties:
       hibernate:
-         dialect: org.hibernate.dialect.PostgreSQLDialect
-         format_sql: true
-    show-sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
 
   mail:
     host: smtp.gmail.com
@@ -30,7 +30,7 @@ spring:
 
 eureka:
   client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka
     register-with-eureka: true
     fetch-registry: true
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER_ADDRESS:http://localhost:8761/eureka}

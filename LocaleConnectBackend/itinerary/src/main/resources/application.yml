@@ -5,9 +5,9 @@ spring:
   application:
     name: itinerary
   datasource:
-    url: jdbc:postgresql://localhost:5432/itinerary_service_db
-    username: 'localeconnect'
-    password: 'lssa2324app'
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/itineraryDB
+    username: localeconnect
+    password: lssa2324app
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -19,10 +19,9 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
-
 eureka:
   client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka
     register-with-eureka: true
     fetch-registry: true
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER_ADDRESS:http://localhost:8761/eureka}
