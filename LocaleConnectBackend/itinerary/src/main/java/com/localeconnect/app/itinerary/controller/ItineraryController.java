@@ -18,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/itinerary")
 @AllArgsConstructor
+@CrossOrigin
 public class ItineraryController {
         private final ItineraryService itineraryService;
     @PostMapping("/create")
