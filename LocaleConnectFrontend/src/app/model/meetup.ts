@@ -11,6 +11,7 @@ export interface Meetup {
   spokenLanguages: string[];
   meetupAttendees: number[];
   rating: number;
+  ratingSubmitted?: boolean;
   totalRatings?: number;
   averageRating?: number;
   expand?: boolean;
