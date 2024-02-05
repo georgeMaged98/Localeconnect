@@ -1,5 +1,6 @@
 package com.localeconnect.app.user.service;
 
+import com.localeconnect.app.user.auth.AuthenticationRequest;
 import com.localeconnect.app.user.auth.AuthenticationResponse;
 import com.localeconnect.app.user.dto.LocalguideDTO;
 import com.localeconnect.app.user.dto.TravelerDTO;
@@ -25,6 +26,7 @@ import java.time.LocalDate;
 @Slf4j
 @AllArgsConstructor
 public class AuthenticationService {
+    private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final WebClient webClient;
@@ -52,19 +54,19 @@ public class AuthenticationService {
                 .bodyToMono(LocalguideDTO.class)
                 .block();
 
-        String accessToken = jwtUtil.generateToken(registeredLocalGuide.getUserName(), registeredTraveler.getEmail());
+        String accessToken = jwtUtil.generateToken(registeredLocalGuide.getUserName(), registeredLocalGuide.getEmail());
         return new AuthenticationResponse(accessToken);
     }
 
-   /* public AuthenticationResponseDTO login(AuthenticationRequestDTO request) {
+     public AuthenticationResponse login(AuthenticationRequest request) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
                         request.getPassword()));
-        User user = userRepository.findByEmail(request.getEmail())
+        User loggedInUser = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UserDoesNotExistException("User with the given Email does not exist!"));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = jwtUtil.generateToken(authentication);
-        return new AuthenticationResponseDTO(token);
-    } */
+        String token = jwtUtil.generateToken(loggedInUser.getUsername(), loggedInUser.getEmail());
+        return new AuthenticationResponse(token);
+    }
 }

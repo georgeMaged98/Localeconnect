@@ -17,16 +17,16 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private AuthenticationService authenticationService;
-    @PostMapping("/registerTraveler")
+    @PostMapping("/register-traveler")
     public ResponseEntity<AuthenticationResponse> registerTraveler(@RequestBody TravelerDTO traveler) {
             return ResponseEntity.ok(authenticationService.registerTraveler(traveler));
     }
-    @PostMapping("/registerLocalguide")
+    @PostMapping("/register-localguide")
     public ResponseEntity<AuthenticationResponse> registerLocalGuide(@RequestBody LocalguideDTO localguide) {
         return ResponseEntity.ok(authenticationService.registerLocalguide(localguide));
     }
-    /* @PostMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest loginRequest){
             return ResponseEntity.ok(authenticationService.login(loginRequest));
-    } */
+    }
 }
