@@ -29,6 +29,7 @@ import {MatListModule} from "@angular/material/list";
 import {AddPostDialogComponent} from './pages/feed/add-post-dialog/add-post-dialog.component';
 import {PickerModule} from "@ctrl/ngx-emoji-mart";
 import { MeetupComponent } from './pages/meetup/meetup.component';
+import { MeetupDialogComponent } from './pages/meetup/meetup-dialog/meetup-dialog.component';
 
 
 @NgModule({
@@ -43,6 +44,7 @@ import { MeetupComponent } from './pages/meetup/meetup.component';
     FeedComponent,
     AddPostDialogComponent,
     MeetupComponent,
+    MeetupDialogComponent,
 
 
 

@@ -38,8 +38,10 @@
           <p>{{ meetup.description }}</p>
           <h4>Location:</h4>
           <p>{{ meetup.location }}</p>
+          <div *ngIf="meetup.cost">
           <h4>Cost:</h4>
           <p>{{ meetup.cost | currency:'EUR':true }}</p>
+          </div>
           <h4>Date:</h4>
           <p>{{ meetup.date | date }}</p>
           <p><b>Start Time:</b> {{ meetup.startTime }}</p>
@@ -67,5 +69,5 @@
   </mat-card>
 </ng-container>
 <div class="button-container">
-  <button mat-raised-button>Add Meetup</button>
+  <button mat-raised-button (click)="openAddMeetupDialog()" >Add Meetup</button>
 </div>

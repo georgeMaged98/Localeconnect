@@ -1,14 +1,25 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Meetup} from "../model/meetup";
+import {BehaviorSubject} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
 })
 export class MeetupService {
   private apiUrl = '/api/meetup';
+  private meetupSource = new BehaviorSubject<Meetup | null>(null);
+  currentMeetup = this.meetupSource.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+  }
+
+  changeMeetup(meetup: any) {
+    if (meetup) {
+      this.meetupSource.next(meetup);
+
+    }
+  }
 
   getAllMeetups() {
     return this.http.get<Meetup[]>(`${this.apiUrl}/`);
@@ -27,11 +38,11 @@ export class MeetupService {
   }
 
   attendMeetup(id: number, travellerId: number) {
-    return this.http.post(`${this.apiUrl}/${id}/attend`, { travellerId });
+    return this.http.post(`${this.apiUrl}/${id}/attend`, {travellerId});
   }
 
   unattendMeetup(id: number, travellerId: number) {
-    return this.http.post(`${this.apiUrl}/${id}/unattend`, { travellerId });
+    return this.http.post(`${this.apiUrl}/${id}/unattend`, {travellerId});
   }
 
   deleteMeetup(id: number) {
@@ -47,6 +58,7 @@ export class MeetupService {
       meetup.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }
+
   getMeetupsMocks(): Meetup[] {
     return [
       {
@@ -74,11 +86,11 @@ export class MeetupService {
         cost: 20.00,
         location: 'Ocean View Beach, CA',
         spokenLanguages: ['English', 'Spanish'],
-        meetupAttendees: [2004, 2005],rating:0, averageRating: 2.5, totalRatings:5
+        meetupAttendees: [2004, 2005], rating: 0, averageRating: 2.5, totalRatings: 5
       },
       {
         id: 3,
-        creatorName :'Phillip K.',
+        creatorName: 'Phillip K.',
         name: 'Urban Sketchers Meetup',
         description: 'Join us to sketch our city\'s beautiful historic buildings.',
         date: new Date(2024, 7, 15),
@@ -87,8 +99,8 @@ export class MeetupService {
         cost: 0,
         location: 'Downtown Central Plaza, NY',
         spokenLanguages: ['English', 'French'],
-        meetupAttendees: [], averageRating:4,
-        rating:0, totalRatings: 1
+        meetupAttendees: [], averageRating: 4,
+        rating: 0, totalRatings: 1
       }
     ];
   }

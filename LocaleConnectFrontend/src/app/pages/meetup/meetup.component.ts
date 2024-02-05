@@ -1,25 +1,34 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Meetup} from "../../model/meetup";
 import {MeetupService} from "../../service/meetup.service";
 import {FormControl} from "@angular/forms";
-import {debounceTime, distinctUntilChanged} from "rxjs";
+import {debounceTime, distinctUntilChanged, Subscription} from "rxjs";
 import {UserService} from "../../service/user.service";
 import {Review} from "../../model/review";
 import {ReviewService} from "../../service/review.service";
+import {ItineraryDialogComponent} from "../itinerary/itinerary-dialog/itinerary-dialog.component";
+import {MatDialog} from "@angular/material/dialog";
+import {MeetupDialogComponent} from "./meetup-dialog/meetup-dialog.component";
+import {Itinerary} from "../../model/itinerary";
 
 @Component({
   selector: 'app-meetup',
   templateUrl: './meetup.component.html',
   styleUrls: ['./meetup.component.scss']
 })
-export class MeetupComponent implements OnInit {
+export class MeetupComponent implements OnInit, OnDestroy {
   meetups: Meetup[] = [];
   searchMeetups: Meetup[] = [];
   searchControl = new FormControl('');
+  subscription: Subscription = new Subscription();
 
 
-  constructor(private reviewService: ReviewService, private meetupService: MeetupService, private userService: UserService) {
+  constructor(private dialog: MatDialog, private reviewService: ReviewService, private meetupService: MeetupService, private userService: UserService) {
   }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+    }
 
   ngOnInit(): void {
     this.meetups = this.meetupService.getMeetupsMocks();
@@ -31,6 +40,14 @@ export class MeetupComponent implements OnInit {
     });
 
      */
+    this.subscription = this.meetupService.currentMeetup.subscribe(meetup => {
+      if (meetup) {
+        //TODO: replace mock with backend
+        // this.addMeetup(meetup)
+        this.addMeetupMock(meetup);
+      }
+
+    });
     this.searchControl.valueChanges.pipe(
       debounceTime(300),
       distinctUntilChanged(),
@@ -50,6 +67,12 @@ export class MeetupComponent implements OnInit {
     const travellerId = this.getTravellerId();
     this.meetupService.attendMeetup(meetupId, travellerId).subscribe(() => {
     });
+  }
+
+  addMeetupMock(meetup: Meetup) {
+    this.meetupService.createMeetup(meetup);
+    this.meetups.push(meetup);
+
   }
 
   unattendMeetup(meetupId: number): void {
@@ -91,6 +114,12 @@ export class MeetupComponent implements OnInit {
     }
   }
 
+  openAddMeetupDialog(): void {
+    const dialogRef = this.dialog.open(MeetupDialogComponent, {
+      width: '600px',
+      height: '600px'
+    });
+  }
 
   private getTravellerId(): number {
     return 123;
