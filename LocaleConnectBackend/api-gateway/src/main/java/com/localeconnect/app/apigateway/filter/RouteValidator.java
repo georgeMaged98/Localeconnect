@@ -12,7 +12,8 @@ public class RouteValidator {
     // endpoints that will be ignored
     public static final List<String> openApiEndpoints = List.of(
             "/api/auth/login",
-            "/eureka"
+            "/api/auth/register-traveler",
+            "/api/auth/register-localguide"
     );
 
     public Predicate<ServerHttpRequest> isSecured =
