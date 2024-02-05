@@ -22,12 +22,33 @@ import java.util.List;
 @RequestMapping("/api/user")
 public class UserController {
     private final UserService userService;
+    @PostMapping("/register-traveler")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<?> registerTraveler(@RequestBody TravelerDTO travelerDTO) {
+        try {
+            return new ResponseEntity<>(userService.registerTraveler(travelerDTO), HttpStatus.CREATED);
+        } catch (UserAlreadyExistsException | IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>("An internal error has  occured", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PostMapping("/register-localguide")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<?> registerLocalGuide(@RequestBody LocalguideDTO localguideDTO) {
+        try {
+            return new ResponseEntity<>(userService.registerLocalguide(localguideDTO), HttpStatus.CREATED);
+        } catch (UserAlreadyExistsException | IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>("An internal error has  occured", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @GetMapping("/all")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
             return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
-
     @GetMapping("/{userId}")
     public ResponseEntity<?> getUserById(@PathVariable("userId") Long userId) {
         try {

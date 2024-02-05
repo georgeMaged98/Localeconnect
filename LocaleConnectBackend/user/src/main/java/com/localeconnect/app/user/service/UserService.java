@@ -24,6 +24,44 @@ import lombok.extern.slf4j.Slf4j;
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final TravelerMapper travelerMapper;
+    private final LocalguideMapper localguideMapper;
+    private final UserConfirmationEmail userConfirmationEmail;
+    public TravelerDTO registerTraveler(TravelerDTO travelerDTO) {
+        if (userRepository.existsByUserName(travelerDTO.getUserName())) {
+            throw new UserAlreadyExistsException("A user with the given username already exists.");
+        }
+
+        if (userRepository.existsByEmail(travelerDTO.getEmail())) {
+            throw new UserAlreadyExistsException("A user with the given email already exists");
+        }
+
+        userConfirmationEmail.sendConfirmationEmail(travelerDTO);
+        userRepository.save(travelerMapper.toEntity(travelerDTO));
+
+        return travelerDTO;
+    }
+
+    public LocalguideDTO registerLocalguide(LocalguideDTO localguideDTO) {
+        if (userRepository.existsByUserName(localguideDTO.getUserName())) {
+            throw new UserAlreadyExistsException("A user with the given username already exists.");
+        }
+
+        if (userRepository.existsByEmail(localguideDTO.getEmail())) {
+            throw new UserAlreadyExistsException("A user with the given email already exists");
+        }
+
+        if (!(localguideDTO.getLanguages().size() < 2)
+                || localguideDTO.getDateOfBirth().plusYears(18).isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("Cannot be a local guide: must accept the conditions and" +
+                    " speak at least 2 languages and be at least 18 years old.");
+        }
+
+        userConfirmationEmail.sendConfirmationEmail(localguideDTO);
+        userRepository.save(localguideMapper.toEntity(localguideDTO));
+
+        return localguideDTO;
+    }
 
 
     public List<UserDTO> getAllUsers() {
