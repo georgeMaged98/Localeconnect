@@ -1,8 +1,6 @@
 package com.localeconnect.app.user.service;
 
 import com.localeconnect.app.user.auth.AuthenticationResponse;
-import com.localeconnect.app.user.dto.AuthenticationRequestDTO;
-import com.localeconnect.app.user.dto.AuthenticationResponseDTO;
 import com.localeconnect.app.user.dto.LocalguideDTO;
 import com.localeconnect.app.user.dto.TravelerDTO;
 import com.localeconnect.app.user.exception.UserAlreadyExistsException;
@@ -12,15 +10,14 @@ import com.localeconnect.app.user.mapper.TravelerMapper;
 import com.localeconnect.app.user.model.User;
 import com.localeconnect.app.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDate;
 
@@ -28,49 +25,38 @@ import java.time.LocalDate;
 @Slf4j
 @AllArgsConstructor
 public class AuthenticationService {
-    private final UserRepository userRepository;
-    private final UserConfirmationEmail userConfirmationEmail;
-    private final TravelerMapper travelerMapper;
-    private final LocalguideMapper localguideMapper;
-    private final JwtService jwtService;
+    private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
+    private final WebClient webClient;
 
-    public TravelerDTO registerTraveler(TravelerDTO travelerDTO) {
-        if (userRepository.existsByUserName(travelerDTO.getUserName())) {
-            throw new UserAlreadyExistsException("A user with the given username already exists.");
-        }
+    public AuthenticationResponse registerTraveler(TravelerDTO traveler) {
 
-        if (userRepository.existsByEmail(travelerDTO.getEmail())) {
-            throw new UserAlreadyExistsException("A user with the given email already exists");
-        }
+        traveler.setPassword(BCrypt.hashpw(traveler.getPassword(), BCrypt.gensalt()));
+        TravelerDTO registeredTraveler  = webClient.post()
+                .uri("http://user-service/api/user/register-traveler")
+                .bodyValue(traveler)
+                .retrieve()
+                .bodyToMono(TravelerDTO.class)
+                .block();
 
-        userConfirmationEmail.sendConfirmationEmail(travelerDTO);
-        userRepository.save(travelerMapper.toEntity(travelerDTO));
-
-        return travelerDTO;
+        String accessToken = jwtUtil.generateToken(registeredTraveler.getUserName(), registeredTraveler.getEmail());
+        return new AuthenticationResponse(accessToken);
     }
 
-    public LocalguideDTO registerLocalguide(LocalguideDTO localguideDTO) {
-        if (userRepository.existsByUserName(localguideDTO.getUserName())) {
-            throw new UserAlreadyExistsException("A user with the given username already exists.");
-        }
+    public AuthenticationResponse registerLocalguide(LocalguideDTO localguide) {
+        localguide.setPassword(BCrypt.hashpw(localguide.getPassword(), BCrypt.gensalt()));
+        LocalguideDTO registeredLocalGuide  = webClient.post()
+                .uri("http://user-service/api/user/register-localguide")
+                .bodyValue(localguide)
+                .retrieve()
+                .bodyToMono(LocalguideDTO.class)
+                .block();
 
-        if (userRepository.existsByEmail(localguideDTO.getEmail())) {
-            throw new UserAlreadyExistsException("A user with the given email already exists");
-        }
-
-        if (!(localguideDTO.getLanguages().size() < 2)
-                || localguideDTO.getDateOfBirth().plusYears(18).isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("Cannot be a local guide: must accept the conditions and" +
-                    " speak at least 2 languages and be at least 18 years old.");
-        }
-
-        userConfirmationEmail.sendConfirmationEmail(localguideDTO);
-        userRepository.save(localguideMapper.toEntity(localguideDTO));
-
-        return localguideDTO;
+        String accessToken = jwtUtil.generateToken(registeredLocalGuide.getUserName(), registeredTraveler.getEmail());
+        return new AuthenticationResponse(accessToken);
     }
-    public AuthenticationResponseDTO login(AuthenticationRequestDTO request) {
+
+   /* public AuthenticationResponseDTO login(AuthenticationRequestDTO request) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -78,7 +64,7 @@ public class AuthenticationService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UserDoesNotExistException("User with the given Email does not exist!"));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = jwtService.generateToken(authentication);
+        String token = jwtUtil.generateToken(authentication);
         return new AuthenticationResponseDTO(token);
-    }
+    } */
 }

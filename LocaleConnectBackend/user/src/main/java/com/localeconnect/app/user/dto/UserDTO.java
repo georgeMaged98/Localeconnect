@@ -32,7 +32,6 @@ public class UserDTO {
     @JsonFormat(pattern="yyyy-MM-dd")
     private LocalDate dateOfBirth;
     private String bio;
-    @Setter(AccessLevel.NONE)
     @NotBlank(message = "This is a required field")
     private String password;
     private List<String> visitedCountries;
@@ -41,15 +40,5 @@ public class UserDTO {
     private List<String> languages;
     private List<Long> followerIds;
     private List<Long> followingIds;
-
-    // Setter method for password with hash logic
-    public void setPassword(String password) {
-        this.password = hashPassword(password);
-    }
-
-    // Private method for password hashing
-    private String hashPassword(String password) {
-        return BCrypt.hashpw(password, BCrypt.gensalt());
-    }
 
 }

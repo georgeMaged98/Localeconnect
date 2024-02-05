@@ -1,6 +1,6 @@
 package com.localeconnect.app.user.security;
 
-import com.localeconnect.app.user.service.JwtService;
+import com.localeconnect.app.user.service.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +19,7 @@ import java.io.IOException;
 
 @AllArgsConstructor
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
-    private JwtService jwtService;
+    private JwtUtil jwtUtil;
     private UserDetailsService userDetailsService;
 
 
@@ -29,8 +29,8 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
         String token = getJWTFromRequest(request);
-        if(StringUtils.hasText(token) && jwtService.validateToken(token)) {
-            String username = jwtService.getUsernameFromJWT(token);
+        if(StringUtils.hasText(token) && jwtUtil.validateToken(token)) {
+            String username = jwtUtil.getUsernameFromJWT(token);
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,

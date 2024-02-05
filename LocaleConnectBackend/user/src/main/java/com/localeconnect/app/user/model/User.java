@@ -36,7 +36,6 @@ public class User implements UserDetails {
     private LocalDate dateOfBirth;
     @Column
     private String bio;
-    @Setter(AccessLevel.NONE)
     @Column(nullable = false)
     private String password;
     @ElementCollection
