@@ -7,7 +7,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "post")
@@ -42,6 +44,8 @@ public class Post {
     @Column(name = "post_type", nullable = false)
     private PostType postType;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Like> likes = new ArrayList<>();
 
     public void addComment(Comment comment) {
         comments.add(comment);
@@ -51,5 +55,15 @@ public class Post {
     public void removeComment(Comment comment) {
         comments.remove(comment);
         comment.setPost(null);
+    }
+
+    public void addLike(Like like) {
+        likes.add(like);
+        like.setPost(this);
+    }
+
+    public void removeLike(Like like) {
+        likes.remove(like);
+        like.setPost(null);
     }
 }

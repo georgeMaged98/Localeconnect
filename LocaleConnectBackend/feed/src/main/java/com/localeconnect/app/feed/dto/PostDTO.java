@@ -2,6 +2,7 @@ package com.localeconnect.app.feed.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.localeconnect.app.feed.model.Comment;
+import com.localeconnect.app.feed.model.Like;
 import com.localeconnect.app.feed.type.PostType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -37,5 +38,7 @@ public class PostDTO implements Serializable{
 
     @NotNull(message = "Post type cannot be null")
     private PostType postType;
+
+    private List<Like> likes = new ArrayList<>();
 
 }

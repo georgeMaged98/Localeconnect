@@ -4,8 +4,10 @@ import com.localeconnect.app.feed.dto.*;
 import com.localeconnect.app.feed.exceptions.LogicException;
 import com.localeconnect.app.feed.exceptions.ResourceNotFoundException;
 import com.localeconnect.app.feed.mapper.CommentMapper;
+import com.localeconnect.app.feed.mapper.LikeMapper;
 import com.localeconnect.app.feed.mapper.PostMapper;
 import com.localeconnect.app.feed.model.Comment;
+import com.localeconnect.app.feed.model.Like;
 import com.localeconnect.app.feed.model.Post;
 import com.localeconnect.app.feed.repository.CommentRepository;
 import com.localeconnect.app.feed.repository.PostRepository;
@@ -16,9 +18,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -30,6 +34,7 @@ public class FeedService {
 //    private final RabbitMQMessageProducer rabbitMQMessageProducer;
     private final PostMapper postMapper;
     private final CommentMapper commentMapper;
+    private final LikeMapper likeMapper;
     private final WebClient webClient;
 
     public PostDTO createPost(RegularPostDTO regularPost){
@@ -130,6 +135,58 @@ public class FeedService {
         return postMapper.toDomain(createdPost);
     }
 
+    public PostDTO getPostById(Long postId) {
+        Post postToFind = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("No Post Found with id: " + postId + "!"));
+        return postMapper.toDomain(postToFind);
+    }
+
+    public List<String> getPostLikes(Long postId) {
+        PostDTO post = getPostById(postId);
+        List<String> usersLikedThePost = new ArrayList<>();
+
+        for(Like like : post.getLikes()) {
+            usersLikedThePost.add(getUserNameById(like.getLikerId()));
+        }
+        return usersLikedThePost;
+    }
+
+    public PostDTO likePost(Long postId, LikeDTO likeDTO) {
+        Post postToFind = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("No Post Found with id: " + postId + "!"));
+        Like like = likeMapper.toEntity(likeDTO);
+
+        Long likerId = like.getLikerId();
+        if(!checkUserExists(likerId))
+            throw new ResourceNotFoundException("User with id " + likerId + " does not exist!");
+
+        postToFind.addLike(like);
+        postRepository.save(postToFind);
+        return postMapper.toDomain(postToFind);
+    }
+
+    public PostDTO unlikePost(Long postId, LikeDTO likeDTO) {
+        Post postToFind = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("No Post Found with id: " + postId + "!"));
+        Like like = likeMapper.toEntity(likeDTO);
+
+        Long likerId = like.getLikerId();
+        if(!checkUserExists(likerId))
+            throw new ResourceNotFoundException("User with id " + likerId + " does not exist!");
+
+        postToFind.removeLike(like);
+        postRepository.save(postToFind);
+        return postMapper.toDomain(postToFind);
+    }
+
+    public List<PostDTO> getPostsByAuthor(Long authorId) {
+        if(!checkUserExists(authorId))
+            throw new ResourceNotFoundException("User with id " + authorId + " does not exist!");
+
+        return postRepository.findByAuthorID(authorId).stream()
+                .map(postMapper::toDomain).collect(Collectors.toList());
+    }
+
     private String createContentFromItinerary(ItineraryDTO dto) {
         return String.format("Itinerary: %s, Days: %d, Places: %s, Description: %s",
                 dto.getName(), dto.getNumberOfDays(), String.join(", ", dto.getPlacesToVisit()), dto.getDescription());
@@ -149,6 +206,15 @@ public class FeedService {
         return Boolean.TRUE.equals(this.webClient.get()
                 .uri("http://user-service:8084/api/user/exists/{userId}", userId)
                 .retrieve().bodyToMono(Boolean.class).block());
+    }
+
+    private String getUserNameById(Long id) {
+        if (checkUserExists(id)) {
+            return this.webClient.get()
+                    .uri("http://user-service:8084/api/user/{userId}", id)
+                    .retrieve().bodyToMono(UserDTO.class).block().getUserName();
+        }
+        return null;
     }
 
 }

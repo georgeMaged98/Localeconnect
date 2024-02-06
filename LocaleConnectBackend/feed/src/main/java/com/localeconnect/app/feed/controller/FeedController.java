@@ -10,6 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @RestController
 @AllArgsConstructor
@@ -19,14 +22,14 @@ public class FeedController {
 
     private final FeedService feedService;
 
-    @PostMapping("/")
+    @PostMapping("/create")
     public ResponseEntity<Object> createRegularPost(@RequestBody @Valid RegularPostDTO regularPost) {
         PostDTO newPostDTO = feedService.createPost(regularPost);
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.CREATED, newPostDTO, null);
     }
 
-    @DeleteMapping(path = "/{postId}")
+    @DeleteMapping(path = "/delete/{postId}")
     public ResponseEntity<Object> deletePostById(@PathVariable("postId") Long postId) {
         PostDTO deletedPostDTO = feedService.deletePost(postId);
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, deletedPostDTO, null);
@@ -68,5 +71,35 @@ public class FeedController {
         PostDTO meetupPost = feedService.shareMeetup(meetupToShare, authorId);
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.CREATED, meetupPost, null);
+    }
+
+    @GetMapping(path = "/{postId}")
+    public ResponseEntity<Object> getPostById(@PathVariable("postId") Long postId) {
+        PostDTO foundPost = feedService.getPostById(postId);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, foundPost, null);
+    }
+    @GetMapping("/{postId}/like-list")
+    public ResponseEntity<Object> getPostLikes(@PathVariable("postId") Long postId) {
+        List<String> usersLiked = feedService.getPostLikes(postId);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, usersLiked, null);
+    }
+
+    @PostMapping("/{postId}/like")
+    public ResponseEntity<Object> likePost(@PathVariable("postId") Long postId,
+                                           @RequestBody @Valid LikeDTO likeDTO) {
+        PostDTO postLiked = feedService.likePost(postId, likeDTO);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, postLiked, null);
+    }
+
+    @PostMapping("/{postId}/unlike")
+    public ResponseEntity<Object> unlikePost(@PathVariable("postId") Long postId,
+                                             @RequestBody @Valid LikeDTO likeDTO) {
+        PostDTO postUnliked = feedService.unlikePost(postId, likeDTO);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, postUnliked, null);
+    }
+    @GetMapping(path = "/{authorId}")
+    public ResponseEntity<Object> getPostByAuthorId(@PathVariable("authorId") Long authorId) {
+        List<PostDTO> foundPost = feedService.getPostsByAuthor(authorId);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, foundPost, null);
     }
 }
