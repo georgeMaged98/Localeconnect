@@ -40,6 +40,11 @@ spring:
           predicates:
             - Path=/api/trip/**
 
+        - id: notification-service
+          uri: http://notification-service:7002
+          predicates:
+            - Path=/api/notification/**
+
 eureka:
   client:
     serviceUrl:

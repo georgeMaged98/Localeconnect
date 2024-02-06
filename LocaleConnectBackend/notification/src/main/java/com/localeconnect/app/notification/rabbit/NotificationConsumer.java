@@ -4,10 +4,12 @@ import com.localeconnect.app.notification.config.NotificationRabbitConfig;
 import com.localeconnect.app.notification.dto.NotificationDTO;
 import com.localeconnect.app.notification.service.NotificationService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @AllArgsConstructor
 public class NotificationConsumer {
@@ -17,9 +19,9 @@ public class NotificationConsumer {
     private SimpMessagingTemplate messagingTemplate;
 
     @RabbitListener(queues = NotificationRabbitConfig.QUEUE)
-    public void notificationConsumer(NotificationDTO notificationDTO){
+    public void notificationConsumer(NotificationDTO notificationDTO) {
 
-        System.out.println("Notification " + notificationDTO);
+        log.info("Notification Received in queue: " + NotificationRabbitConfig.QUEUE + " with content:  " + notificationDTO);
         messagingTemplate.convertAndSend("/topic/notification", notificationDTO);
     }
 

@@ -47,7 +47,7 @@ services:
     container_name: notification-service
     build:
       context: ../
-      dockerfile: notification/Dockerfile
+      dockerfile: Dockerfile_OLD
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://notification-postgresqlDB:5432/notification-DB
       - SPRING_DATASOURCE_USERNAME=localeconnect

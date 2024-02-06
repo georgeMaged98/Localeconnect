@@ -1,6 +1,7 @@
 package com.localeconnect.app.notification.controller;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
@@ -12,8 +13,8 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 @Component
 @AllArgsConstructor
+@Slf4j
 public class WebSocketEventListener {
-
 
     private SimpMessageSendingOperations messagingTemplate;
 
@@ -21,7 +22,7 @@ public class WebSocketEventListener {
     public void handleSessionConnected(SessionConnectEvent event) {
         SimpMessageHeaderAccessor headers = SimpMessageHeaderAccessor.wrap(event.getMessage());
 //        String username = headers.getUser().getName();
-        System.out.println("USER CONNECTED!! ");
+        log.info("USER CONNECTED!! ");
 //        System.out.println(username);
     }
 

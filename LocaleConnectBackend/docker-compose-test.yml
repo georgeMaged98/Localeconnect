@@ -13,7 +13,7 @@ services:
       - postgres:/data/postgres
       - ./init-scripts:/docker-entrypoint-initdb.d
     ports:
-      - 5432:5432
+      - "5432:5432"
     restart: unless-stopped
 
   pgadmin:
@@ -35,7 +35,7 @@ services:
     environment:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
     ports:
-      - 8080:8080
+      - "8080:8080"
     restart: always
 
   chat-service:
@@ -50,6 +50,7 @@ services:
     environment:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
       - DB_HOST=postgres-service
+      - RABBITMQ_HOST=rabbitmq
 
   user-service:
     image: georgemaged/user-service:latest
@@ -79,12 +80,27 @@ services:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
       - DB_HOST=postgres-service
 
+  notification-service:
+    image: georgemaged/notification-service:latest
+    pull_policy: always
+    environment:
+      - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
+      - DB_HOST=postgres-service
+
   discovery-server:
     image: georgemaged/discovery-server
     pull_policy: always
     ports:
       - '8761:8761'
 
+  rabbitmq:
+    image: rabbitmq:3.9.11-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+#    networks:
+#      - localeconnect-network
 
 volumes:
   postgres:

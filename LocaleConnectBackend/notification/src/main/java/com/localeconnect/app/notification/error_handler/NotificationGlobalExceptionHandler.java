@@ -3,6 +3,7 @@ package com.localeconnect.app.notification.error_handler;
 import com.localeconnect.app.notification.exceptions.ResourceNotFoundException;
 import com.localeconnect.app.notification.exceptions.ValidationException;
 import com.localeconnect.app.notification.response_handler.ResponseHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
+@Slf4j
 public class NotificationGlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
@@ -24,7 +26,7 @@ public class NotificationGlobalExceptionHandler {
         HttpStatus status = HttpStatus.NOT_FOUND; // 404
 
         List<String> errorMessages = Arrays.asList(e.getMessage());
-        System.out.println("Custom ResourceNotFoundException: " + errorMessages);
+        log.error("Custom ResourceNotFoundException: " + errorMessages);
 
         ErrorResponse errorResponse = new ErrorResponse(
                 status,
@@ -40,7 +42,7 @@ public class NotificationGlobalExceptionHandler {
 
         HttpStatus status = HttpStatus.BAD_REQUEST; // 400
 
-        System.out.println("Custom MethodArgumentNotValidException: " + errors);
+        log.error("Custom MethodArgumentNotValidException: " + errors);
         ErrorResponse errorResponse = new ErrorResponse(
                 status,
                 errors
@@ -55,8 +57,8 @@ public class NotificationGlobalExceptionHandler {
             Exception e
     ) {
         HttpStatus status = HttpStatus.BAD_REQUEST; // 400
-        System.out.println("Custom ValidationException: " + e.getMessage());
-        System.out.println("Custom ValidationException TRACE: " + Arrays.toString(e.getStackTrace()));
+        log.error("Custom ValidationException: " + e.getMessage());
+        log.error("Custom ValidationException TRACE: " + Arrays.toString(e.getStackTrace()));
 
         List<String> errors = Arrays.asList(e.getMessage());
 
@@ -72,9 +74,9 @@ public class NotificationGlobalExceptionHandler {
             Exception e
     ) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR; // 500
-        System.out.println(e);
-//        System.out.println("Custom General Exception: " + e.getMessage());
-//        System.out.println("Custom General Exception TRACE: " + Arrays.toString(e.getStackTrace()));
+
+        log.error("Custom General Exception: " + e.getMessage());
+        log.error("Custom General Exception TRACE: " + Arrays.toString(e.getStackTrace()));
 
         List<String> errors = Arrays.asList("Internal Server Error: Something Went Wrong!");
 
