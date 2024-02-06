@@ -30,6 +30,7 @@ import {AddPostDialogComponent} from './pages/feed/add-post-dialog/add-post-dial
 import {PickerModule} from "@ctrl/ngx-emoji-mart";
 import { MeetupComponent } from './pages/meetup/meetup.component';
 import { MeetupDialogComponent } from './pages/meetup/meetup-dialog/meetup-dialog.component';
+import { GuideComponent } from './pages/guide/guide.component';
 
 
 @NgModule({
@@ -45,6 +46,7 @@ import { MeetupDialogComponent } from './pages/meetup/meetup-dialog/meetup-dialo
     AddPostDialogComponent,
     MeetupComponent,
     MeetupDialogComponent,
+    GuideComponent,
 
 
 
