@@ -57,7 +57,6 @@ export class RegisterGuideComponent {
         bio: '',
         password: formValue.password,
         visitedCountries: [],
-        registeredAsLocalGuide: false,
         languages:formValue.languages,
         followingIds: [],
         followerIds: [],

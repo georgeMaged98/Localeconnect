@@ -5,11 +5,9 @@ import {ItineraryDialogComponent} from "./itinerary-dialog/itinerary-dialog.comp
 import {MatDialog} from "@angular/material/dialog";
 import {debounceTime, distinctUntilChanged, Subscription} from "rxjs";
 import {UserService} from "../../service/user.service";
-import {Review} from "../../model/review";
 import {ReviewService} from "../../service/review.service";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {ImagesService} from "../../service/image.service";
-import {Meetup} from "../../model/meetup";
 
 @Component({
   selector: 'app-itinerary',
