@@ -19,7 +19,7 @@
 </div>
 
 
-<ng-container class="main-container" *ngFor="let itinerary of allItineraries">
+<ng-container class="main-container" *ngFor="let itinerary of displayedItineraries">
   <mat-card class="itinerary-card">
     <div class="card-content">
       <div class="image-container">
@@ -82,7 +82,6 @@
             <div *ngIf="!itinerary.ratingSubmitted"> <b>Rate this Meetup! </b></div>
             <app-review *ngIf="!itinerary.ratingSubmitted" [(rating)]="itinerary.rating"
                         (ratingChange)="submitRating(itinerary,$event)"></app-review>
-            <div *ngIf="itinerary.ratingSubmitted"> <b>Review submitted successfully!</b></div>
           </div>
         </mat-card-content>
         <mat-card-actions>
@@ -97,5 +96,11 @@
 <div class="button-container">
   <button mat-raised-button (click)="openAddItineraryDialog()">Add Itinerary</button>
 </div>
+<mat-paginator [length]="totalLength"
+               [pageSize]="pageSize"
+               [pageSizeOptions]="[5, 10, 25, 100]"
+               (page)="updateDisplayedItineraries()"
+               aria-label="Select page of meetups">
+</mat-paginator>
 
 

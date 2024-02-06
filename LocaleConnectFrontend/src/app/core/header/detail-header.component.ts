@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
-import {WebSocketService} from "../../service/web-socket.service";
 import {Notification} from "../../model/notification";
+import {NotificationService} from "../../service/notification.service";
 
 @Component({
   selector: 'app-detail-header',
@@ -12,11 +12,11 @@ export class DetailHeaderComponent implements OnInit {
   showNotifications: boolean = false;
   hasNewNotifications: boolean= false;
 
-  constructor(private webSocketService: WebSocketService) {
+  constructor(private notificationService: NotificationService) {
   }
 
   ngOnInit() {
-    this.webSocketService.getNotifications().subscribe((notifications) => {
+    this.notificationService.getNotifications().subscribe((notifications) => {
       this.notifications = notifications;
       this.hasNewNotifications = notifications.length > 0;
 
@@ -28,7 +28,7 @@ export class DetailHeaderComponent implements OnInit {
     this.hasNewNotifications = false;
 
     if (!this.showNotifications) {
-      this.webSocketService.deleteAllNotifications();
+      this.notificationService.deleteAllNotifications();
       this.notifications = [];
   }}
 

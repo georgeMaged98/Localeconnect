@@ -1,4 +1,5 @@
 import {User} from "./user";
+import {Trip} from "./trip";
 
 export interface Guide extends User{
   city: string;
@@ -18,8 +19,7 @@ export interface GuideProfile{
   totalRatings?: number;
   averageRating?: number;
   expand?: boolean;
-  //TODO: replace with trips organized
-  trips?: string;
+  trips?: Trip[];
   isFollowing?: boolean;
   imageUrl?: string;
 }

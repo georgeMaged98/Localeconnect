@@ -7,7 +7,7 @@
   </div>
 </div>
 
-<ng-container class="main-container" *ngFor="let guide of guides">
+<ng-container class="main-container" *ngFor="let guide of displayedGuides">
   <mat-card class="guide-card">
     <div class="card-content">
       <div class="image-container">
@@ -47,7 +47,7 @@
           </div>
           <h4>Location:</h4>
           <p>{{ guide.city }}</p>
-          <h4>Spoken Languages: </h4>
+          <h4>Speaks The Languages: </h4>
           <mat-chip-listbox>
             <mat-chip class="lang" *ngFor="let lang of guide.languages">{{ lang }}</mat-chip>
           </mat-chip-listbox>
@@ -55,7 +55,6 @@
             <div *ngIf="!guide.ratingSubmitted"><b>Rate this Guide! </b></div>
             <app-review *ngIf="!guide.ratingSubmitted" [(rating)]="guide.rating"
                         (ratingChange)="submitRating(guide,$event)"></app-review>
-            <div *ngIf="guide.ratingSubmitted"><b>Review submitted successfully!</b></div>
           </div>
         </mat-card-content>
         <mat-card-actions>
@@ -67,3 +66,10 @@
     </div>
   </mat-card>
 </ng-container>
+<mat-paginator [length]="totalLength"
+               [pageSize]="pageSize"
+               [pageSizeOptions]="[5, 10, 25, 100]"
+               (page)="updateDisplayedGuides()"
+               aria-label="Select page of meetups">
+</mat-paginator>
+

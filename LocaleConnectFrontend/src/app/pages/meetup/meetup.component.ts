@@ -1,15 +1,14 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {Meetup} from "../../model/meetup";
 import {MeetupService} from "../../service/meetup.service";
 import {FormControl} from "@angular/forms";
 import {debounceTime, distinctUntilChanged, Subscription} from "rxjs";
 import {UserService} from "../../service/user.service";
-import {Review} from "../../model/review";
 import {ReviewService} from "../../service/review.service";
-import {ItineraryDialogComponent} from "../itinerary/itinerary-dialog/itinerary-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 import {MeetupDialogComponent} from "./meetup-dialog/meetup-dialog.component";
-import {Itinerary} from "../../model/itinerary";
+import {NotificationService} from "../../service/notification.service";
+import {MatPaginator} from "@angular/material/paginator";
 
 @Component({
   selector: 'app-meetup',
@@ -21,25 +20,31 @@ export class MeetupComponent implements OnInit, OnDestroy {
   searchMeetups: Meetup[] = [];
   searchControl = new FormControl('');
   subscription: Subscription = new Subscription();
+  totalLength = 0;
+  displayedMeetups: Meetup[] = [];
+  pageSize = 10;
 
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  constructor(private dialog: MatDialog, private reviewService: ReviewService, private meetupService: MeetupService, private userService: UserService) {
+  constructor(private notificationService: NotificationService, private dialog: MatDialog, private reviewService: ReviewService, private meetupService: MeetupService, private userService: UserService) {
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
-    }
+  }
 
   ngOnInit(): void {
     this.meetups = this.meetupService.getMeetupsMocks();
+    this.totalLength = this.meetups.length;
+    this.initializeDisplayedMeetups();
     this.searchMeetups = [...this.meetups];
 
     //TODO: use this api call instead
-    /*this.meetupService.getAllMeetups().subscribe(data => {
+    this.meetupService.getAllMeetups().subscribe(data => {
       this.meetups = data;
     });
 
-     */
+
     this.subscription = this.meetupService.currentMeetup.subscribe(meetup => {
       if (meetup) {
         //TODO: replace mock with backend
@@ -54,6 +59,20 @@ export class MeetupComponent implements OnInit, OnDestroy {
     ).subscribe(searchTerm => {
       this.performSearch(searchTerm);
     });
+  }
+
+  ngAfterViewInit() {
+    this.paginator.page.subscribe(() => {
+      this.updateDisplayedMeetups();
+    });
+  }
+  initializeDisplayedMeetups(): void {
+    this.displayedMeetups = this.meetups.slice(0, this.pageSize);
+  }
+  updateDisplayedMeetups(): void {
+    const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
+    const endIndex = startIndex + this.paginator.pageSize;
+    this.displayedMeetups = this.meetups.slice(startIndex, endIndex);
   }
 
   performSearch(searchTerm: string | null = ''): void {
@@ -72,6 +91,9 @@ export class MeetupComponent implements OnInit, OnDestroy {
   addMeetupMock(meetup: Meetup) {
     this.meetupService.createMeetup(meetup);
     this.meetups.push(meetup);
+    this.totalLength = this.meetups.length;
+    this.updateDisplayedMeetups();
+
 
   }
 
@@ -95,6 +117,8 @@ export class MeetupComponent implements OnInit, OnDestroy {
         meetup.averageRating = rating;
       }
       meetup.totalRatings = (meetup.totalRatings || 0) + 1;
+      this.notificationService.showSuccess('You submitted the review successfully!')
+
       //TODO: uncomment for api call
       /*
       const review: Review = { userId: this.getTravellerId(), rating, entityId: meetup.id, entityType: "meetup" };

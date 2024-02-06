@@ -7,7 +7,7 @@
   </div>
 </div>
 
-<ng-container class="main-container" *ngFor="let meetup of meetups">
+<ng-container class="main-container" *ngFor="let meetup of displayedMeetups">
   <mat-card class="meetup-card">
     <div class="card-content">
       <div class="details-container">
@@ -56,7 +56,6 @@
               <div *ngIf="!meetup.ratingSubmitted"> <b>Rate this Meetup! </b></div>
               <app-review *ngIf="!meetup.ratingSubmitted" [(rating)]="meetup.rating"
                       (ratingChange)="submitRating(meetup,$event)"></app-review>
-          <div *ngIf="meetup.ratingSubmitted"> <b>Review submitted successfully!</b></div>
           </div>
         </mat-card-content>
         <mat-card-actions>
@@ -71,3 +70,9 @@
 <div class="button-container">
   <button mat-raised-button (click)="openAddMeetupDialog()" >Add Meetup</button>
 </div>
+<mat-paginator [length]="totalLength"
+               [pageSize]="pageSize"
+               [pageSizeOptions]="[2,5, 10, 25, 100]"
+               (page)="updateDisplayedMeetups()"
+               aria-label="Select page of meetups">
+</mat-paginator>

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {FormControl} from "@angular/forms";
 import {debounceTime, distinctUntilChanged} from "rxjs";
 import {MatDialog} from "@angular/material/dialog";
@@ -6,6 +6,8 @@ import {ReviewService} from "../../service/review.service";
 import {UserService} from "../../service/user.service";
 import {ImagesService} from "../../service/image.service";
 import {GuideProfile} from "../../model/guide";
+import {NotificationService} from "../../service/notification.service";
+import {MatPaginator} from "@angular/material/paginator";
 
 @Component({
   selector: 'app-guide',
@@ -17,21 +19,32 @@ export class GuideComponent implements OnInit{
   searchGuides: GuideProfile[] = [];
   images: string[]=[];
   searchControl = new FormControl('');
+  totalLength=0;
+  displayedGuides: GuideProfile[] = [];
+  pageSize=10;
+
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
 
 
-  constructor(private imageService: ImagesService, private dialog: MatDialog, private reviewService: ReviewService, private userService: UserService) {
+
+  constructor(private notificationService: NotificationService, private imageService: ImagesService, private dialog: MatDialog, private reviewService: ReviewService, private userService: UserService) {
   }
 
 
   ngOnInit(): void {
     this.guides = this.userService.getGuidesMock();
+    this.totalLength = this.guides.length;
+    this.initializeDisplayedGuides();
     this.searchGuides = [...this.guides];
 
     //TODO: use this api call instead
     /*this.userService.getAllGuides().subscribe(data => {
     //TODO: map the data from backend
       this.guides = data;
+        this.totalLength = data.length;
+      this.updateDisplayedMeetups();
     });
 
      */
@@ -45,7 +58,19 @@ export class GuideComponent implements OnInit{
       this.performSearch(searchTerm);
     });
   }
-
+  ngAfterViewInit() {
+    this.paginator.page.subscribe(() => {
+      this.updateDisplayedGuides();
+    });
+  }
+  initializeDisplayedGuides(): void {
+    this.displayedGuides = this.guides.slice(0, this.pageSize);
+  }
+  updateDisplayedGuides(): void {
+    const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
+    const endIndex = startIndex + this.paginator.pageSize;
+    this.displayedGuides = this.guides.slice(startIndex, endIndex);
+  }
   performSearch(searchTerm: string | null = ''): void {
     this.guides = searchTerm
       ? this.userService.searchGuides(searchTerm, this.searchGuides)
@@ -67,7 +92,8 @@ export class GuideComponent implements OnInit{
         guide.averageRating = rating;
       }
       guide.totalRatings = (guide.totalRatings || 0) + 1;
-      console.log(rating);
+      this.notificationService.showSuccess('You submitted the review successfully!');
+
       //TODO: uncomment for api call
       /*
       const review: Review = { userId: guide.id, rating, entityId: guide.id, entityType: "guide" };
