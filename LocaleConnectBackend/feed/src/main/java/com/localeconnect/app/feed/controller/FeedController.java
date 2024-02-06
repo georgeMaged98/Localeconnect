@@ -1,6 +1,5 @@
 package com.localeconnect.app.feed.controller;
-import com.localeconnect.app.feed.dto.CommentDTO;
-import com.localeconnect.app.feed.dto.PostDTO;
+import com.localeconnect.app.feed.dto.*;
 import com.localeconnect.app.feed.response_handler.ResponseHandler;
 import com.localeconnect.app.feed.service.FeedService;
 import jakarta.validation.Valid;
@@ -9,6 +8,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 
 @RestController
@@ -46,5 +46,24 @@ public class FeedController {
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, updatedPost, null);
     }
 
+    @PostMapping("/share-trip")
+    public ResponseEntity<Object> shareTrip(TripDTO tripToShare) {
+        PostDTO tripPost = feedService.shareTrip(tripToShare);
 
+        return ResponseHandler.generateResponse("Success!", HttpStatus.CREATED, tripPost, null);
+    }
+
+    @PostMapping("/share-itinerary")
+    public ResponseEntity<Object> shareItinerary(ItineraryDTO itineraryToShare) {
+        PostDTO itineraryPost = feedService.shareItinerary(itineraryToShare);
+
+        return ResponseHandler.generateResponse("Success!", HttpStatus.CREATED, itineraryPost, null);
+    }
+
+    @PostMapping("/share-meetup")
+    public ResponseEntity<Object> shareMeetup(MeetupDTO meetupToShare) {
+        PostDTO meetupPost = feedService.shareMeetup(meetupToShare);
+
+        return ResponseHandler.generateResponse("Success!", HttpStatus.CREATED, meetupPost, null);
+    }
 }

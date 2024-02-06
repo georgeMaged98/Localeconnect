@@ -37,6 +37,10 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
+    @Column(name = "post_type")
+    private String postType; // regular, trip, itinerary, meetup
+
+
     public void addComment(Comment comment) {
         comments.add(comment);
         comment.setPost(this);
