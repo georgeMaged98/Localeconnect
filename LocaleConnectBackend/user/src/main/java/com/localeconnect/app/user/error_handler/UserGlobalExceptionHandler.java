@@ -1,9 +1,10 @@
-package com.localeconnect.app.trip.error_handler;
+package com.localeconnect.app.user.error_handler;
 
-import com.localeconnect.app.trip.exceptions.LogicException;
-import com.localeconnect.app.trip.exceptions.ResourceNotFoundException;
-import com.localeconnect.app.trip.exceptions.ValidationException;
-import com.localeconnect.app.trip.response_handler.ResponseHandler;
+import com.localeconnect.app.user.exception.LogicException;
+import com.localeconnect.app.user.exception.UserAlreadyExistsException;
+import com.localeconnect.app.user.exception.UserDoesNotExistException;
+import com.localeconnect.app.user.exception.ValidationException;
+import com.localeconnect.app.user.response_handler.ResponseHandler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -15,8 +16,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
-public class TripGlobalExceptionHandler {
-    @ExceptionHandler(ResourceNotFoundException.class)
+public class UserGlobalExceptionHandler {
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<Object> handleEntityNotFoundExceptions(Exception e){
         HttpStatus status = HttpStatus.NOT_FOUND; //404
         List<String> errorMessages = Arrays.asList(e.getMessage());
@@ -61,8 +63,24 @@ public class TripGlobalExceptionHandler {
         return ResponseHandler.generateResponse("Error!", status, null, errorResponse);
     }
 
-    @ExceptionHandler(LogicException.class)
+    @ExceptionHandler(UserDoesNotExistException.class)
     public ResponseEntity<Object> handleLogicExceptions(
+            Exception e
+    ) {
+        HttpStatus status = HttpStatus.BAD_REQUEST; // 400
+
+        List<String> errorMessages = Arrays.asList(e.getMessage());
+        System.out.println("UnauthorizedUser: " + errorMessages);
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                status,
+                errorMessages
+        );
+        return ResponseHandler.generateResponse("Error!", status, null, errorResponse);
+    }
+
+    @ExceptionHandler(LogicException.class)
+    public ResponseEntity<Object> handleItineraryAlreadyExistsExceptions(
             Exception e
     ) {
         HttpStatus status = HttpStatus.BAD_REQUEST; // 400
