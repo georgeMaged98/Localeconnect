@@ -148,6 +148,15 @@ public class UserService {
         return ratedLocalGuideDTO;
     }
 
+    public List<LocalguideDTO> getAllGuides() {
+        List<Localguide> guides = userRepository.findByRegisteredAsLocalGuide(true).stream()
+                .filter(Localguide.class::isInstance)
+                .map(Localguide.class::cast)
+                .collect(Collectors.toList());
+        return guides.stream()
+                .map(localguideMapper::toDomain)
+                .collect(Collectors.toList());
+    }
 
     public boolean checkUserId(Long userId) {
         return userRepository.findById(userId).isPresent();

@@ -80,6 +80,11 @@ public class UserController {
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, ratedLocalGuide, null);
     }
+    @GetMapping("/guides")
+    public ResponseEntity<Object> getAllGuides() {
+        List<LocalguideDTO> guides = userService.getAllGuides();
+        return ResponseHandler.generateResponse("All local guides retrieved successfully.", HttpStatus.OK, guides, null);
+    }
 
     @GetMapping("/exists/{userId}")
     public ResponseEntity<Object> checkUserExists(@PathVariable("userId") Long userId) {
