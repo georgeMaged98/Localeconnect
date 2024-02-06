@@ -9,6 +9,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {MeetupDialogComponent} from "./meetup-dialog/meetup-dialog.component";
 import {NotificationService} from "../../service/notification.service";
 import {MatPaginator} from "@angular/material/paginator";
+import {GuideProfile} from "../../model/guide";
 
 @Component({
   selector: 'app-meetup',
@@ -147,5 +148,18 @@ export class MeetupComponent implements OnInit, OnDestroy {
 
   private getTravellerId(): number {
     return 123;
+  }
+  toggleAttend(meetup : Meetup): void {
+    meetup.isAttending = !meetup.isAttending;
+    /*  if (meetup.isAttending) {
+        this.meetupService.attendMeetup(meetup.id, this.getTravellerId()).subscribe(() => {
+          meetup.isAttending = false;
+        });
+      } else {
+        this.meetupService.un AttendMeetup(meetup.id, this.getTravellerId()).subscribe(() => {
+          meetup.isAttending = true;
+        });
+      }
+     */
   }
 }

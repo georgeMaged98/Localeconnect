@@ -15,4 +15,5 @@ export interface Meetup {
   totalRatings?: number;
   averageRating?: number;
   expand?: boolean;
+  isAttending?: boolean;
 }

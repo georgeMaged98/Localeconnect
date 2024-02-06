@@ -47,10 +47,15 @@
           </div>
           <h4>Location:</h4>
           <p>{{ guide.city }}</p>
-          <h4>Speaks The Languages: </h4>
+          <h4>Visited Countries:</h4>
+          <ul>
+            <li *ngFor="let place of guide.visitedCountries">{{ place }}</li>
+          </ul>
+          <h4>Speaks: </h4>
           <mat-chip-listbox>
             <mat-chip class="lang" *ngFor="let lang of guide.languages">{{ lang }}</mat-chip>
           </mat-chip-listbox>
+
           <div class="rating">
             <div *ngIf="!guide.ratingSubmitted"><b>Rate this Guide! </b></div>
             <app-review *ngIf="!guide.ratingSubmitted" [(rating)]="guide.rating"
