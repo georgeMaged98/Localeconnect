@@ -9,6 +9,7 @@ import com.localeconnect.app.feed.model.Comment;
 import com.localeconnect.app.feed.model.Post;
 import com.localeconnect.app.feed.repository.CommentRepository;
 import com.localeconnect.app.feed.repository.PostRepository;
+import com.localeconnect.app.feed.type.PostType;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,9 +32,9 @@ public class FeedService {
     private final CommentMapper commentMapper;
     private final WebClient webClient;
 
-    public PostDTO createPost(PostDTO postDTO){
+    public PostDTO createPost(RegularPostDTO regularPost){
 
-        Post post = postMapper.toEntity(postDTO);
+        Post post = postMapper.toEntity(regularPost);
         // CHECK USER EXISTS
         long authorId = post.getAuthorID();
         if (!checkUserExists(authorId))
@@ -95,34 +96,34 @@ public class FeedService {
 
         return postMapper.toDomain(actualPost);
     }
-    public PostDTO shareTrip(TripDTO tripShareDTO) {
+    public PostDTO shareTrip(TripDTO trip, Long authorId) {
         Post post = new Post();
-        post.setAuthorID(tripShareDTO.getLocalguideId());
-        post.setPostType("trip");
-        post.setContent(createContentFromTrip(tripShareDTO));
+        post.setAuthorID(authorId);
+        post.setPostType(PostType.TRIP);
+        post.setContent(createContentFromTrip(trip));
         post.setDate(LocalDateTime.now());
-        post.setImages(tripShareDTO.getImageUrls());
+        post.setImages(trip.getImageUrls());
 
         Post createdPost = postRepository.save(post);
         return postMapper.toDomain(createdPost);
     }
 
-    public PostDTO shareItinerary(ItineraryDTO itineraryShareDTO) {
+    public PostDTO shareItinerary(ItineraryDTO itinerary, Long authorId) {
         Post post = new Post();
-        post.setAuthorID(itineraryShareDTO.getUserId());
-        post.setPostType("itinerary");
-        post.setContent(createContentFromItinerary(itineraryShareDTO));
+        post.setAuthorID(authorId);
+        post.setPostType(PostType.ITINERARY);
+        post.setContent(createContentFromItinerary(itinerary));
         post.setDate(LocalDateTime.now());
-        post.setImages(itineraryShareDTO.getImageUrls()); // Assuming Post has a list of image URLs
+        post.setImages(itinerary.getImageUrls());
 
         Post createdPost = postRepository.save(post);
         return postMapper.toDomain(createdPost);
     }
-    public PostDTO shareMeetup(MeetupDTO meetupShareDTO) {
+    public PostDTO shareMeetup(MeetupDTO meetup, Long authorId) {
         Post post = new Post();
-        post.setAuthorID(meetupShareDTO.getCreatorId());
-        post.setPostType("meetup");
-        post.setContent(createContentFromMeetup(meetupShareDTO));
+        post.setAuthorID(authorId);
+        post.setPostType(PostType.MEETUP);
+        post.setContent(createContentFromMeetup(meetup));
         post.setDate(LocalDateTime.now());
 
         Post createdPost = postRepository.save(post);

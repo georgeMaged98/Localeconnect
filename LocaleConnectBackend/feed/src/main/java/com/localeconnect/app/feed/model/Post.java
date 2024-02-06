@@ -1,6 +1,7 @@
 package com.localeconnect.app.feed.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.localeconnect.app.feed.type.PostType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -37,8 +38,9 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
-    @Column(name = "post_type")
-    private String postType; // regular, trip, itinerary, meetup
+    @Enumerated(EnumType.STRING)
+    @Column(name = "post_type", nullable = false)
+    private PostType postType;
 
 
     public void addComment(Comment comment) {

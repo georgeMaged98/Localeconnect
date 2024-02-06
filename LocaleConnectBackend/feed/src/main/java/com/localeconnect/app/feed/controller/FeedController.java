@@ -20,8 +20,8 @@ public class FeedController {
     private final FeedService feedService;
 
     @PostMapping("/")
-    public ResponseEntity<Object> createPost(@RequestBody @Valid PostDTO postDTO) {
-        PostDTO newPostDTO = feedService.createPost(postDTO);
+    public ResponseEntity<Object> createRegularPost(@RequestBody @Valid RegularPostDTO regularPost) {
+        PostDTO newPostDTO = feedService.createPost(regularPost);
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.CREATED, newPostDTO, null);
     }
@@ -47,22 +47,25 @@ public class FeedController {
     }
 
     @PostMapping("/share-trip")
-    public ResponseEntity<Object> shareTrip(TripDTO tripToShare) {
-        PostDTO tripPost = feedService.shareTrip(tripToShare);
+    public ResponseEntity<Object> shareTrip(@RequestBody @Valid TripDTO tripToShare,
+                                            @RequestParam @Valid Long authorId) {
+        PostDTO tripPost = feedService.shareTrip(tripToShare, authorId);
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.CREATED, tripPost, null);
     }
 
     @PostMapping("/share-itinerary")
-    public ResponseEntity<Object> shareItinerary(ItineraryDTO itineraryToShare) {
-        PostDTO itineraryPost = feedService.shareItinerary(itineraryToShare);
+    public ResponseEntity<Object> shareItinerary(@RequestBody @Valid ItineraryDTO itineraryToShare,
+                                                 @RequestParam @Valid Long authorId) {
+        PostDTO itineraryPost = feedService.shareItinerary(itineraryToShare, authorId);
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.CREATED, itineraryPost, null);
     }
 
     @PostMapping("/share-meetup")
-    public ResponseEntity<Object> shareMeetup(MeetupDTO meetupToShare) {
-        PostDTO meetupPost = feedService.shareMeetup(meetupToShare);
+    public ResponseEntity<Object> shareMeetup(@RequestBody @Valid MeetupDTO meetupToShare,
+                                              @RequestParam @Valid Long authorId) {
+        PostDTO meetupPost = feedService.shareMeetup(meetupToShare, authorId);
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.CREATED, meetupPost, null);
     }
