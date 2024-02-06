@@ -79,7 +79,7 @@
             </ul>
           </div>
           <div class="rating">
-            <div *ngIf="!itinerary.ratingSubmitted"> <b>Rate this Meetup! </b></div>
+            <div *ngIf="!itinerary.ratingSubmitted"> <b>Rate this Itinerary! </b></div>
             <app-review *ngIf="!itinerary.ratingSubmitted" [(rating)]="itinerary.rating"
                         (ratingChange)="submitRating(itinerary,$event)"></app-review>
             <div *ngIf="itinerary.ratingSubmitted"> <b>Review submitted successfully!</b></div>
