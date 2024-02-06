@@ -33,6 +33,7 @@ import {MeetupDialogComponent} from './pages/meetup/meetup-dialog/meetup-dialog.
 import {GuideComponent} from './pages/guide/guide.component';
 import {MatPaginatorModule} from "@angular/material/paginator";
 import {MatSnackBarModule} from "@angular/material/snack-bar";
+import { TripPreviewComponent } from './pages/guide/trip-preview/trip-preview.component';
 
 
 @NgModule({
@@ -49,6 +50,7 @@ import {MatSnackBarModule} from "@angular/material/snack-bar";
     MeetupComponent,
     MeetupDialogComponent,
     GuideComponent,
+    TripPreviewComponent,
 
 
 

@@ -52,10 +52,13 @@
             <li *ngFor="let place of guide.visitedCountries">{{ place }}</li>
           </ul>
           <h4>Speaks: </h4>
-          <mat-chip-listbox>
+          <mat-chip-listbox class="listbox">
             <mat-chip class="lang" *ngFor="let lang of guide.languages">{{ lang }}</mat-chip>
           </mat-chip-listbox>
-
+          <h4>Organized Trips:</h4>
+          <div class="trips-container">
+            <app-trip-preview *ngFor="let trip of guide.trips" [trip]="trip"></app-trip-preview>
+          </div>
           <div class="rating">
             <div *ngIf="!guide.ratingSubmitted"><b>Rate this Guide! </b></div>
             <app-review *ngIf="!guide.ratingSubmitted" [(rating)]="guide.rating"

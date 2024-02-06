@@ -1,12 +1,13 @@
 import {User} from "./user";
-import {Trip} from "./trip";
+import {Trip, TripPreview} from "./trip";
 
-export interface Guide extends User{
+export interface Guide extends User {
   city: string;
   rating: number;
 }
+
 //TODO: map from guide profile to guide and vices versa
-export interface GuideProfile{
+export interface GuideProfile {
   id: number;
   name: string;
   userName: string;
@@ -19,7 +20,7 @@ export interface GuideProfile{
   totalRatings?: number;
   averageRating?: number;
   expand?: boolean;
-  trips?: Trip[];
+  trips?: TripPreview[];
   isFollowing?: boolean;
   imageUrl?: string;
 }

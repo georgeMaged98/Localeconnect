@@ -3,6 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {Meetup} from "../model/meetup";
 import {GuideProfile} from "../model/guide";
+import {TripPreview} from "../model/trip";
 
 @Injectable({
   providedIn: 'root'
@@ -73,6 +74,7 @@ export class UserService {
         rating: 0,
         totalRatings: 45,
         averageRating: 4.7,
+        trips: this.MOCK_TRIP_PREVIEWS
       },
       {
         id: 5,
@@ -89,4 +91,30 @@ export class UserService {
       }
     ];
   }
+   MOCK_TRIP_PREVIEWS: TripPreview[] = [
+    {
+      id: '1',
+      name: 'Explore the Mountains',
+      description: 'Join us for an unforgettable adventure in the mountains. Experience breathtaking views, challenging hikes, and the serenity of nature.',
+      link: '/trips/mountains' // Adjust the link as necessary for your routing
+    },
+    {
+      id: '2',
+      name: 'City Lights Tour',
+      description: 'Discover the vibrant life of the city after dark. This tour takes you through bustling streets, markets, and landmarks illuminated beautifully at night.',
+      link: '/trips/city-lights'
+    },
+    {
+      id: '3',
+      name: 'Safari Adventure',
+      description: 'Get close to nature and wildlife on this exciting safari adventure. See wild animals in their natural habitat and learn about conservation efforts.',
+      link: '/trips/safari'
+    },
+    {
+      id: '4',
+      name: 'Cultural Heritage Tour',
+      description: 'Explore the rich cultural heritage of the region. Visit historical sites, museums, and monuments that tell the story of the people and their traditions.',
+      link: '/trips/cultural-heritage'
+    }
+  ];
 }

@@ -106,7 +106,12 @@ mat-card-actions {
         padding: 15px;
         border-radius: 5px;
         margin-top: 15px;
-
+        .trips-container {
+          padding: 15px 15px;
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+        }
         .rating {
           display: flex;
           flex-direction: column;
@@ -126,10 +131,11 @@ mat-card-actions {
         background-color: #e0d0f1;
       }
 
-      .mat-chip-listbox {
+      .listbox {
         display: flex;
         flex-wrap: wrap;
         list-style-type: none;
+        padding-bottom: 15px;
       }
 
       ul {
