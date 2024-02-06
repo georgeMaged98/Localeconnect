@@ -86,7 +86,7 @@ services:
       - '8761:8761'
 
   authentication-service:
-    image: george/user-service:latest
+    image: moetazkhelil/authentication-service:latest
     pull_policy: always
     environment:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
