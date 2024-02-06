@@ -98,17 +98,6 @@ public class UserController {
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, travelers, null);
     }
 
-    @GetMapping("/exists/{userId}")
-    public ResponseEntity<Object> checkUserExists(@PathVariable("userId") Long userId) {
-        boolean exists = userService.checkUserId(userId);
-        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, exists, null);
-    }
-    @GetMapping("/filter")
-    public ResponseEntity<Object> filterUsers(@RequestParam("localGuide") boolean isLocalGuide) {
-        List<UserDTO> users = userService.filterUsers(isLocalGuide);
-        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, users, null);
-    }
-
     @GetMapping("/{userId}/followers")
     public ResponseEntity<Object> getFollowers(@PathVariable("userId") Long userId) {
         List<UserDTO> followers = userService.getFollowers(userId);
@@ -119,5 +108,10 @@ public class UserController {
     public ResponseEntity<Object> getFollowing(@PathVariable("userId") Long userId) {
         List<UserDTO> following = userService.getFollowing(userId);
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, following, null);
+    }
+    @GetMapping("/exists/{userId}")
+    public ResponseEntity<Object> checkUserExists(@PathVariable("userId") Long userId) {
+        boolean exists = userService.checkUserId(userId);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, exists, null);
     }
 }
