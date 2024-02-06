@@ -158,6 +158,25 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    public List<LocalguideDTO> searchLocalguides(String keyword) {
+        List<Localguide> guides = userRepository.findByCityContainingIgnoreCase(keyword).stream()
+                .filter(Localguide.class::isInstance)
+                .map(Localguide.class::cast)
+                .collect(Collectors.toList());
+        return guides.stream()
+                .map(localguideMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    public List<UserDTO> searchTravelers(String keyword) {
+        List<User> travelers = userRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(keyword, keyword).stream()
+                .filter(user -> !user.isRegisteredAsLocalGuide())
+                .collect(Collectors.toList());
+        return travelers.stream()
+                .map(userMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
     public boolean checkUserId(Long userId) {
         return userRepository.findById(userId).isPresent();
     }

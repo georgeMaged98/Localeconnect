@@ -86,6 +86,18 @@ public class UserController {
         return ResponseHandler.generateResponse("All local guides retrieved successfully.", HttpStatus.OK, guides, null);
     }
 
+    @GetMapping("/search/guides")
+    public ResponseEntity<Object> searchLocalguides(@RequestParam("keyword") String keyword) {
+        List<LocalguideDTO> guides = userService.searchLocalguides(keyword);
+        return ResponseHandler.generateResponse("Local guides search results.", HttpStatus.OK, guides, null);
+    }
+
+    @GetMapping("/search/travelers")
+    public ResponseEntity<Object> searchTravelers(@RequestParam("keyword") String keyword) {
+        List<UserDTO> travelers = userService.searchTravelers(keyword);
+        return ResponseHandler.generateResponse("Travelers search results.", HttpStatus.OK, travelers, null);
+    }
+
     @GetMapping("/exists/{userId}")
     public ResponseEntity<Object> checkUserExists(@PathVariable("userId") Long userId) {
         boolean exists = userService.checkUserId(userId);

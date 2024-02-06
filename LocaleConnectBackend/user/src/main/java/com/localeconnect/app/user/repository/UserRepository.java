@@ -1,5 +1,6 @@
 package com.localeconnect.app.user.repository;
 
+import com.localeconnect.app.user.model.Localguide;
 import com.localeconnect.app.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,4 +12,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
     Optional<User> findByEmail(String email);
     List<User> findByRegisteredAsLocalGuide(boolean isLocalGuide);
+    List<Localguide> findByCityContainingIgnoreCase(String city);
+    List<User> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(String firstName, String lastName);
 }
