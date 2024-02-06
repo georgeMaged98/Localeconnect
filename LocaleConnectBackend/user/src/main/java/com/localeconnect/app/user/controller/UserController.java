@@ -72,6 +72,15 @@ public class UserController {
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, null, null);
     }
 
+    @PostMapping("/{guideId}/rate/{travelerId}")
+    public ResponseEntity<Object> rateLocalGuide(@PathVariable("guideId") Long guideId,
+                                                 @PathVariable("travelerId") Long travelerId,
+                                                 @RequestBody Double rating) {
+        LocalguideDTO ratedLocalGuide = userService.rateLocalGuide(guideId, travelerId, rating);
+
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, ratedLocalGuide, null);
+    }
+
     @GetMapping("/exists/{userId}")
     public ResponseEntity<Object> checkUserExists(@PathVariable("userId") Long userId) {
         boolean exists = userService.checkUserId(userId);

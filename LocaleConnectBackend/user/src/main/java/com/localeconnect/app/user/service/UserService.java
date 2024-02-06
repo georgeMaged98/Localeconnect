@@ -8,6 +8,7 @@ import com.localeconnect.app.user.exception.UserDoesNotExistException;
 import com.localeconnect.app.user.mapper.LocalguideMapper;
 import com.localeconnect.app.user.mapper.TravelerMapper;
 import com.localeconnect.app.user.mapper.UserMapper;
+import com.localeconnect.app.user.model.Localguide;
 import com.localeconnect.app.user.model.User;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -129,6 +130,24 @@ public class UserService {
         User savedUser = userRepository.save(existingUser);
         return userMapper.toDomain(savedUser);
     }
+
+    public LocalguideDTO rateLocalGuide(Long guideId, Long travelerId, Double rating) {
+        Localguide localguide = userRepository.findById(guideId)
+                .filter(user -> user instanceof Localguide)
+                .map(user -> (Localguide) user)
+                .orElseThrow(() -> new UserDoesNotExistException("LocalGuide with id " + guideId + " does not exist"));
+
+        if(!checkUserId(travelerId))
+            throw new UserDoesNotExistException("Traveler with id " + travelerId + " does not exist");
+
+        localguide.addRating(rating);
+
+        userRepository.save(localguide);
+        LocalguideDTO ratedLocalGuideDTO = localguideMapper.toDomain(localguide);
+        ratedLocalGuideDTO.setAverageRating(localguide.getAverageRating());
+        return ratedLocalGuideDTO;
+    }
+
 
     public boolean checkUserId(Long userId) {
         return userRepository.findById(userId).isPresent();
