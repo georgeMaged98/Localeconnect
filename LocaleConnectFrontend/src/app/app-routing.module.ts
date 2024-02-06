@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import {LandingPageComponent} from "./pages/landing-page/landing-page.component";
 import {ItineraryComponent} from "./pages/itinerary/itinerary.component";
 import {FeedComponent} from "./pages/feed/feed.component";
+import {MeetupComponent} from "./pages/meetup/meetup.component";
 
 const routes: Routes = [
   {
@@ -15,6 +16,10 @@ const routes: Routes = [
   {
     path: 'pages/home',
     component: FeedComponent
+  },
+  {
+    path: 'pages/meetups',
+    component: MeetupComponent
   }
 ];
 
