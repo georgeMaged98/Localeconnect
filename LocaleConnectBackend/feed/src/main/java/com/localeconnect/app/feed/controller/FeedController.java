@@ -2,14 +2,19 @@ package com.localeconnect.app.feed.controller;
 import com.localeconnect.app.feed.dto.*;
 import com.localeconnect.app.feed.response_handler.ResponseHandler;
 import com.localeconnect.app.feed.service.FeedService;
+import com.localeconnect.app.feed.type.PostType;
+import feign.Response;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,11 +81,13 @@ public class FeedController {
     @GetMapping(path = "/{postId}")
     public ResponseEntity<Object> getPostById(@PathVariable("postId") Long postId) {
         PostDTO foundPost = feedService.getPostById(postId);
+
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, foundPost, null);
     }
     @GetMapping("/{postId}/like-list")
     public ResponseEntity<Object> getPostLikes(@PathVariable("postId") Long postId) {
         List<String> usersLiked = feedService.getPostLikes(postId);
+
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, usersLiked, null);
     }
 
@@ -88,6 +95,7 @@ public class FeedController {
     public ResponseEntity<Object> likePost(@PathVariable("postId") Long postId,
                                            @RequestBody @Valid LikeDTO likeDTO) {
         PostDTO postLiked = feedService.likePost(postId, likeDTO);
+
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, postLiked, null);
     }
 
@@ -95,11 +103,30 @@ public class FeedController {
     public ResponseEntity<Object> unlikePost(@PathVariable("postId") Long postId,
                                              @RequestBody @Valid LikeDTO likeDTO) {
         PostDTO postUnliked = feedService.unlikePost(postId, likeDTO);
+
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, postUnliked, null);
     }
-    @GetMapping(path = "/{authorId}")
+    @GetMapping( "/{authorId}")
     public ResponseEntity<Object> getPostByAuthorId(@PathVariable("authorId") Long authorId) {
         List<PostDTO> foundPost = feedService.getPostsByAuthor(authorId);
+
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, foundPost, null);
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<Object> searchPost(@RequestParam("keyword") String keyword) {
+        List<PostDTO> searchedPosts = feedService.searchPosts(keyword);
+
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, searchedPosts, null);
+     }
+
+     @GetMapping("/filter")
+    public ResponseEntity<Object> filterPost(@RequestParam(value = "authorId", required = false) Long authorID,
+                                             @RequestParam(value = "postType", required = false) PostType postType,
+                                             @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+                                             @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
+        List<PostDTO> filteredPosts = feedService.filterPosts(authorID, postType, startDate, endDate);
+
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, filteredPosts, null);
+     }
 }

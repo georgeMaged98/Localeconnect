@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class UserDTO {
+public class UserFeedDTO {
 
     @NotBlank(message = "This is a required field")
     private String firstName;

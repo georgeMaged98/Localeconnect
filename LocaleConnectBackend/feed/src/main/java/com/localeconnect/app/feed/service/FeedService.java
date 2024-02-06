@@ -1,6 +1,7 @@
 package com.localeconnect.app.feed.service;
 
 import com.localeconnect.app.feed.dto.*;
+import com.localeconnect.app.feed.dto.UserFeedDTO;
 import com.localeconnect.app.feed.exceptions.LogicException;
 import com.localeconnect.app.feed.exceptions.ResourceNotFoundException;
 import com.localeconnect.app.feed.mapper.CommentMapper;
@@ -187,6 +188,18 @@ public class FeedService {
                 .map(postMapper::toDomain).collect(Collectors.toList());
     }
 
+    public List<PostDTO> searchPosts(String keyword) {
+        return postRepository.findByContentContainingIgnoreCase(keyword)
+                .stream().map(postMapper::toDomain).collect(Collectors.toList());
+    }
+
+    public List<PostDTO> filterPosts(Long authorID, PostType postType, LocalDateTime startDate, LocalDateTime endDate) {
+        List<Post> posts = postRepository.findByAuthorIDAndPostTypeAndDateBetween(authorID, postType, startDate, endDate);
+        return posts.stream()
+                .map(postMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
     private String createContentFromItinerary(ItineraryDTO dto) {
         return String.format("Itinerary: %s, Days: %d, Places: %s, Description: %s",
                 dto.getName(), dto.getNumberOfDays(), String.join(", ", dto.getPlacesToVisit()), dto.getDescription());
@@ -209,12 +222,12 @@ public class FeedService {
     }
 
     private String getUserNameById(Long id) {
-        if (checkUserExists(id)) {
+        if (!checkUserExists(id))
+            throw new ResourceNotFoundException("User with id " + id + " does not exist!");
+
             return this.webClient.get()
                     .uri("http://user-service:8084/api/user/{userId}", id)
-                    .retrieve().bodyToMono(UserDTO.class).block().getUserName();
-        }
-        return null;
+                    .retrieve().bodyToMono(UserFeedDTO.class).block().getUserName();
     }
 
 }
