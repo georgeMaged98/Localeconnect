@@ -83,24 +83,41 @@ public class UserController {
     @GetMapping("/guides")
     public ResponseEntity<Object> getAllGuides() {
         List<LocalguideDTO> guides = userService.getAllGuides();
-        return ResponseHandler.generateResponse("All local guides retrieved successfully.", HttpStatus.OK, guides, null);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, guides, null);
     }
 
-    @GetMapping("/search/guides")
-    public ResponseEntity<Object> searchLocalguides(@RequestParam("keyword") String keyword) {
-        List<LocalguideDTO> guides = userService.searchLocalguides(keyword);
-        return ResponseHandler.generateResponse("Local guides search results.", HttpStatus.OK, guides, null);
+    @GetMapping("/filter-guides-city")
+    public ResponseEntity<Object> filterLocalGuideByCity(@RequestParam("keyword") String keyword) {
+        List<LocalguideDTO> guides = userService.filterLocalGuideByCity(keyword);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, guides, null);
     }
 
-    @GetMapping("/search/travelers")
+    @GetMapping("/filter-travelers-name")
     public ResponseEntity<Object> searchTravelers(@RequestParam("keyword") String keyword) {
-        List<UserDTO> travelers = userService.searchTravelers(keyword);
-        return ResponseHandler.generateResponse("Travelers search results.", HttpStatus.OK, travelers, null);
+        List<UserDTO> travelers = userService.filterTravelersByFirstLastName(keyword);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, travelers, null);
     }
 
     @GetMapping("/exists/{userId}")
     public ResponseEntity<Object> checkUserExists(@PathVariable("userId") Long userId) {
         boolean exists = userService.checkUserId(userId);
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, exists, null);
+    }
+    @GetMapping("/filter")
+    public ResponseEntity<Object> filterUsers(@RequestParam("localGuide") boolean isLocalGuide) {
+        List<UserDTO> users = userService.filterUsers(isLocalGuide);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, users, null);
+    }
+
+    @GetMapping("/{userId}/followers")
+    public ResponseEntity<Object> getFollowers(@PathVariable("userId") Long userId) {
+        List<UserDTO> followers = userService.getFollowers(userId);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, followers, null);
+    }
+
+    @GetMapping("/{userId}/following")
+    public ResponseEntity<Object> getFollowing(@PathVariable("userId") Long userId) {
+        List<UserDTO> following = userService.getFollowing(userId);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, following, null);
     }
 }

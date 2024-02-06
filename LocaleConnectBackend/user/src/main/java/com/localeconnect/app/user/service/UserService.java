@@ -158,7 +158,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public List<LocalguideDTO> searchLocalguides(String keyword) {
+    public List<LocalguideDTO> filterLocalGuideByCity(String keyword) {
         List<Localguide> guides = userRepository.findByCityContainingIgnoreCase(keyword).stream()
                 .filter(Localguide.class::isInstance)
                 .map(Localguide.class::cast)
@@ -168,11 +168,27 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public List<UserDTO> searchTravelers(String keyword) {
+    public List<UserDTO> filterTravelersByFirstLastName(String keyword) {
         List<User> travelers = userRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(keyword, keyword).stream()
                 .filter(user -> !user.isRegisteredAsLocalGuide())
                 .collect(Collectors.toList());
         return travelers.stream()
+                .map(userMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    public List<UserDTO> getFollowers(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserDoesNotExistException("User with the id " + userId + "does not Exist!"));
+        return user.getFollowers().stream()
+                .map(userMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    public List<UserDTO> getFollowing(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserDoesNotExistException("User with the id " + userId + "does not Exist!"));
+        return user.getFollowing().stream()
                 .map(userMapper::toDomain)
                 .collect(Collectors.toList());
     }
