@@ -1,3 +1,9 @@
+
+.guide{
+  padding-left: 100px;
+  padding-right: 100px;
+}
+
 .filters-and-search-container {
   display: flex;
   justify-content: center;
@@ -81,9 +87,9 @@ mat-card-actions {
       padding-top: 10px;
 
       img {
-        width: 300px;
-        height: 200px;
-        border-radius: 4px;
+          width: 150px;
+          height: 150px;
+          border-radius: 50%;
       }
     }
 

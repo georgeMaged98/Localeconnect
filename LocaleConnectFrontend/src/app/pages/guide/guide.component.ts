@@ -72,7 +72,7 @@ export class GuideComponent implements OnInit{
     this.displayedGuides = this.guides.slice(startIndex, endIndex);
   }
   performSearch(searchTerm: string | null = ''): void {
-    this.guides = searchTerm
+    this.displayedGuides = searchTerm
       ? this.userService.searchGuides(searchTerm, this.searchGuides)
       : [...this.searchGuides];
   }

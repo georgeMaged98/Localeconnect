@@ -90,7 +90,7 @@ export class ItineraryComponent implements OnInit, OnDestroy {
   }
 
   performSearch(searchTerm: string | null = ''): void {
-    this.allItineraries = searchTerm
+    this.displayedItineraries = searchTerm
       ? this.itineraryService.searchItineraries(searchTerm, this.itineraries)
       : [...this.itineraries];
   }

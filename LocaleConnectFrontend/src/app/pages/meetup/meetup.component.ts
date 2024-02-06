@@ -77,7 +77,7 @@ export class MeetupComponent implements OnInit, OnDestroy {
   }
 
   performSearch(searchTerm: string | null = ''): void {
-    this.meetups = searchTerm
+    this.displayedMeetups = searchTerm
       ? this.meetupService.searchMeetups(searchTerm, this.searchMeetups)
       : [...this.searchMeetups];
   }
