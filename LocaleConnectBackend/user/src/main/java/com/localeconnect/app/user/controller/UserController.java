@@ -5,12 +5,11 @@ import com.localeconnect.app.user.dto.TravelerDTO;
 import com.localeconnect.app.user.dto.UserDTO;
 import com.localeconnect.app.user.exception.UserAlreadyExistsException;
 import com.localeconnect.app.user.exception.UserDoesNotExistException;
-import com.localeconnect.app.user.response_handler.ResponseHandler;
+import com.localeconnect.app.user.request.AuthenticationRequest;
 import com.localeconnect.app.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,58 +22,104 @@ import java.util.List;
 @RequestMapping("/api/user")
 public class UserController {
     private final UserService userService;
+    @PostMapping("/register-traveler")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<?> registerTraveler(@RequestBody @Valid TravelerDTO travelerDTO) {
+        log.info("************entred api/user/register-traveler request**************");
+        try {
+            return new ResponseEntity<>(userService.registerTraveler(travelerDTO), HttpStatus.CREATED);
+        } catch (UserAlreadyExistsException | IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>("An internal error has  occured", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PostMapping("/register-localguide")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<?> registerLocalGuide(@RequestBody @Valid LocalguideDTO localguideDTO) {
+        try {
+            return new ResponseEntity<>(userService.registerLocalguide(localguideDTO), HttpStatus.CREATED);
+        } catch (UserAlreadyExistsException | IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>("An internal error has  occured", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> registerLocalGuide(@RequestBody @Valid AuthenticationRequest request) {
+        try {
+            return new ResponseEntity<>(userService.login(request), HttpStatus.CREATED);
+        } catch (UserAlreadyExistsException | IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>("An internal error has  occured", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @GetMapping("/all")
-    public ResponseEntity<Object> getAllUsers() {
-        List<UserDTO> users = userService.getAllUsers();
-        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, users, null);
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
+            return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
-
     @GetMapping("/{userId}")
-    public ResponseEntity<Object> getUserById(@PathVariable("userId") Long userId) {
-        UserDTO user = userService.getUserById(userId);
-        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, user, null);
-    }
-
-    @PostMapping("/register-traveler")
-    public ResponseEntity<Object> registerTraveler(@RequestBody TravelerDTO travelerDTO) {
-        TravelerDTO registeredTraveler = userService.registerTraveler(travelerDTO);
-        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, registeredTraveler, null);
-    }
-
-    @PostMapping("/register-localguide")
-    public ResponseEntity<Object> registerLocalGuide(@RequestBody LocalguideDTO localguideDTO) {
-        LocalguideDTO registeredLocalguide = userService.registerLocalguide(localguideDTO);
-        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, registeredLocalguide, null);
+    public ResponseEntity<?> getUserById(@PathVariable("userId") Long userId) {
+        try {
+            return new ResponseEntity<>(userService.getUserById(userId), HttpStatus.OK);
+        }
+        catch (UserDoesNotExistException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>("An internal error has occured", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Object> updateUser(@RequestBody UserDTO userDTO) {
-        UserDTO updatedUser = userService.updateUser(userDTO);
-        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, updatedUser, null);
+    public ResponseEntity<?> updateUser(@RequestBody @Valid UserDTO userDTO) {
+        try {
+            return new ResponseEntity<>(userService.updateUser(userDTO), HttpStatus.OK);
+        }
+        catch(UserDoesNotExistException | IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>("An internal error has  occured", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
-
     @DeleteMapping("/delete/{userId}")
-    public ResponseEntity<Object> deleteUser(@PathVariable("userId") Long userId) {
-        userService.deleteUser(userId);
-        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, null, null);
+    public ResponseEntity<?> deleteUser(@PathVariable("userId") Long userId) {
+        try {
+            userService.deleteUser(userId);
+            return new ResponseEntity<>("User successfully deleted", HttpStatus.OK);
+        } catch (UserDoesNotExistException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            log.error("Error deleting user: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
-
     @PostMapping("/{userId}/follow/{followerId}")
-    public ResponseEntity<Object> followUser(@PathVariable("userId") Long userId, @PathVariable("followerId") Long followerId) {
-        userService.followUser(userId, followerId);
-        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, null, null);
+    public ResponseEntity<?> followUser(@PathVariable("userId") Long userId, @PathVariable("followerId") Long followerId) {
+        try {
+            userService.followUser(userId, followerId);
+            return new ResponseEntity<>("Follow request successful", HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Error following user: {}", e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("/{userId}/unfollow/{followeeId}")
-    public ResponseEntity<Object> unfollowUser(@PathVariable("userId") Long userId, @PathVariable("followeeId") Long followeeId) {
-        userService.unfollowUser(userId, followeeId);
-        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, null, null);
+    public ResponseEntity<?> unfollowUser(@PathVariable("userId") Long userId, @PathVariable("followeeId") Long followeeId) {
+        try {
+            userService.unfollowUser(userId, followeeId);
+            return new ResponseEntity<>("Unfollow successful", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
-
     @GetMapping("/exists/{userId}")
-    public ResponseEntity<Object> checkUserExists(@PathVariable("userId") Long userId) {
+    public ResponseEntity<Boolean> checkUserExists(@PathVariable("userId") Long userId) {
         boolean exists = userService.checkUserId(userId);
-        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, exists, null);
+        return new ResponseEntity<>(exists, HttpStatus.OK);
     }
 }

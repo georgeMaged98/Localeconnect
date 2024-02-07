@@ -8,8 +8,12 @@ import com.localeconnect.app.user.exception.UserDoesNotExistException;
 import com.localeconnect.app.user.mapper.LocalguideMapper;
 import com.localeconnect.app.user.mapper.TravelerMapper;
 import com.localeconnect.app.user.mapper.UserMapper;
+import com.localeconnect.app.user.model.Localguide;
+import com.localeconnect.app.user.model.Traveler;
 import com.localeconnect.app.user.model.User;
+import com.localeconnect.app.user.request.AuthenticationRequest;
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import com.localeconnect.app.user.repository.UserRepository;
 
@@ -23,27 +27,12 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final UserConfirmationEmail userConfirmationEmail;
     private final UserMapper userMapper;
     private final TravelerMapper travelerMapper;
     private final LocalguideMapper localguideMapper;
-
-
-    public List<UserDTO> getAllUsers() {
-        List<User> allUsers = userRepository.findAll();
-
-        return allUsers.stream()
-                .map(userMapper::toDomain)
-                .collect(Collectors.toList());
-    }
-
-    public UserDTO getUserById(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserDoesNotExistException("User with the given id does not exist"));
-        return userMapper.toDomain(user);
-    }
-
+    private final UserConfirmationEmail userConfirmationEmail;
     public TravelerDTO registerTraveler(TravelerDTO travelerDTO) {
+        log.info("************entred USERSERVICE/register-traveler **************");
         if (userRepository.existsByUserName(travelerDTO.getUserName())) {
             throw new UserAlreadyExistsException("A user with the given username already exists.");
         }
@@ -53,7 +42,9 @@ public class UserService {
         }
 
         userConfirmationEmail.sendConfirmationEmail(travelerDTO);
-        userRepository.save(travelerMapper.toEntity(travelerDTO));
+        Traveler traveler = travelerMapper.toEntity(travelerDTO);
+        traveler.setPassword(BCrypt.hashpw(traveler.getPassword(), BCrypt.gensalt()));
+        userRepository.save(traveler);
 
         return travelerDTO;
     }
@@ -74,9 +65,31 @@ public class UserService {
         }
 
         userConfirmationEmail.sendConfirmationEmail(localguideDTO);
-        userRepository.save(localguideMapper.toEntity(localguideDTO));
+        Localguide localguide = localguideMapper.toEntity(localguideDTO);
+        localguide.setPassword(BCrypt.hashpw(localguide.getPassword(), BCrypt.gensalt()));
+        userRepository.save(localguide);
 
         return localguideDTO;
+    }
+    public UserDTO login(AuthenticationRequest request) {
+        User loggedInUser = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UserDoesNotExistException("User with the given Email does not exist!"));
+
+        return userMapper.toDomain(loggedInUser);
+    }
+
+    public List<UserDTO> getAllUsers() {
+        List<User> allUsers = userRepository.findAll();
+
+        return allUsers.stream()
+                .map(userMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    public UserDTO getUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserDoesNotExistException("User with the given id does not exist"));
+        return userMapper.toDomain(user);
     }
 
     public void deleteUser(Long userId) {

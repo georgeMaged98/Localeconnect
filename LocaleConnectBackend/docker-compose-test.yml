@@ -30,7 +30,7 @@ services:
     restart: unless-stopped
 
   api-gateway:
-    image: georgemaged/api-gateway
+    image: moetazkhelil/api-gateway
     pull_policy: always
     environment:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
@@ -52,7 +52,7 @@ services:
       - DB_HOST=postgres-service
 
   user-service:
-    image: georgemaged/user-service:latest
+    image: moetazkhelil/user-service:latest
     pull_policy: always
     environment:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
@@ -73,7 +73,14 @@ services:
       - DB_HOST=postgres-service
 
   trip-service:
-    image: georgemaged/trip-service:latest
+    image: moetazkhelil/trip-service:latest
+    pull_policy: always
+    environment:
+      - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
+      - DB_HOST=postgres-service
+
+  authentication-service:
+    image: moetazkhelil/authentication-service:latest
     pull_policy: always
     environment:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka

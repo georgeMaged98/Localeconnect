@@ -1,11 +1,14 @@
-package com.localeconnect.app.user.dto;
+package com.localeconnect.app.authentication.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
@@ -32,7 +35,6 @@ public class UserDTO {
     private LocalDate dateOfBirth;
     private String bio;
     @NotBlank(message = "This is a required field")
-    @Getter(AccessLevel.NONE)
     private String password;
     private List<String> visitedCountries;
     @NotNull(message = "This is a required field")
