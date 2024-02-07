@@ -7,10 +7,11 @@ import {MatIconModule} from "@angular/material/icon";
 import {MatButtonModule} from "@angular/material/button";
 import {FooterComponent} from "./footer/footer.component";
 import { DetailHeaderComponent } from './header/detail-header.component';
+import {MatMenuModule} from "@angular/material/menu";
 
 @NgModule({
   declarations: [HeaderComponent, FooterComponent, DetailHeaderComponent],
-  imports: [CommonModule, RouterModule, MatToolbarModule, MatIconModule, MatButtonModule, NgOptimizedImage],
+    imports: [CommonModule, RouterModule, MatToolbarModule, MatIconModule, MatButtonModule, NgOptimizedImage, MatMenuModule],
   exports: [HeaderComponent,FooterComponent,DetailHeaderComponent],
 })
 export class CoreModule {}

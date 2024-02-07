@@ -6,11 +6,10 @@ export interface User {
   email: string;
   dateOfBirth: Date;
   bio?: string;
-  password: string;
   visitedCountries: string[];
-  registeredAsLocalGuide: boolean;
   languages: string[];
-   followerIds:number[] ;
+  followerIds: number[];
   followingIds: number[];
-
+  token?: string;
+  imageUrl?: string;
 }

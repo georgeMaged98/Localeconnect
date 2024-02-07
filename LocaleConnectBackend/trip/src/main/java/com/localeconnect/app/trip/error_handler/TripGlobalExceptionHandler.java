@@ -1,5 +1,6 @@
 package com.localeconnect.app.trip.error_handler;
 
+import com.localeconnect.app.trip.exceptions.LogicException;
 import com.localeconnect.app.trip.exceptions.ResourceNotFoundException;
 import com.localeconnect.app.trip.exceptions.ValidationException;
 import com.localeconnect.app.trip.response_handler.ResponseHandler;
@@ -9,7 +10,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.security.auth.login.LoginException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,7 +61,7 @@ public class TripGlobalExceptionHandler {
         return ResponseHandler.generateResponse("Error!", status, null, errorResponse);
     }
 
-    @ExceptionHandler(LoginException.class)
+    @ExceptionHandler(LogicException.class)
     public ResponseEntity<Object> handleLogicExceptions(
             Exception e
     ) {
