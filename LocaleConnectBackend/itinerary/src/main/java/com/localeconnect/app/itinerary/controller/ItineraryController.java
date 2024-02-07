@@ -4,7 +4,6 @@ import com.localeconnect.app.itinerary.dto.ItineraryDTO;
 import com.localeconnect.app.itinerary.dto.ItineraryShareDTO;
 import com.localeconnect.app.itinerary.dto.ReviewDTO;
 import com.localeconnect.app.itinerary.dto.Tag;
-import com.localeconnect.app.itinerary.exception.*;
 import com.localeconnect.app.itinerary.response_handler.ResponseHandler;
 import com.localeconnect.app.itinerary.service.ItineraryService;
 import jakarta.validation.Valid;
@@ -19,7 +18,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/itinerary")
 @AllArgsConstructor
-@CrossOrigin
 public class ItineraryController {
     private final ItineraryService itineraryService;
     @PostMapping("/create")

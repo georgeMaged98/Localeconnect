@@ -19,7 +19,7 @@ public class ItineraryDTO {
     private String description;
     @Positive(message = "Number of days must be greater than or equal to 1")
     private Integer numberOfDays;
-    private List<Tag> tags;
+    private List<String> tags;
     @NotEmpty(message = "Provide at least one destination")
     private List<String> placesToVisit;
     private List<String> dailyActivities;

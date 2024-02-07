@@ -9,6 +9,23 @@ spring:
 
   cloud:
     gateway:
+#      default-filters:
+#        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+#        - AddResponseHeader=Access-Control-Allow-Origin, *
+#      globalcors:
+#        corsConfigurations:
+#          '[/**]':
+#            allowedOrigins: "*"
+#            allowedMethods:
+#              - GET
+#              - POST
+#              - DELETE
+#              - PUT
+#              - OPTIONS
+#            allowedHeaders: "*"
+#            allowCredentials: true
+
+
       routes:
         - id: chat-service
           uri: http://chat-service:8003

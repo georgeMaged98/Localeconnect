@@ -99,6 +99,8 @@ public class ItineraryGlobalExceptionHandler {
     ) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR; // 500
         System.out.println("General Exception: " + e.getMessage());
+        System.out.println("Stack Trace: " + Arrays.toString(e.getStackTrace()));
+
         List<String> errors = Arrays.asList("Internal Server Error: Something Went Wrong!");
 
         ErrorResponse errorResponse = new ErrorResponse(
