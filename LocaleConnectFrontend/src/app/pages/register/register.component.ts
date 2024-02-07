@@ -66,7 +66,7 @@ export class RegisterComponent {
   openGuideDialog(): void {
     this.dialog.open(RegisterGuideComponent, {
       width: '400px',
-      maxHeight: '600px'
+      height: '700px'
     });
   }
 

@@ -11,4 +11,5 @@ export interface User {
   followerIds: number[];
   followingIds: number[];
   token?: string;
+  imageUrl?: string;
 }
