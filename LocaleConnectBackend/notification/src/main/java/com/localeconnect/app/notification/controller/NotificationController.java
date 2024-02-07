@@ -1,6 +1,8 @@
 package com.localeconnect.app.notification.controller;
 
+import com.localeconnect.app.notification.config.NotificationRabbitConfig;
 import com.localeconnect.app.notification.dto.NotificationDTO;
+import com.localeconnect.app.notification.rabbit.RabbitMQMessageProducer;
 import com.localeconnect.app.notification.response_handler.ResponseHandler;
 import com.localeconnect.app.notification.service.NotificationService;
 import jakarta.validation.Valid;
@@ -13,10 +15,13 @@ import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @RestController
+@RequestMapping("api/notification")
 public class NotificationController {
 
     private final NotificationService notificationService;
     private SimpMessagingTemplate messagingTemplate;
+
+    private final RabbitMQMessageProducer rabbitMQMessageProducer;
 
     @GetMapping("/notify")
     public ResponseEntity<Object> getNotification() throws InterruptedException {
@@ -26,13 +31,13 @@ public class NotificationController {
     }
 
     @PostMapping("/notify")
-    public ResponseEntity<Object> sendNotification(@RequestBody @Valid NotificationDTO incomingNotificationDTO)  {
+    public ResponseEntity<Object> sendNotification(@RequestBody @Valid NotificationDTO incomingNotificationDTO) {
 //        NotificationDTO notificationDTO = new NotificationDTO(23L, 1L, 2L, LocalDateTime.now(), "test");
 //        messagingTemplate.convertAndSend("/topic/notification", notificationDTO);
 
-//            rabbitMQMessageProducer.publish(incomingNotificationDTO, NotificationRabbitConfig.EXCHANGE, NotificationRabbitConfig.ROUTING_KEY);
+//        rabbitMQMessageProducer.publish(incomingNotificationDTO, NotificationRabbitConfig.EXCHANGE, NotificationRabbitConfig.ROUTING_KEY);
 
-        NotificationDTO  newNotificationDTO = notificationService.handleIncomingNotification(incomingNotificationDTO);
+        NotificationDTO newNotificationDTO = notificationService.handleIncomingNotification(incomingNotificationDTO);
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, newNotificationDTO, null);
     }
 }

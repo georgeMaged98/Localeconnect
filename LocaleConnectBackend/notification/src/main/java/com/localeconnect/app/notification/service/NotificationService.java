@@ -7,17 +7,22 @@ import com.localeconnect.app.notification.model.Notification;
 import com.localeconnect.app.notification.rabbit.RabbitMQMessageProducer;
 import com.localeconnect.app.notification.repository.NotificationRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final RabbitMQMessageProducer rabbitMQMessageProducer;
+
+    private final SimpMessagingTemplate simpMessagingTemplate;
     private final NotificationMapper notificationMapper;
 
 
@@ -26,18 +31,19 @@ public class NotificationService {
         Notification notification = notificationMapper.toEntity(notificationDTO);
 
         // TODO: Check if there exists a websocket connection with notification receiver.
-        System.out.println("TEST: " + notification);
+        log.info("TEST: " + notification);
         Notification createdNotification = notificationRepository.save(notification);
 
-        System.out.println("CREATED NOTIFICATION: " + createdNotification);
+        log.info("CREATED NOTIFICATION: " + createdNotification);
 
         NotificationDTO createdNotificationDTO = notificationMapper.toDomain(createdNotification);
 
-        System.out.println("CREATED NOTIFICATION DTO 2222: " + createdNotificationDTO);
+        log.info("CREATED NOTIFICATION DTO 2222: " + createdNotificationDTO);
 
         // PUSH TO RABBITMQ LISTENER temporarily ->
         // TODO: SHOULD BE REMOVED
-        rabbitMQMessageProducer.publish(createdNotificationDTO, NotificationRabbitConfig.EXCHANGE, NotificationRabbitConfig.ROUTING_KEY);
+//        rabbitMQMessageProducer.publish(createdNotificationDTO, NotificationRabbitConfig.EXCHANGE, NotificationRabbitConfig.ROUTING_KEY);
+        simpMessagingTemplate.convertAndSendToUser(notificationDTO.getReceiverID().toString(), "/msg", notificationDTO);
         return createdNotificationDTO;
     }
 

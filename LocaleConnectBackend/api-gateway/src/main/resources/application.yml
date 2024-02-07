@@ -45,6 +45,13 @@ spring:
           predicates:
             - Path=/api/notification/**
 
+        # WebSocket route for notification service
+        - id: notification-websocket
+          uri: ws://notification-service:7002
+          predicates:
+            - Path=/ws/**
+          filters:
+            - RewritePath=/ws/info(?<segment>.*), /ws/info?t=1707248057738/${segment}
 eureka:
   client:
     serviceUrl:

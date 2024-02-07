@@ -86,6 +86,8 @@ services:
     environment:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
       - DB_HOST=postgres-service
+    ports:
+      - "7002:7002"
 
   discovery-server:
     image: georgemaged/discovery-server

@@ -22,7 +22,8 @@ public class NotificationConsumer {
     public void notificationConsumer(NotificationDTO notificationDTO) {
 
         log.info("Notification Received in queue: " + NotificationRabbitConfig.QUEUE + " with content:  " + notificationDTO);
-        messagingTemplate.convertAndSend("/topic/notification", notificationDTO);
+//        messagingTemplate.convertAndSend("/topic/notification", notificationDTO);
+        notificationService.handleIncomingNotification(notificationDTO);
     }
 
 }

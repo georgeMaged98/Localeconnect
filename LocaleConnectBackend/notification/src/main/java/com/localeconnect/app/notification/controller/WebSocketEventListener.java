@@ -31,6 +31,7 @@ public class WebSocketEventListener {
         SimpMessageHeaderAccessor headers = SimpMessageHeaderAccessor.wrap(event.getMessage());
 //        String username = headers.getUser().getName();
         System.out.println("USER CONNECTED2222!! ");
+        log.info(headers.toString());
 //        System.out.println(username);
     }
 
