@@ -37,11 +37,9 @@ export class RegisterComponent {
         bio: '',
         password: formValue.password,
         visitedCountries: [],
-        registeredAsLocalGuide: false,
         languages: [],
         followingIds: [],
         followerIds: [],
-        interests: [], travelerStyle: ''
       };
 
       this.authService.registerTraveler(newUser).subscribe({

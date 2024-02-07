@@ -8,7 +8,6 @@ export interface User {
   bio?: string;
   password: string;
   visitedCountries: string[];
-  registeredAsLocalGuide: boolean;
   languages: string[];
    followerIds:number[] ;
   followingIds: number[];

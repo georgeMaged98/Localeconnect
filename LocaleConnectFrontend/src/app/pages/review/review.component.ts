@@ -36,5 +36,17 @@ export class ReviewComponent implements OnInit {
       (reviews: Review[]) => this.reviews = reviews
     );
   }
+  getStars(rating: number) {
+    const fullStars = Math.floor(rating);
+    const halfStar = rating % 1 !== 0 ? 1 : 0;
+    const emptyStars = 5 - fullStars - halfStar;
 
+    return {
+      fullStars: Array(fullStars).fill('star'),
+      halfStar: Array(halfStar).fill('star_half'),
+      emptyStars: Array(emptyStars).fill('star_border'),
+    };
+  }
+
+  protected readonly onsubmit = onsubmit;
 }

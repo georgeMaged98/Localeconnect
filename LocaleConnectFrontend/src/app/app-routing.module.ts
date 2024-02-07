@@ -4,6 +4,7 @@ import {LandingPageComponent} from "./pages/landing-page/landing-page.component"
 import {ItineraryComponent} from "./pages/itinerary/itinerary.component";
 import {FeedComponent} from "./pages/feed/feed.component";
 import {MeetupComponent} from "./pages/meetup/meetup.component";
+import {GuideComponent} from "./pages/guide/guide.component";
 
 const routes: Routes = [
   {
@@ -20,6 +21,11 @@ const routes: Routes = [
   {
     path: 'pages/meetups',
     component: MeetupComponent
+  },
+
+  {
+    path: 'pages/guides',
+    component: GuideComponent
   }
 ];
 
