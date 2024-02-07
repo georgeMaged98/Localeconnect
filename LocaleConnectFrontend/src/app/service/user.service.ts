@@ -39,6 +39,7 @@ export class UserService {
         city: 'New York',
         rating: 4.8,
         ratingSubmitted: true,
+
         totalRatings: 50,
         averageRating: 4.8,
         expand: false
@@ -54,6 +55,7 @@ export class UserService {
         rating: 0,
         totalRatings: 35,
         averageRating: 2.5,
+        imageUrl: 'https://www.profilebakery.com/wp-content/uploads/2023/04/AI-Profile-Picture.jpg',
       },
       {
         id: 3,
