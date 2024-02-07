@@ -1,6 +1,7 @@
 package com.localeconnect.app.apigateway.filter;
 
 import com.localeconnect.app.apigateway.service.JwtUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -14,6 +15,7 @@ import reactor.core.publisher.Mono;
 
 @RefreshScope
 @Component
+@Slf4j
 public class AuthenticationFilter implements GatewayFilter {
 
     @Autowired
@@ -26,20 +28,25 @@ public class AuthenticationFilter implements GatewayFilter {
         ServerHttpRequest request = exchange.getRequest();
 
         if (validator.isSecured.test(request)) {
+            log.info("************entred isSecured**************");
             if (authMissing(request)) {
+                log.info("************entred isMissing**************");
                 return onError(exchange, HttpStatus.UNAUTHORIZED);
             }
 
             final String token = request.getHeaders().getOrEmpty("Authorization").get(0);
 
             if (jwtUtils.isExpired(token)) {
+                log.info("************entred isExpired**************");
                 return onError(exchange, HttpStatus.UNAUTHORIZED);
             }
         }
+        log.info("************Processing request**************");
         return chain.filter(exchange);
     }
 
     private Mono<Void> onError(ServerWebExchange exchange, HttpStatus httpStatus) {
+        log.info("************Processing request**************");
         ServerHttpResponse response = exchange.getResponse();
         response.setStatusCode(httpStatus);
         return response.setComplete();

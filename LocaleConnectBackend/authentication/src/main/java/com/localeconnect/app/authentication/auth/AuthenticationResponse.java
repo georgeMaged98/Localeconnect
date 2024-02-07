@@ -1,12 +1,10 @@
 package com.localeconnect.app.authentication.auth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 public class AuthenticationResponse {
     @JsonProperty("access_token")
     private String accessToken;

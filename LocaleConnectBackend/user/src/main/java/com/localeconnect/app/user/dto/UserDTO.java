@@ -32,6 +32,7 @@ public class UserDTO {
     private LocalDate dateOfBirth;
     private String bio;
     @NotBlank(message = "This is a required field")
+    @Getter(AccessLevel.NONE)
     private String password;
     private List<String> visitedCountries;
     @NotNull(message = "This is a required field")

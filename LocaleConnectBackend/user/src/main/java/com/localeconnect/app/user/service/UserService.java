@@ -32,6 +32,7 @@ public class UserService {
     private final LocalguideMapper localguideMapper;
     private final UserConfirmationEmail userConfirmationEmail;
     public TravelerDTO registerTraveler(TravelerDTO travelerDTO) {
+        log.info("************entred USERSERVICE/register-traveler **************");
         if (userRepository.existsByUserName(travelerDTO.getUserName())) {
             throw new UserAlreadyExistsException("A user with the given username already exists.");
         }

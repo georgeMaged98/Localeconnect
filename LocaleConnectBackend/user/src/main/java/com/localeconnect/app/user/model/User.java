@@ -4,8 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 import jakarta.persistence.Id;
 import lombok.experimental.SuperBuilder;
+/*
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+*/
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -19,7 +21,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class User implements UserDetails {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,7 +55,7 @@ public class User implements UserDetails {
     @ManyToMany(mappedBy = "followers")
     private List<User> following = new ArrayList<>();
 
-    @Override
+   /* @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
     }
@@ -81,5 +83,5 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return false;
-    }
+    }*/
 }

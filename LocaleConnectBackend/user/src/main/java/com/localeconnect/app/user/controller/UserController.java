@@ -25,6 +25,7 @@ public class UserController {
     @PostMapping("/register-traveler")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> registerTraveler(@RequestBody @Valid TravelerDTO travelerDTO) {
+        log.info("************entred api/user/register-traveler request**************");
         try {
             return new ResponseEntity<>(userService.registerTraveler(travelerDTO), HttpStatus.CREATED);
         } catch (UserAlreadyExistsException | IllegalArgumentException e) {

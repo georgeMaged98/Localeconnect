@@ -12,39 +12,43 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestTemplate;
+//import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @Slf4j
 @AllArgsConstructor
 public class AuthenticationService {
+    private final RestTemplate restTemplate;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
-    private final WebClient webClient;
+    //private final WebClient webClient;
 
     public AuthenticationResponse registerTraveler(TravelerDTO traveler) {
 
-        TravelerDTO registeredTraveler  = webClient.post()
-                .uri("http://user-service/api/user/register-traveler")
+/*        TravelerDTO registeredTraveler  = webClient.post()
+                .uri("http://user-service:8084/api/user/register-traveler")
                 .bodyValue(traveler)
                 .retrieve()
                 .bodyToMono(TravelerDTO.class)
-                .block();
-
-        String accessToken = jwtUtil.generateToken(registeredTraveler.getUserName(), registeredTraveler.getEmail());
+                .block();*/
+        log.info("************entred  SERVICE REGISTER-TRAVELER**************");
+        TravelerDTO registeredTraveler = restTemplate.postForObject("http://user-service:8084/api/user/register-traveler", traveler, TravelerDTO.class);
+        String accessToken = jwtUtil.generateToken(registeredTraveler.getUserName());
         return new AuthenticationResponse(accessToken);
     }
 
     public AuthenticationResponse registerLocalguide(LocalguideDTO localguide) {
 
-        LocalguideDTO registeredLocalGuide  = webClient.post()
-                .uri("http://user-service/api/user/register-localguide")
+/*        LocalguideDTO registeredLocalGuide  = webClient.post()
+                .uri("http://user-service:8084/api/user/register-localguide")
                 .bodyValue(localguide)
                 .retrieve()
                 .bodyToMono(LocalguideDTO.class)
-                .block();
+                .block();*/
+        LocalguideDTO registeredLocalGuide = restTemplate.postForObject("http://user-service:8084/api/user/register-localguide", localguide, LocalguideDTO.class);
 
-        String accessToken = jwtUtil.generateToken(registeredLocalGuide.getUserName(), registeredLocalGuide.getEmail());
+        String accessToken = jwtUtil.generateToken(registeredLocalGuide.getUserName());
         return new AuthenticationResponse(accessToken);
 
     }
@@ -55,14 +59,15 @@ public class AuthenticationService {
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
                         request.getPassword()));
-        UserDTO loggedInUser = webClient.post()
-                .uri("http://user-service/api/user/login")
+        /*UserDTO loggedInUser = webClient.post()
+                .uri("http://user-service:8084/api/user/login")
                 .bodyValue(request)
                 .retrieve()
                 .bodyToMono(UserDTO.class)
-                .block();
+                .block();*/
+         UserDTO loggedInUser = restTemplate.postForObject("http://user-service:8084/api/user/login", request, UserDTO.class);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = jwtUtil.generateToken(loggedInUser.getUserName(), loggedInUser.getEmail());
+        String token = jwtUtil.generateToken(loggedInUser.getUserName());
         return new AuthenticationResponse(token);
 
     }

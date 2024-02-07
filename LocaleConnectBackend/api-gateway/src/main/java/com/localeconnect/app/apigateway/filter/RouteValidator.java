@@ -2,11 +2,12 @@ package com.localeconnect.app.apigateway.filter;
 
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.function.Predicate;
 
-@Component
+@Service
 public class RouteValidator {
     public static final List<String> openApiEndpoints = List.of(
             "/api/auth/login",
