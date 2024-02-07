@@ -55,7 +55,6 @@ export class RegisterGuideComponent {
         email: formValue.email,
         dateOfBirth:formValue.dateOfBirth,
         bio: '',
-        password: formValue.password,
         visitedCountries: [],
         languages:formValue.languages,
         followingIds: [],

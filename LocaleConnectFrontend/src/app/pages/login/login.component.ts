@@ -21,7 +21,7 @@ export class LoginComponent {
 
   onSubmit(): void {
     if (this.loginForm.valid) {
-      this.authService.login(this.loginForm.value).subscribe(
+      this.authService.login( this.loginForm.value.username, this.loginForm.value.password).subscribe(
         {
           next: (user) => {
             return user;

@@ -35,7 +35,6 @@ export class RegisterComponent {
         email: formValue.email,
         dateOfBirth: new Date(),
         bio: '',
-        password: formValue.password,
         visitedCountries: [],
         languages: [],
         followingIds: [],

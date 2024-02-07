@@ -3,6 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {GuideProfile} from "../model/guide";
 import {TripPreview} from "../model/trip";
+import {User} from "../model/user";
 
 @Injectable({
   providedIn: 'root'
@@ -25,6 +26,15 @@ export class UserService {
     return searchGuides.filter(guide =>
       guide.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
+  }
+
+
+  getAllUsers(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/all`);
+  }
+
+  getUserById(userId: number): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/${userId}`);
   }
 
   getGuidesMock(): GuideProfile[] {
