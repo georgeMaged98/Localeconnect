@@ -3,6 +3,7 @@ import {MatDialogRef} from '@angular/material/dialog';
 import {AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators} from '@angular/forms';
 import {MeetupService} from "../../../service/meetup.service";
 import {Meetup} from "../../../model/meetup";
+import {LANGUAGES} from "../../../helper/DataHelper";
 
 @Component({
   selector: 'app-meetup-dialog',
@@ -36,7 +37,6 @@ export class MeetupDialogComponent {
   onSubmit(): void {
     if (this.meetupForm.valid) {
       const formData = this.meetupForm.value;
-      formData.spokenLanguages = formData.spokenLanguages.split(',').map((lang: string) => lang.trim());
 
       const newMeetup: Meetup = {
         ...formData,
@@ -56,6 +56,7 @@ export class MeetupDialogComponent {
   }
 
 
+    protected readonly LANGUAGES = LANGUAGES;
 }
 
 export function timeFormatValidator(): ValidatorFn {

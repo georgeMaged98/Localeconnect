@@ -34,6 +34,7 @@ import {GuideComponent} from './pages/guide/guide.component';
 import {MatPaginatorModule} from "@angular/material/paginator";
 import {MatSnackBarModule} from "@angular/material/snack-bar";
 import { TripPreviewComponent } from './pages/guide/trip-preview/trip-preview.component';
+import {MatStepperModule} from "@angular/material/stepper";
 
 
 @NgModule({
@@ -77,7 +78,8 @@ import { TripPreviewComponent } from './pages/guide/trip-preview/trip-preview.co
     MatListModule,
     PickerModule,
     MatPaginatorModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatStepperModule
 
 
   ],

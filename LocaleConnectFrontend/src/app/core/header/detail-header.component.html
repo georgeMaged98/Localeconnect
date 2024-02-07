@@ -11,15 +11,19 @@
     <a mat-button routerLink="pages/trips">Trips</a>
   </span>
 
-  <button mat-icon-button (click)="toggleNotifications()" class="notification-button">
-    <mat-icon>account_circle</mat-icon>
-    <span class="notification-dot" *ngIf="hasNewNotifications"></span>
-  </button>
-  <div *ngIf="showNotifications" class="notifications-dropdown">
-    <div class="title">Notifications</div>
-    <div *ngFor="let notification of notifications" class="notification-item">
-      <p>{{ notification.message }}</p>
-      <small>{{ notification.sentAt | date: 'MMM d. y,  h:mm a' }}</small>
+   <button  class="notification-button" mat-icon-button [matMenuTriggerFor]="userMenu" (click)="toggleNotifications()">
+  <mat-icon>account_circle</mat-icon>
+  <span class="notification-dot" *ngIf="hasNewNotifications"></span>
+</button>
+
+  <mat-menu #userMenu="matMenu">
+    <div class="notifications-dropdown" (click)="$event.stopPropagation()">
+      <div class="title">Notifications</div>
+      <div *ngFor="let notification of notifications" class="notification-item">
+        <p>{{ notification.message }}</p>
+        <small>{{ notification.sentAt | date: 'MMM d. y,  h:mm a' }}</small>
+      </div>
+      <button mat-menu-item (click)="logout()">Logout</button>
     </div>
-  </div>
+  </mat-menu>
 </mat-toolbar>

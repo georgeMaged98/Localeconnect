@@ -35,7 +35,6 @@ export class RegisterComponent {
         email: formValue.email,
         dateOfBirth: new Date(),
         bio: '',
-        password: formValue.password,
         visitedCountries: [],
         languages: [],
         followingIds: [],
@@ -67,7 +66,7 @@ export class RegisterComponent {
   openGuideDialog(): void {
     this.dialog.open(RegisterGuideComponent, {
       width: '400px',
-      maxHeight: '600px'
+      height: '700px'
     });
   }
 
