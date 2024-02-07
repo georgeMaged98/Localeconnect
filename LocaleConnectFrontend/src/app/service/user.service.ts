@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
-import {Meetup} from "../model/meetup";
 import {GuideProfile} from "../model/guide";
 import {TripPreview} from "../model/trip";
 
@@ -10,11 +9,15 @@ import {TripPreview} from "../model/trip";
 })
 export class UserService {
   private apiUrl = '/api/user';
-  constructor(private http: HttpClient) { }
+
+  constructor(private http: HttpClient) {
+  }
+
 //TODO: add api endpoint to get user by id
   getUsername(userId: number): Observable<string> {
     return this.http.get<string>(`${this.apiUrl}/${userId}/username`);
   }
+
   searchGuides(searchTerm: string, searchGuides: GuideProfile[]): GuideProfile[] {
     if (!searchTerm) {
       return [...searchGuides];
@@ -23,8 +26,9 @@ export class UserService {
       guide.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }
-  getGuidesMock(): GuideProfile[]{
-    return  [
+
+  getGuidesMock(): GuideProfile[] {
+    return [
       {
         id: 1,
         name: 'John Doe',
@@ -91,7 +95,8 @@ export class UserService {
       }
     ];
   }
-   MOCK_TRIP_PREVIEWS: TripPreview[] = [
+
+  MOCK_TRIP_PREVIEWS: TripPreview[] = [
     {
       id: '1',
       name: 'Explore the Mountains',
