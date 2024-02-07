@@ -35,6 +35,7 @@ public class ItineraryService {
 
 
     public ItineraryDTO createItinerary(ItineraryDTO itineraryDTO, Long userId) {
+        System.out.println("IT DTO" + itineraryDTO);
         Itinerary itinerary = mapper.toEntity(itineraryDTO);
         if (itinerary == null) {
             throw new ItineraryNotFoundException("Itinerary data is invalid");
@@ -48,6 +49,10 @@ public class ItineraryService {
             throw new ItineraryAlreadyExistsException("This user already created this itinerary.");
         }
 
+        System.out.println("IMAGES: " + itineraryDTO.getImageUrls());
+        // Save image in GCP
+        String res = saveImageToGCP(itineraryDTO.getImageUrls().get(0));
+        System.out.println("RESPONSE: " + res);
         itinerary.setUserId(userId);
         itineraryRepository.save(itinerary);
         return mapper.toDomain(itinerary);
@@ -216,6 +221,14 @@ public class ItineraryService {
                 .bodyValue(itineraryShareDTO)
                 .retrieve()
                 .bodyToMono(ItineraryShareDTO.class);
+    }
+
+    private String saveImageToGCP(String  image) {
+        System.out.println("IMAGE: "+ image);
+        return webClient.post()
+                .uri("http://gcp-service/api/gcp?filename=imageeeee1.png")
+                .bodyValue(image)
+                .retrieve().toString();
     }
 
 }

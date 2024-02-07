@@ -19,6 +19,7 @@ package gcpstorage;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 
 /**
@@ -26,6 +27,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * (GCS) using the Spring Resource abstraction and the gs: protocol prefix.
  */
 @SpringBootApplication
+@EnableDiscoveryClient
 public class GcsApplication {
 
     public static void main(String[] args) {

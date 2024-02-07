@@ -79,6 +79,17 @@ services:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
       - DB_HOST=postgres-service
 
+  gcp-service:
+    image: georgemaged/gcp-service:latest
+    pull_policy: always
+    volumes:
+      - /Users/georgemaged/.config/gcloud/legacy_credentials/g.maged327@gmail.com/adc.json:/configurations
+    environment:
+      - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
+      - GCP_CONFIG=./configurations
+    ports:
+      - '5005:5005'
+
   discovery-server:
     image: georgemaged/discovery-server
     pull_policy: always
@@ -87,5 +98,6 @@ services:
 
 
 volumes:
+
   postgres:
   pgadmin:

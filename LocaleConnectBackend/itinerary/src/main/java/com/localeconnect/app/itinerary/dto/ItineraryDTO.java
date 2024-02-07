@@ -11,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 public class ItineraryDTO {
     private Long id;
     private Long userId;

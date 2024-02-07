@@ -57,6 +57,11 @@ spring:
           predicates:
             - Path=/api/trip/**
 
+        - id: gcp-service
+          uri: http://gcp-service:5005
+          predicates:
+            - Path=/api/gcp/**
+
 eureka:
   client:
     serviceUrl:
