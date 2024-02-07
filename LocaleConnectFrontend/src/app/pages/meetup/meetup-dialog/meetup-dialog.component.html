@@ -49,12 +49,17 @@
         <input matInput formControlName="location">
         <mat-error *ngIf="meetupForm.controls['location'].hasError('required')">Location is required.</mat-error>
       </mat-form-field>
-
-      <mat-form-field appearance="outline" class="meetup-form-field">
-        <mat-label>Spoken Languages</mat-label>
-        <input matInput placeholder="Language1,   Language2, Language3..." formControlName="spokenLanguages">
+      <mat-form-field appearance="fill">
+      <mat-label>Spoken Languages</mat-label>
+      <mat-select formControlName="spokenLanguages" [multiple]="true">
+        <mat-option *ngFor="let language of LANGUAGES" [value]="language">
+          {{ language }}
+        </mat-option>
+      </mat-select>
         <mat-error *ngIf="meetupForm.controls['spokenLanguages'].hasError('required')">At least one language is required.</mat-error>
+
       </mat-form-field>
+
 
       <div class="form-actions">
         <button mat-button type="button" (click)="onNoClick()">Cancel</button>
