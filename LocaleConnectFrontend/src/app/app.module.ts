@@ -1,4 +1,4 @@
-import {LOCALE_ID, NgModule} from '@angular/core';
+import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 
 import {AppRoutingModule} from './app-routing.module';
@@ -28,8 +28,13 @@ import {FeedComponent} from './pages/feed/feed.component';
 import {MatListModule} from "@angular/material/list";
 import {AddPostDialogComponent} from './pages/feed/add-post-dialog/add-post-dialog.component';
 import {PickerModule} from "@ctrl/ngx-emoji-mart";
-import { MeetupComponent } from './pages/meetup/meetup.component';
-import { MeetupDialogComponent } from './pages/meetup/meetup-dialog/meetup-dialog.component';
+import {MeetupComponent} from './pages/meetup/meetup.component';
+import {MeetupDialogComponent} from './pages/meetup/meetup-dialog/meetup-dialog.component';
+import {GuideComponent} from './pages/guide/guide.component';
+import {MatPaginatorModule} from "@angular/material/paginator";
+import {MatSnackBarModule} from "@angular/material/snack-bar";
+import { TripPreviewComponent } from './pages/guide/trip-preview/trip-preview.component';
+import {MatStepperModule} from "@angular/material/stepper";
 
 
 @NgModule({
@@ -45,6 +50,8 @@ import { MeetupDialogComponent } from './pages/meetup/meetup-dialog/meetup-dialo
     AddPostDialogComponent,
     MeetupComponent,
     MeetupDialogComponent,
+    GuideComponent,
+    TripPreviewComponent,
 
 
 
@@ -69,7 +76,11 @@ import { MeetupDialogComponent } from './pages/meetup/meetup-dialog/meetup-dialo
     MatIconModule,
     MatChipsModule,
     MatListModule,
-    PickerModule
+    PickerModule,
+    MatPaginatorModule,
+    MatSnackBarModule,
+    MatStepperModule
+
 
   ],
   providers: [MatDatepickerModule, {provide: MAT_DATE_LOCALE, useValue: 'de-DE'}],

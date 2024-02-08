@@ -1,11 +1,10 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FeedService} from "../../service/feed.service";
-import {Comment, Profile, Post} from "../../model/feed";
+import {Comment, Post, Profile} from "../../model/feed";
 import {AddPostDialogComponent} from "./add-post-dialog/add-post-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 import {Subscription} from "rxjs";
 import {ImagesService} from "../../service/image.service";
-import {Itinerary} from "../../model/itinerary";
 
 @Component({
   selector: 'app-feed',
@@ -131,11 +130,6 @@ export class FeedComponent implements OnInit {
   openAddPostDialog(): void {
     const dialogRef = this.dialog.open(AddPostDialogComponent, {
       width: '500px',
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      // Handle dialog close result, if necessary
-      console.log('The dialog was closed');
     });
   }
 

@@ -35,13 +35,10 @@ export class RegisterComponent {
         email: formValue.email,
         dateOfBirth: new Date(),
         bio: '',
-        password: formValue.password,
         visitedCountries: [],
-        registeredAsLocalGuide: false,
         languages: [],
         followingIds: [],
         followerIds: [],
-        interests: [], travelerStyle: ''
       };
 
       this.authService.registerTraveler(newUser).subscribe({
@@ -69,7 +66,7 @@ export class RegisterComponent {
   openGuideDialog(): void {
     this.dialog.open(RegisterGuideComponent, {
       width: '400px',
-      maxHeight: '600px'
+      height: '700px'
     });
   }
 
