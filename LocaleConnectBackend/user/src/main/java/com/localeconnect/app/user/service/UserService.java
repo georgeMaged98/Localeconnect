@@ -3,6 +3,7 @@ package com.localeconnect.app.user.service;
 import com.localeconnect.app.user.dto.LocalguideDTO;
 import com.localeconnect.app.user.dto.TravelerDTO;
 import com.localeconnect.app.user.dto.UserDTO;
+import com.localeconnect.app.user.dto.UserPrincipalDTO;
 import com.localeconnect.app.user.exception.UserAlreadyExistsException;
 import com.localeconnect.app.user.exception.UserDoesNotExistException;
 import com.localeconnect.app.user.mapper.LocalguideMapper;
@@ -11,21 +12,25 @@ import com.localeconnect.app.user.mapper.UserMapper;
 import com.localeconnect.app.user.model.Localguide;
 import com.localeconnect.app.user.model.Traveler;
 import com.localeconnect.app.user.model.User;
-import com.localeconnect.app.user.request.AuthenticationRequest;
+import com.localeconnect.app.user.auth.AuthenticationRequest;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import com.localeconnect.app.user.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
 @AllArgsConstructor
-public class UserService {
+public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final TravelerMapper travelerMapper;
@@ -71,16 +76,11 @@ public class UserService {
 
         return localguideDTO;
     }
-    public UserDTO login(AuthenticationRequest request) {
-        User loggedInUser = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UserDoesNotExistException("User with the given Email does not exist!"));
-
-        return userMapper.toDomain(loggedInUser);
-    }
 
     public List<UserDTO> getAllUsers() {
+        log.info("************entred USERSERVICE GETALLUSERS CONTROLLER**************");
         List<User> allUsers = userRepository.findAll();
-
+        log.info("************finished fetching ALLUSERS **************");
         return allUsers.stream()
                 .map(userMapper::toDomain)
                 .collect(Collectors.toList());
@@ -147,4 +147,13 @@ public class UserService {
         return userRepository.findById(userId).isPresent();
     }
 
+    @Override
+        public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+            Optional<User> user = userRepository.findByEmail(email);
+            if (user.isEmpty()) {
+                throw new UsernameNotFoundException("user not found with email :" + email);
+            } else {
+                return new UserPrincipalDTO(user.get());
+        }
+    }
 }

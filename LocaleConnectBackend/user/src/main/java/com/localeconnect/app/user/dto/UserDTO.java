@@ -2,6 +2,7 @@ package com.localeconnect.app.user.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -32,7 +33,6 @@ public class UserDTO {
     private LocalDate dateOfBirth;
     private String bio;
     @NotBlank(message = "This is a required field")
-    @Getter(AccessLevel.NONE)
     private String password;
     private List<String> visitedCountries;
     @NotNull(message = "This is a required field")
@@ -40,5 +40,7 @@ public class UserDTO {
     private List<String> languages;
     private List<Long> followerIds;
     private List<Long> followingIds;
+    private Boolean isEnabled;
+    private String role;
 
 }

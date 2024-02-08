@@ -54,6 +54,10 @@ public class User {
 
     @ManyToMany(mappedBy = "followers")
     private List<User> following = new ArrayList<>();
+    @Column
+    private Boolean isEnabled;
+    @Column
+    private String role;
 
    /* @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

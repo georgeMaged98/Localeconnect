@@ -1,4 +1,4 @@
-package com.localeconnect.app.authentication.config;
+package com.localeconnect.app.user.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,16 +16,13 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    @Bean
-    public UserDetailsService userDetailsService(){
-        return new CustomUserDetailsService();
-    }
 
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(c -> c.disable())
-                .authorizeHttpRequests(req -> req.requestMatchers("/api/auth/register-traveler", "/api/auth/register-localguide", "/api/auth/login").permitAll())
+                .authorizeHttpRequests(req -> req.requestMatchers("/api/auth/register-traveler",
+                        "/api/auth/register-localguide", "/api/auth/login").permitAll().anyRequest().authenticated())
                 .build();
     }
 
@@ -33,17 +30,11 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-    @Bean
-    public AuthenticationProvider authenticationProvider(){
-        DaoAuthenticationProvider authenticationProvider=new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService());
-        authenticationProvider.setPasswordEncoder(passwordEncoder());
-        return authenticationProvider;
-    }
+    
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
+
 }

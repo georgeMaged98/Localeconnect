@@ -1,20 +1,26 @@
 package com.localeconnect.app.user.controller;
 
+import com.localeconnect.app.user.auth.AuthenticationRequest;
+import com.localeconnect.app.user.auth.AuthenticationResponse;
 import com.localeconnect.app.user.dto.LocalguideDTO;
 import com.localeconnect.app.user.dto.TravelerDTO;
 import com.localeconnect.app.user.dto.UserDTO;
 import com.localeconnect.app.user.exception.UserAlreadyExistsException;
 import com.localeconnect.app.user.exception.UserDoesNotExistException;
-import com.localeconnect.app.user.request.AuthenticationRequest;
+import com.localeconnect.app.user.response_handler.ResponseHandler;
+import com.localeconnect.app.user.service.AuthenticationService;
 import com.localeconnect.app.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+
 @CrossOrigin
 @RestController
 @AllArgsConstructor
@@ -22,44 +28,13 @@ import java.util.List;
 @RequestMapping("/api/user")
 public class UserController {
     private final UserService userService;
-    @PostMapping("/register-traveler")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> registerTraveler(@RequestBody @Valid TravelerDTO travelerDTO) {
-        log.info("************entred api/user/register-traveler request**************");
-        try {
-            return new ResponseEntity<>(userService.registerTraveler(travelerDTO), HttpStatus.CREATED);
-        } catch (UserAlreadyExistsException | IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity<>("An internal error has  occured", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-    @PostMapping("/register-localguide")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> registerLocalGuide(@RequestBody @Valid LocalguideDTO localguideDTO) {
-        try {
-            return new ResponseEntity<>(userService.registerLocalguide(localguideDTO), HttpStatus.CREATED);
-        } catch (UserAlreadyExistsException | IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity<>("An internal error has  occured", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<?> registerLocalGuide(@RequestBody @Valid AuthenticationRequest request) {
-        try {
-            return new ResponseEntity<>(userService.login(request), HttpStatus.CREATED);
-        } catch (UserAlreadyExistsException | IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity<>("An internal error has  occured", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 
     @GetMapping("/all")
-    public ResponseEntity<List<UserDTO>> getAllUsers() {
-            return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
+    public ResponseEntity<Object> getAllUsers() {
+        log.info("************entred GETALLUSERS USER CONTROLLER**************");
+        List<UserDTO> users = userService.getAllUsers();
+
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, users, null);
     }
     @GetMapping("/{userId}")
     public ResponseEntity<?> getUserById(@PathVariable("userId") Long userId) {

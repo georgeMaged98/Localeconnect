@@ -19,7 +19,6 @@
     <module>notification</module>
     <module>discovery-server</module>
     <module>api-gateway</module>
-      <module>authentication</module>
   </modules>
 
   <name>localeconnect</name>

@@ -1,4 +1,4 @@
-package com.localeconnect.app.authentication.auth;
+package com.localeconnect.app.user.auth;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
