@@ -1,3 +1,4 @@
+
 .filters-and-search-container {
   display: flex;
   justify-content: center;
@@ -138,4 +139,11 @@ mat-card-actions {
     }
   }
 }
-
+.top{
+  display: flex;
+  flex-direction: column;
+  min-height: 80vh;
+}
+.bottom{
+  margin-top: auto;
+}

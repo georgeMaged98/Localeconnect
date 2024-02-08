@@ -6,12 +6,12 @@ export interface TripPreview {
   link: string;
 }
 export interface Trip {
-  localguideId: number;
+  localguideId?: number;
   name: string;
   description?: string;
   departureTime: string;
   destination: string;
-  durationInHours: number;
+  durationInDays: number;
   capacity: number;
   travelers: number[];
   languages: string[];
@@ -25,7 +25,6 @@ export interface Trip {
   expand?: boolean;
 }
 
-// trip-review.model.ts
 export interface TripReview {
   tripReviewId?: number;
   tripId: number;

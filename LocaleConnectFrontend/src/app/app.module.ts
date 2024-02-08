@@ -36,6 +36,7 @@ import {MatSnackBarModule} from "@angular/material/snack-bar";
 import { TripPreviewComponent } from './pages/guide/trip-preview/trip-preview.component';
 import {MatStepperModule} from "@angular/material/stepper";
 import { TripComponent } from './pages/trip/trip.component';
+import { TripDialogComponent } from './pages/trip/trip-dialog/trip-dialog.component';
 
 
 @NgModule({
@@ -54,6 +55,7 @@ import { TripComponent } from './pages/trip/trip.component';
     GuideComponent,
     TripPreviewComponent,
     TripComponent,
+    TripDialogComponent,
 
 
 

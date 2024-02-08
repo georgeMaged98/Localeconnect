@@ -6,10 +6,9 @@ import {NotificationService} from "../../service/notification.service";
 import {UserService} from "../../service/user.service";
 import {ReviewService} from "../../service/review.service";
 import {MatDialog} from "@angular/material/dialog";
-import {Meetup} from "../../model/meetup";
-import {MeetupDialogComponent} from "../meetup/meetup-dialog/meetup-dialog.component";
 import {Trip} from "../../model/trip";
 import {TripService} from "../../service/trip.service";
+import {TripDialogComponent} from "./trip-dialog/trip-dialog.component";
 
 @Component({
   selector: 'app-trip',
@@ -45,8 +44,6 @@ export class TripComponent implements OnInit, OnDestroy {
 
     this.subscription = this.tripService.currentTrip.subscribe(trip => {
       if (trip) {
-        //TODO: replace mock with backend in the dialog
-        // this.addMeetup(meetup)
         this.trips.push(trip);
         this.totalLength = this.trips.length;
         this.updateDisplayedTrips();
@@ -124,7 +121,7 @@ export class TripComponent implements OnInit, OnDestroy {
   }
 
   openAddMeetupDialog(): void {
-    const dialogRef = this.dialog.open(MeetupDialogComponent, {
+    const dialogRef = this.dialog.open(TripDialogComponent, {
       width: '600px',
       height: '600px'
     });

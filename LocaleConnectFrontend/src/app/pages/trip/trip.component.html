@@ -6,7 +6,7 @@
     </button>
   </div>
 </div>
-
+<div class="top">
 <ng-container class="main-container" *ngFor="let trip of displayedTrips">
   <mat-card class="trip-card">
     <div class="card-content">
@@ -41,7 +41,7 @@
             <h4>Destination:</h4>
             <p>{{ trip.destination}}</p>
           <p><b>Departure Time:</b> {{ trip.departureTime }}</p>
-          <p><b>Duration:</b> {{ trip.durationInHours }}</p>
+          <p><b>Duration:</b> {{ trip.durationInDays }} Days</p>
           <div *ngIf="trip.placesToVisit.length">
             <h4>Places to Visit:</h4>
             <ul>
@@ -75,12 +75,15 @@
     </div>
   </mat-card>
 </ng-container>
-<div class="button-container">
-  <button mat-raised-button (click)="openAddMeetupDialog()" >Add Trip</button>
+<div class="bottom">
+  <div class="button-container">
+    <button mat-raised-button (click)="openAddMeetupDialog()" >Add Trip</button>
+  </div>
+  <mat-paginator [length]="totalLength"
+                 [pageSize]="pageSize"
+                 [pageSizeOptions]="[2,5, 10, 25, 100]"
+                 (page)="updateDisplayedTrips()"
+                 aria-label="Select page of trips">
+  </mat-paginator>
 </div>
-<mat-paginator [length]="totalLength"
-               [pageSize]="pageSize"
-               [pageSizeOptions]="[2,5, 10, 25, 100]"
-               (page)="updateDisplayedTrips()"
-               aria-label="Select page of trips">
-</mat-paginator>
+</div>
