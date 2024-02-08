@@ -2,12 +2,13 @@ package com.localeconnect.app.apigateway.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestTemplate;
 
 @Configuration
-public class WebClientConfiguration {
+public class AppConfig {
+
     @Bean
-    public WebClient webClient() {
-        return WebClient.builder().build();
+    public RestTemplate template(){
+        return new RestTemplate();
     }
 }
