@@ -11,7 +11,7 @@ export class ItineraryService {
   currentItinerary = this.itinerarySource.asObservable();
 
 
-  private apiUrl = '/api/itinerary';
+  private apiUrl = 'http://localghost:8080/api/itinerary';
 
   constructor(private http: HttpClient) {}
   changeItinerary(itinerary: any) {
