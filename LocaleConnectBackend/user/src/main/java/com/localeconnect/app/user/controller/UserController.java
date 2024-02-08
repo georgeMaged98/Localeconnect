@@ -29,14 +29,14 @@ import java.util.Map;
 public class UserController {
     private final UserService userService;
 
-    @GetMapping("/all")
+    @GetMapping("secured/all")
     public ResponseEntity<Object> getAllUsers() {
         log.info("************entred GETALLUSERS USER CONTROLLER**************");
         List<UserDTO> users = userService.getAllUsers();
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, users, null);
     }
-    @GetMapping("/{userId}")
+    @GetMapping("secured/{userId}")
     public ResponseEntity<?> getUserById(@PathVariable("userId") Long userId) {
         try {
             return new ResponseEntity<>(userService.getUserById(userId), HttpStatus.OK);
@@ -49,7 +49,7 @@ public class UserController {
         }
     }
 
-    @PutMapping("/update")
+    @PutMapping("secured/update")
     public ResponseEntity<?> updateUser(@RequestBody @Valid UserDTO userDTO) {
         try {
             return new ResponseEntity<>(userService.updateUser(userDTO), HttpStatus.OK);
@@ -60,7 +60,7 @@ public class UserController {
             return new ResponseEntity<>("An internal error has  occured", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @DeleteMapping("/delete/{userId}")
+    @DeleteMapping("secured/delete/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable("userId") Long userId) {
         try {
             userService.deleteUser(userId);
@@ -72,7 +72,7 @@ public class UserController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PostMapping("/{userId}/follow/{followerId}")
+    @PostMapping("secured/{userId}/follow/{followerId}")
     public ResponseEntity<?> followUser(@PathVariable("userId") Long userId, @PathVariable("followerId") Long followerId) {
         try {
             userService.followUser(userId, followerId);
@@ -83,7 +83,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/{userId}/unfollow/{followeeId}")
+    @PostMapping("secured/{userId}/unfollow/{followeeId}")
     public ResponseEntity<?> unfollowUser(@PathVariable("userId") Long userId, @PathVariable("followeeId") Long followeeId) {
         try {
             userService.unfollowUser(userId, followeeId);
@@ -92,7 +92,7 @@ public class UserController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-    @GetMapping("/exists/{userId}")
+    @GetMapping("auth/exists/{userId}")
     public ResponseEntity<Boolean> checkUserExists(@PathVariable("userId") Long userId) {
         boolean exists = userService.checkUserId(userId);
         return new ResponseEntity<>(exists, HttpStatus.OK);
