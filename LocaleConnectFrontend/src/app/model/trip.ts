@@ -1,12 +1,13 @@
 
 export interface TripPreview {
-  id: string;
+  id: number;
   name: string;
   description: string;
   link: string;
 }
 export interface Trip {
-  localguideId?: number;
+  id:number;
+  localguideId: number;
   name: string;
   description?: string;
   departureTime: string;
@@ -18,7 +19,8 @@ export interface Trip {
   placesToVisit: string[];
   dailyActivities?: string[];
   imageUrls?: string[];
-  rating?: number;
+  isAttending?: boolean;
+  rating: number;
   ratingSubmitted?: boolean;
   totalRatings?: number;
   averageRating?: number;

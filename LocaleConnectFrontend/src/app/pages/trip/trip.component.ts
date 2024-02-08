@@ -9,6 +9,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {Trip} from "../../model/trip";
 import {TripService} from "../../service/trip.service";
 import {TripDialogComponent} from "./trip-dialog/trip-dialog.component";
+import {Meetup} from "../../model/meetup";
 
 @Component({
   selector: 'app-trip',
@@ -23,6 +24,8 @@ export class TripComponent implements OnInit, OnDestroy {
   totalLength = 0;
   displayedTrips: Trip[] = [];
   pageSize = 10;
+  showAllImages = false;
+
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -119,13 +122,39 @@ export class TripComponent implements OnInit, OnDestroy {
        */
     }
   }
+  joinTrip(tripId: number): void {
+    //TODO: add api call to get current traveler id
+    const travellerId = 0;
+    this.tripService.joinTrip(tripId, travellerId).subscribe(() => {
+    });
+  }
 
+  leaveTrip(tripId: number): void {
+    //TODO: add api call to get current traveler id
+    const travellerId = 0;
+    this.tripService.leaveTrip(tripId, travellerId).subscribe(() => {
+    });
+  }
   openAddMeetupDialog(): void {
     const dialogRef = this.dialog.open(TripDialogComponent, {
       width: '600px',
       height: '600px'
     });
   }
-
-
+  toggleJoin(trip : Trip): void {
+    //TODO: get id from current user
+    trip.isAttending = !trip.isAttending;
+     if (trip.isAttending) {
+        this.tripService.joinTrip(trip.id, 0).subscribe(() => {
+          trip.isAttending = false;
+        });
+      } else {
+        this.tripService.leaveTrip(trip.id,0).subscribe(() => {
+          trip.isAttending = true;
+        });
+      }
+  }
+  toggleImagesDisplay() {
+    this.showAllImages = !this.showAllImages;
+  }
 }

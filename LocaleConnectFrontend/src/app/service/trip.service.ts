@@ -39,6 +39,13 @@ export class TripService {
   deleteTrip(tripId: number): Observable<{}> {
     return this.http.delete(`${this.apiUrl}/delete/${tripId}`);
   }
+  joinTrip(id: number, travellerId: number) {
+    return this.http.post(`${this.apiUrl}/${id}/join`, {travellerId});
+  }
+
+  leaveTrip(id: number, travellerId: number) {
+    return this.http.post(`${this.apiUrl}/${id}/leave`, {travellerId});
+  }
 
   searchTrip(tripName: string): Observable<Trip[]> {
     return this.http.get<Trip[]>(`${this.apiUrl}/search?name=${tripName}`);

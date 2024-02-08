@@ -45,13 +45,15 @@ export class TripDialogComponent {
       formData.dailyActivities = DataHelper.dataToList(formData.dailyActivities);
       const newTrip: Trip = {
         ...formData,
-        localguideId: 0,
+        localguideId: 0,//TODO: get from backend
+        id:0,//TODO: get from backend
+        rating: 0,
       };
-      console.log(newTrip);
+      this.tripService.changeTrip(newTrip);
+      this.dialogRef.close();
       this.tripService.createTrip(newTrip).subscribe({
         next: (trip) => {
-          this.tripService.changeTrip(newTrip);
-          console.log(trip);
+          this.tripService.changeTrip(trip);
           this.dialogRef.close(trip);
         },
         error: (error) => {
