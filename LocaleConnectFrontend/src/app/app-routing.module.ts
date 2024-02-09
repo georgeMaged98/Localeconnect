@@ -1,11 +1,11 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
 import {LandingPageComponent} from "./pages/landing-page/landing-page.component";
 import {ItineraryComponent} from "./pages/itinerary/itinerary.component";
 import {FeedComponent} from "./pages/feed/feed.component";
 import {MeetupComponent} from "./pages/meetup/meetup.component";
 import {GuideComponent} from "./pages/guide/guide.component";
-import {authGuard} from "./service/auth-guard";
+import {TripComponent} from "./pages/trip/trip.component";
 //TODO: uncomment guard
 const routes: Routes = [
   {
@@ -31,6 +31,11 @@ const routes: Routes = [
   {
     path: 'pages/guides',
     component: GuideComponent,
+    // canActivate:[authGuard]
+  },
+  {
+    path: 'pages/trips',
+    component: TripComponent,
     // canActivate:[authGuard]
   }
 ];

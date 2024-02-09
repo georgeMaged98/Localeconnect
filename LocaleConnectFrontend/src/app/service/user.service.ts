@@ -110,25 +110,25 @@ export class UserService {
 
   MOCK_TRIP_PREVIEWS: TripPreview[] = [
     {
-      id: '1',
+      id: 1,
       name: 'Explore the Mountains',
       description: 'Join us for an unforgettable adventure in the mountains. Experience breathtaking views, challenging hikes, and the serenity of nature.',
       link: '/trips/mountains' // Adjust the link as necessary for your routing
     },
     {
-      id: '2',
+      id: 2,
       name: 'City Lights Tour',
       description: 'Discover the vibrant life of the city after dark. This tour takes you through bustling streets, markets, and landmarks illuminated beautifully at night.',
       link: '/trips/city-lights'
     },
     {
-      id: '3',
+      id: 3,
       name: 'Safari Adventure',
       description: 'Get close to nature and wildlife on this exciting safari adventure. See wild animals in their natural habitat and learn about conservation efforts.',
       link: '/trips/safari'
     },
     {
-      id: '4',
+      id: 4,
       name: 'Cultural Heritage Tour',
       description: 'Explore the rich cultural heritage of the region. Visit historical sites, museums, and monuments that tell the story of the people and their traditions.',
       link: '/trips/cultural-heritage'

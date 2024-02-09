@@ -212,7 +212,7 @@ public class ItineraryService {
 
     private Boolean checkUserId(Long userId) {
         Boolean check = this.webClient.get()
-                .uri("http://user-service:8084/api/user/exists/{userId}", userId)
+                .uri("http://user-service:8084/api/user/auth/exists/{userId}", userId)
                 .retrieve().bodyToMono(Boolean.class).block();
         return check != null && check;
     }
@@ -220,7 +220,7 @@ public class ItineraryService {
 
     private Mono<ItineraryShareDTO> postToFeed(ItineraryShareDTO itineraryShareDTO) {
         return webClient.post()
-                .uri("http://feed-service/api/feed/share-itinerary")
+                .uri("http://feed-service:8081/api/feed/share-itinerary")
                 .bodyValue(itineraryShareDTO)
                 .retrieve()
                 .bodyToMono(ItineraryShareDTO.class);

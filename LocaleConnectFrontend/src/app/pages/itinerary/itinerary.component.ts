@@ -29,7 +29,7 @@ export class ItineraryComponent implements OnInit, OnDestroy {
   itineraries: Itinerary[] = [];
   filterItineraries: Itinerary[] = [];
   images: string[] = [];
-
+  showAllImages: boolean = false;
   subscription: Subscription = new Subscription();
   searchControl = new FormControl('');
   filterForm: FormGroup;
@@ -233,5 +233,9 @@ export class ItineraryComponent implements OnInit, OnDestroy {
 
        */
     }
+  }
+
+  toggleImagesDisplay() {
+    this.showAllImages = !this.showAllImages;
   }
 }

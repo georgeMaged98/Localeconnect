@@ -2,14 +2,20 @@ package com.localeconnect.app.user.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -29,27 +35,20 @@ public class UserDTO {
     @Email(message = "Invalid email format")
     private String email;
     @NotNull(message = "This is a required field")
-    @JsonFormat(pattern="yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    //@JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate dateOfBirth;
     private String bio;
-    @Setter(AccessLevel.NONE)
     @NotBlank(message = "This is a required field")
     private String password;
     private List<String> visitedCountries;
     @NotNull(message = "This is a required field")
     private boolean registeredAsLocalGuide;
     private List<String> languages;
-    private List<Long> followerIds;
-    private List<Long> followingIds;
-
-    // Setter method for password with hash logic
-    public void setPassword(String password) {
-        this.password = hashPassword(password);
-    }
-
-    // Private method for password hashing
-    private String hashPassword(String password) {
-        return BCrypt.hashpw(password, BCrypt.gensalt());
-    }
+    private List<UserDTO> followers;
+    private List<UserDTO> followings;
+    private Boolean isEnabled;
+    private String role;
 
 }

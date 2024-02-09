@@ -15,14 +15,17 @@ public class CorsConfig {
     public CorsWebFilter corsWebFilter() {
 
         final CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.setAllowedOrigins(Collections.singletonList("*"));
+        corsConfig.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
         corsConfig.setMaxAge(3600L);
-        corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+        corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE","OPTIONS"));
         corsConfig.addAllowedHeader("*");
+        corsConfig.setExposedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        corsConfig.setAllowCredentials(true);
+
 
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", corsConfig);
+        source.registerCorsConfiguration("/", corsConfig);
 
         return new CorsWebFilter(source);
-    }
+        }
 }

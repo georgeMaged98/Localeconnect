@@ -30,7 +30,7 @@ services:
     restart: unless-stopped
 
   api-gateway:
-    image: georgemaged/api-gateway
+    image: localeconnect/api-gateway
     pull_policy: always
     environment:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
@@ -39,41 +39,41 @@ services:
     restart: always
 
   chat-service:
-    image: georgemaged/chat-service:latest
+    image: localeconnect/chat-service:latest
     pull_policy: always
     environment:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
 
   meetup-service:
-    image: georgemaged/meetup-service:latest
+    image: localeconnect/meetup-service:latest
     pull_policy: always
     environment:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
       - DB_HOST=postgres-service
 
   user-service:
-    image: georgemaged/user-service:latest
+    image: localeconnect/user-service:latest
     pull_policy: always
     environment:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
       - DB_HOST=postgres-service
 
   itinerary-service:
-    image: georgemaged/itinerary-service:latest
+    image: localeconnect/itinerary-service:latest
     pull_policy: always
     environment:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
       - DB_HOST=postgres-service
 
   feed-service:
-    image: georgemaged/feed-service:latest
+    image: localeconnect/feed-service:latest
     pull_policy: always
     environment:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
       - DB_HOST=postgres-service
 
   trip-service:
-    image: georgemaged/trip-service:latest
+    image: localeconnect/trip-service:latest
     pull_policy: always
     environment:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
