@@ -4,6 +4,7 @@ import com.localeconnect.app.user.auth.AuthenticationRequest;
 import com.localeconnect.app.user.auth.AuthenticationResponse;
 import com.localeconnect.app.user.dto.LocalguideDTO;
 import com.localeconnect.app.user.dto.TravelerDTO;
+import com.localeconnect.app.user.exception.UserDoesNotExistException;
 import com.localeconnect.app.user.response_handler.ResponseHandler;
 import com.localeconnect.app.user.service.AuthenticationService;
 import com.localeconnect.app.user.service.UserService;
@@ -47,8 +48,8 @@ public class AuthController {
         try {
             String token = authService.login(request);
             return ResponseHandler.generateResponse("Logged In!", HttpStatus.OK, token, null);
-        } catch (AuthenticationException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed");
+        } catch (UserDoesNotExistException e) {
+            throw new UserDoesNotExistException("False credentials! Please try to login again.");
         }
     }
 

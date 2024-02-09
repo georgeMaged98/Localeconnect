@@ -2,6 +2,7 @@ package com.localeconnect.app.user.controller;
 
 import com.localeconnect.app.user.dto.LocalguideDTO;
 import com.localeconnect.app.user.dto.UserDTO;
+import com.localeconnect.app.user.model.Localguide;
 import com.localeconnect.app.user.model.User;
 import com.localeconnect.app.user.response_handler.ResponseHandler;
 import com.localeconnect.app.user.service.UserService;
@@ -13,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Locale;
+
 @RestController
 @AllArgsConstructor
 @Slf4j
@@ -64,14 +67,14 @@ public class UserController {
     @PostMapping("/{guideId}/rate/{travelerId}")
     public ResponseEntity<Object> rateLocalGuide(@PathVariable("guideId") Long guideId,
                                                  @PathVariable("travelerId") Long travelerId,
-                                                 @RequestBody Double rating) {
+                                                 @RequestParam("rating") Double rating) {
         LocalguideDTO ratedLocalGuide = userService.rateLocalGuide(guideId, travelerId, rating);
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, ratedLocalGuide, null);
     }
     @GetMapping("/guides")
     public ResponseEntity<Object> getAllGuides() {
-        List<UserDTO> guides = userService.getAllGuides();
+        List<LocalguideDTO> guides = userService.getAllGuides();
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, guides, null);
     }

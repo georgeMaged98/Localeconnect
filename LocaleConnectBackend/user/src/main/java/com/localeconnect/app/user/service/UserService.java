@@ -65,8 +65,6 @@ public class UserService implements UserDetailsService {
             throw new UserAlreadyExistsException("A user with the given email already exists");
         }
 
-        //LocalDate dateOfBirth = LocalDate.parse(localguideDTO.getDateOfBirth().toString(), DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-
         if (localguideDTO.getLanguages().size() < 2 || localguideDTO.getDateOfBirth().plusYears(18).isAfter(LocalDate.now())) {
             throw new ValidationException("Cannot be a local guide: must speak at least 2 languages and be at least 18 years old.");
         }
@@ -79,7 +77,6 @@ public class UserService implements UserDetailsService {
 
         return localguideMapper.toDomain(localguide);
     }
-
 
     public List<UserDTO> getAllUsers() {
         log.info("************entred USERSERVICE GETALLUSERS CONTROLLER**************");
@@ -114,7 +111,7 @@ public class UserService implements UserDetailsService {
             userRepository.save(userToFollow);
             // ToDo Notify the user about the new follower
         } else {
-            throw new IllegalStateException("Already following this user");
+            throw new ValidationException("Already following this user");
         }
     }
     public void unfollowUser(Long userId, Long followeeId) {
@@ -134,14 +131,14 @@ public class UserService implements UserDetailsService {
             userRepository.save(user);
             userRepository.save(followee);
         } else {
-            throw new IllegalArgumentException("User is not following the specified followee");
+            throw new ValidationException("User is not following the specified followee");
         }
     }
 
     public UserDTO updateUser(UserDTO userDTO) {
         User existingUser = userRepository.findByEmail(userDTO.getEmail())
                 .orElseThrow(() -> new UserDoesNotExistException("User with email " + userDTO.getEmail() + " does not exist"));
-        if (existingUser instanceof Localguide) {
+        if (existingUser.isRegisteredAsLocalGuide()) {
             ((LocalguideDTO) userDTO).calcAverageRating();
         }
         userMapper.updateUserFromDto(userDTO, existingUser);
@@ -158,21 +155,20 @@ public class UserService implements UserDetailsService {
         if(!checkUserId(travelerId))
             throw new UserDoesNotExistException("Traveler with id " + travelerId + " does not exist");
 
-        LocalguideDTO ratedLocalGuideDTO = localguideMapper.toDomain(localguide);
-        ratedLocalGuideDTO.addRating(rating);
-        ratedLocalGuideDTO.calcAverageRating();
-
-        localguide = localguideMapper.toEntity(ratedLocalGuideDTO);
+        localguide.addRating(rating);
+        localguide.calcAverageRating();
 
         userRepository.save(localguide);
         return localguideMapper.toDomain(localguide);
     }
 
-    public List<UserDTO> getAllGuides() {
-        List<User> guides = userRepository.findByRegisteredAsLocalGuide(true).stream()
+    public List<LocalguideDTO> getAllGuides() {
+        List<Localguide> guides = userRepository.findByRegisteredAsLocalGuide(true).stream()
+                .filter(user -> user instanceof Localguide)
+                .map(user -> (Localguide) user)
                 .toList();
         return guides.stream()
-                .map(userMapper::toDomain)
+                .map(localguideMapper::toDomain)
                 .collect(Collectors.toList());
     }
 
