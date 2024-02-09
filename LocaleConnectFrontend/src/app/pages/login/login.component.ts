@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import {RegisterComponent} from "../register/register.component";
 import {MatDialog} from "@angular/material/dialog";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {AuthService} from "../../api/auth.service";
+import {AuthService} from "../../service/auth.service";
 
 @Component({
   selector: 'app-login',
@@ -21,7 +21,7 @@ export class LoginComponent {
 
   onSubmit(): void {
     if (this.loginForm.valid) {
-      this.authService.login(this.loginForm.value).subscribe(
+      this.authService.login( this.loginForm.value.username, this.loginForm.value.password).subscribe(
         {
           next: (user) => {
             return user;
@@ -37,7 +37,7 @@ export class LoginComponent {
   }
   openRegisterDialog(): void {
      this.dialog.open(RegisterComponent, {
-      width: '400px', maxHeight:'600px'
+      width: '400px', height:'700px'
     });
   }
 

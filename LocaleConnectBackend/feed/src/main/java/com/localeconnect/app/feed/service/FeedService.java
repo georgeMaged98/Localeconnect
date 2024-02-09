@@ -217,7 +217,7 @@ public class FeedService {
 
     private boolean checkUserExists(Long userId) {
         return Boolean.TRUE.equals(this.webClient.get()
-                .uri("http://user-service:8084/api/user/exists/{userId}", userId)
+                .uri("http://user-service:8084/api/user/auth/exists/{userId}", userId)
                 .retrieve().bodyToMono(Boolean.class).block());
     }
 

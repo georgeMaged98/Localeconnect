@@ -16,7 +16,6 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@CrossOrigin
 @RequestMapping("api/meetup")
 public class MeetupController {
 

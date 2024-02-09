@@ -1,4 +1,3 @@
-// itinerary.service.ts
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {BehaviorSubject, Observable} from 'rxjs';
@@ -12,8 +11,7 @@ export class ItineraryService {
   currentItinerary = this.itinerarySource.asObservable();
 
 
-  //TODO: CONFIGURE PROXY
-  private apiUrl = '/api/itinerary';
+  private apiUrl = 'http://localghost:8080/api/itinerary';
 
   constructor(private http: HttpClient) {}
   changeItinerary(itinerary: any) {
@@ -65,19 +63,27 @@ export class ItineraryService {
   addItineraryMock(itinerary: Itinerary): Itinerary{
     return itinerary;
   }
-  searchItineraries(name: string): Observable<Itinerary[]> {
-    return this.http.get<Itinerary[]>('/api/search', { params: { name } });
-  }
 
-  filterItineraries(place?: string, tag?: Tag, days?: string): Observable<Itinerary[]> {
-    let params = new HttpParams();
-    if (place) params = params.set('place', place);
-    if (tag) params = params.set('tag', tag);
-    if (days) params = params.set('days', days.toString());
-    return this.http.get<Itinerary[]>('/api/filter', { params });
+  filterItineraries(searchItineraries: Itinerary[], place: string, tag: Tag | null, days: number| null): Itinerary[] {
+    return searchItineraries.filter(itinerary => {
+      const places = itinerary.placesToVisit.map(x=>x.toLowerCase());
+      const matchesPlace = place ? places.includes(place.toLowerCase()) : true;
+      const matchesTag = tag ? itinerary.tags.includes(tag) : true;
+      const matchesDays = days ? itinerary.numberOfDays <= days : true;
+
+      return matchesPlace && matchesTag && matchesDays;
+    });
   }
 mapTags(tags: Tag[]): string[]{
     return  tags.map(tag =>Tag[tag]);
 }
+  searchItineraries(searchTerm: string, searchItineraries: Itinerary[]): Itinerary[] {
+    if (!searchTerm) {
+      return [...searchItineraries];
+    }
+    return searchItineraries.filter(itinerary =>
+      itinerary.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }
 
 }

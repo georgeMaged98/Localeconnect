@@ -1,11 +1,17 @@
 package com.localeconnect.app.user.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import jakarta.persistence.*;
 import lombok.*;
 import jakarta.persistence.Id;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,14 +36,18 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
     @Column(name = "date_of_birth")
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    //@JsonSerialize(using = LocalDateSerializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate dateOfBirth;
     @Column
     private String bio;
-    @Setter(AccessLevel.NONE)
     @Column(nullable = false)
     private String password;
     @ElementCollection
     private List<String> visitedCountries = new ArrayList<>();
+    @Column(nullable = false)
+    private boolean registeredAsLocalGuide;
     @ElementCollection
     private List<String> languages;
     @ManyToMany
@@ -50,4 +60,9 @@ public class User {
 
     @ManyToMany(mappedBy = "followers")
     private List<User> following = new ArrayList<>();
+    @Column
+    private Boolean isEnabled = true;
+    @Column
+    private String role;
+
 }

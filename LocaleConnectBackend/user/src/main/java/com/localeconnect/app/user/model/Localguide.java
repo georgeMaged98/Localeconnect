@@ -13,9 +13,23 @@ import lombok.experimental.SuperBuilder;
 public class Localguide extends User {
     @Column
     private String city;
+
     @Column
-    private double rating;
+    private double ratingsTotal;
+
+    @Column
+    private int ratingsCount;
+
+    @Column
+    private double averageRating;
+    private String role = "Localguide";
+
+    @Column(nullable = false)
+    private final boolean registeredAsLocalGuide = true;
+
     public Localguide() {
         super();
     }
+
 }
+

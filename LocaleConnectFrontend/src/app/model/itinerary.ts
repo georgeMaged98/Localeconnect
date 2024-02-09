@@ -12,6 +12,9 @@ export interface Itinerary {
   imageUrls:string[],
   expand:boolean,
   rating:number;
+  ratingSubmitted?: boolean;
+  totalRatings?: number;
+  averageRating?: number;
 }
 
 export enum Tag{

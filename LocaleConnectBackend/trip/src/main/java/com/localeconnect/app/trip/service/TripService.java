@@ -191,7 +191,7 @@ public class TripService {
     }
     private Mono<TripShareDTO> postToFeed(TripShareDTO tripShareDTO) {
         return webClient.post()
-                .uri("http://feed-service/api/feed/share-trip")
+                .uri("http://feed-service:8081/api/feed/share-trip")
                 .bodyValue(tripShareDTO)
                 .retrieve()
                 .bodyToMono(TripShareDTO.class);

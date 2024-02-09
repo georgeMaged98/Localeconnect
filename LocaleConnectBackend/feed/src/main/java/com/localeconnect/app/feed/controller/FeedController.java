@@ -21,7 +21,6 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@CrossOrigin
 @RequestMapping("/api/feed")
 public class FeedController {
 
