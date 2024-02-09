@@ -6,6 +6,7 @@ import com.localeconnect.app.user.dto.LocalguideDTO;
 import com.localeconnect.app.user.dto.TravelerDTO;
 import com.localeconnect.app.user.response_handler.ResponseHandler;
 import com.localeconnect.app.user.service.AuthenticationService;
+import com.localeconnect.app.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,8 +16,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-
-@CrossOrigin
 @RestController
 @AllArgsConstructor
 @Slf4j
@@ -24,7 +23,7 @@ import java.util.Map;
 public class AuthController {
     private final AuthenticationService authService;
 
-
+    private final UserService userService;
     @PostMapping("/register-traveler")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> registerTraveler(@RequestBody @Valid TravelerDTO travelerDTO) {
@@ -47,10 +46,15 @@ public class AuthController {
         log.info("************entred AUTH/LOGIN CONTROLLER**************");
         try {
             String token = authService.login(request);
-            return ResponseEntity.ok().body(Map.of("token", token));
+            return ResponseHandler.generateResponse("Logged In!", HttpStatus.OK, token, null);
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed");
         }
+    }
 
+    @GetMapping("/exists/{userId}")
+    public ResponseEntity<Object> checkUserExists(@PathVariable("userId") Long userId) {
+        boolean exists = userService.checkUserId(userId);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, exists, null);
     }
 }

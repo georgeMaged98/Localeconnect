@@ -17,7 +17,6 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@CrossOrigin
 @Slf4j
 @RequestMapping("/api/trip")
 public class TripController {
