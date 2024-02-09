@@ -2,6 +2,8 @@ package com.localeconnect.app.feed.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -18,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @SuperBuilder
 public class UserFeedDTO {
-
+    private Long id;
     @NotBlank(message = "This is a required field")
     private String firstName;
     @NotBlank(message = "This is a required field")
@@ -29,27 +31,15 @@ public class UserFeedDTO {
     @Email(message = "Invalid email format")
     private String email;
     @NotNull(message = "This is a required field")
-    @JsonFormat(pattern="yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate dateOfBirth;
     private String bio;
-    @Setter(AccessLevel.NONE)
-    @NotBlank(message = "This is a required field")
-    private String password;
     private List<String> visitedCountries;
     @NotNull(message = "This is a required field")
     private boolean registeredAsLocalGuide;
     private List<String> languages;
-    private List<Long> followerIds;
-    private List<Long> followingIds;
-
-    // Setter method for password with hash logic
-    public void setPassword(String password) {
-        this.password = hashPassword(password);
-    }
-
-    // Private method for password hashing
-    private String hashPassword(String password) {
-        return BCrypt.hashpw(password, BCrypt.gensalt());
-    }
+    private List<UserFeedDTO> followers;
+    private List<UserFeedDTO> followings;
 
 }

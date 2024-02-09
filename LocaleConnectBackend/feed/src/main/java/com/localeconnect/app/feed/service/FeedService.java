@@ -1,5 +1,6 @@
 package com.localeconnect.app.feed.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.localeconnect.app.feed.dto.*;
 import com.localeconnect.app.feed.dto.UserFeedDTO;
 import com.localeconnect.app.feed.exceptions.LogicException;
@@ -15,8 +16,13 @@ import com.localeconnect.app.feed.repository.PostRepository;
 import com.localeconnect.app.feed.type.PostType;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,23 +38,21 @@ public class FeedService {
 
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
-//    private final RabbitMQMessageProducer rabbitMQMessageProducer;
     private final PostMapper postMapper;
     private final CommentMapper commentMapper;
     private final LikeMapper likeMapper;
     private final WebClient webClient;
+    private final ReactiveRedisTemplate<String, String> reactiveRedisTemplate;
 
     public PostDTO createPost(RegularPostDTO regularPost){
 
         Post post = postMapper.toEntity(regularPost);
-        // CHECK USER EXISTS
         long authorId = post.getAuthorID();
         if (!checkUserExists(authorId))
             throw new ResourceNotFoundException("No User Found with id: " + authorId + "!");
 
         Post createdPost = postRepository.save(post);
 
-        // return saved post
         return postMapper.toDomain(createdPost);
     }
 
@@ -58,9 +62,8 @@ public class FeedService {
             throw new ResourceNotFoundException("No Post Found with id: " + postId + "!");
 
         Post actualPost = optional.get();
-
         postRepository.delete(actualPost);
-        // return deleted post
+
         return postMapper.toDomain(actualPost);
     }
 
@@ -72,14 +75,13 @@ public class FeedService {
         Post actualPost = optional.get();
         Comment comment = commentMapper.toEntity(commentDTO);
 
-        // CHECK USER EXISTS
         long authorId = comment.getAuthorID();
         if (!checkUserExists(authorId))
             throw new ResourceNotFoundException("User with id " + authorId + " does not exist!");
 
         actualPost.addComment(comment);
         postRepository.save(actualPost);
-        // return saved post
+
         return postMapper.toDomain(actualPost);
     }
 
@@ -184,8 +186,7 @@ public class FeedService {
         if(!checkUserExists(authorId))
             throw new ResourceNotFoundException("User with id " + authorId + " does not exist!");
 
-        return postRepository.findByAuthorID(authorId).stream()
-                .map(postMapper::toDomain).collect(Collectors.toList());
+        return postRepository.findByAuthorID(authorId).stream().map(postMapper::toDomain).toList();
     }
 
     public List<PostDTO> searchPosts(String keyword) {
@@ -198,6 +199,35 @@ public class FeedService {
         return posts.stream()
                 .map(postMapper::toDomain)
                 .collect(Collectors.toList());
+    }
+    public Mono<List<PostDTO>> generateUserFeed(Long userId) {
+        return getFollowing(userId)
+                .flatMapMany(Flux::fromIterable)
+                .flatMap(this::getPostsByAuthorId)
+                .collectList()
+                .flatMap(feed -> updateFeedCache(userId, feed).thenReturn(feed));
+    }
+
+    private Mono<List<Long>> getFollowing(Long userId) {
+        return webClient.get()
+                .uri("http://user-service:8084/api/user/secured/{userId}/following", userId)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<List<Long>>() {});
+    }
+
+    private Flux<PostDTO> getPostsByAuthorId(Long authorId) {
+        List<PostDTO> result = new ArrayList<>();
+        List<Post> posts = postRepository.findByAuthorID(authorId);
+        for(Post p : posts) {
+            result.add(postMapper.toDomain(p));
+        }
+        return Flux.fromIterable(result);
+    }
+
+    private Mono<Boolean> updateFeedCache(Long userId, List<PostDTO> feed) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return Mono.fromCallable(() -> objectMapper.writeValueAsString(feed))
+                .flatMap(serializedFeed -> reactiveRedisTemplate.opsForValue().set("feed:" + userId, serializedFeed));
     }
 
     private String createContentFromItinerary(ItineraryDTO dto) {
@@ -225,9 +255,10 @@ public class FeedService {
         if (!checkUserExists(id))
             throw new ResourceNotFoundException("User with id " + id + " does not exist!");
 
-            return this.webClient.get()
+        return this.webClient.get()
                     .uri("http://user-service:8084/api/user/{userId}", id)
                     .retrieve().bodyToMono(UserFeedDTO.class).block().getUserName();
     }
 
 }
+

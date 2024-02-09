@@ -94,17 +94,17 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/followers")
-    public ResponseEntity<Object> getFollowers(@PathVariable("userId") Long userId) {
+    public List<UserDTO> getFollowers(@PathVariable("userId") Long userId) {
         List<UserDTO> followers = userService.getFollowers(userId);
 
-        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, followers, null);
+        return followers;
     }
 
     @GetMapping("/{userId}/following")
-    public ResponseEntity<Object> getFollowing(@PathVariable("userId") Long userId) {
+    public List<UserDTO> getFollowing(@PathVariable("userId") Long userId) {
         List<UserDTO> following = userService.getFollowing(userId);
 
-        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, following, null);
+        return following;
     }
     @GetMapping("/{userId}/profile")
     public ResponseEntity<Object> getProfile(@PathVariable("userId") Long userId) {

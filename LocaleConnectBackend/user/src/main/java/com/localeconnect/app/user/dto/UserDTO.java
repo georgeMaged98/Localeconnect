@@ -24,7 +24,7 @@ import java.util.List;
 @AllArgsConstructor
 @SuperBuilder
 public class UserDTO {
-
+    private Long id;
     @NotBlank(message = "This is a required field")
     private String firstName;
     @NotBlank(message = "This is a required field")

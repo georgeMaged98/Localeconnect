@@ -3,7 +3,6 @@ import com.localeconnect.app.feed.dto.*;
 import com.localeconnect.app.feed.response_handler.ResponseHandler;
 import com.localeconnect.app.feed.service.FeedService;
 import com.localeconnect.app.feed.type.PostType;
-import feign.Response;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
@@ -11,11 +10,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -106,7 +103,7 @@ public class FeedController {
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, postUnliked, null);
     }
     @GetMapping( "/{authorId}")
-    public ResponseEntity<Object> getPostByAuthorId(@PathVariable("authorId") Long authorId) {
+    public ResponseEntity<Object> getPostsByAuthorId(@PathVariable("authorId") Long authorId) {
         List<PostDTO> foundPost = feedService.getPostsByAuthor(authorId);
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, foundPost, null);
@@ -128,4 +125,11 @@ public class FeedController {
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, filteredPosts, null);
      }
+    @GetMapping("/feed/{userId}")
+    public Mono<ResponseEntity<Object>> getUserFeed(@PathVariable("userId") Long userId) {
+        return feedService.generateUserFeed(userId)
+                .switchIfEmpty(feedService.generateUserFeed(userId))
+                .map(feed -> ResponseHandler.generateResponse("Success!", HttpStatus.OK, feed, null));
+    }
+
 }
