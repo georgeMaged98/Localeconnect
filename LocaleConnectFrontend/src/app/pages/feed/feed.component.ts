@@ -35,9 +35,9 @@ export class FeedComponent implements OnInit {
       }
 
     });
-    this.imageService.currentImages.subscribe(images => {
-      this.images = images;
-    });
+    // this.imageService.currentImages.subscribe(images => {
+    //   this.images = images;
+    // });
   }
 
   fetchPosts(): void {
