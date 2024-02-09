@@ -61,8 +61,7 @@
         <mat-card-actions>
           <button mat-button (click)="toggleDetails(meetup)">{{ meetup.expand ? 'Hide Details' : 'View Details' }}
           </button>
-          <button mat-button (click)="attendMeetup(meetup.id)">Attend</button>
-          <button mat-button (click)="toggleAttend(meetup)">{{ meetup.isAttending ? 'Unfollow' : 'Follow' }}</button>
+          <button mat-button (click)="toggleAttend(meetup)">{{ meetup.isAttending ? 'Leave' : 'Attend' }}</button>
 
         </mat-card-actions>
       </div>

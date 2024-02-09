@@ -22,14 +22,6 @@
 <ng-container class="main-container" *ngFor="let itinerary of displayedItineraries">
   <mat-card class="itinerary-card">
     <div class="card-content">
-      <div class="image-container">
-        <img *ngIf="itinerary.imageUrls.length > 0; else fallbackImage" [src]="itinerary.imageUrls[0]"
-             alt="Itinerary image">
-        <ng-template #fallbackImage>
-          <img src="assets/pictures/not_available.png" alt="Default itinerary image">
-        </ng-template>
-      </div>
-
       <div class="details-container">
         <mat-card-header>
           <mat-card-title>{{ itinerary.name }}</mat-card-title>
@@ -78,6 +70,18 @@
               <li *ngFor="let activity of itinerary.dailyActivities">{{ activity }}</li>
             </ul>
           </div>
+          <mat-card-content>
+            <div class="image-container" *ngIf="itinerary.imageUrls">
+              <ng-container *ngFor="let image of itinerary.imageUrls; let i = index">
+                <ng-container *ngIf="showAllImages || i < 3">
+                  <img mat-card-image [src]="image" alt="Post image">
+                </ng-container>
+              </ng-container>
+              <button *ngIf="itinerary.imageUrls.length > 3" (click)="toggleImagesDisplay()">
+                {{ showAllImages ? '- less' : '+' + (itinerary.imageUrls.length - 3) + ' more' }}
+              </button>
+            </div>
+          </mat-card-content>
           <div class="rating">
             <div *ngIf="!itinerary.ratingSubmitted"> <b>Rate this Itinerary! </b></div>
             <app-review *ngIf="!itinerary.ratingSubmitted" [(rating)]="itinerary.rating"
