@@ -37,7 +37,10 @@
   padding: 10px 20px;
   border: 1px solid #ccc;
   border-radius: 20px;
-  width: 100%;
+  min-width: 100px;
+}
+.filter-container mat-select{
+  min-width:120px;
 }
 
 .filter-container button {
@@ -125,6 +128,13 @@ mat-card-actions {
         padding: 15px;
         border-radius: 5px;
         margin-top: 15px;
+
+        .rating {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+
+        }
       }
 
       .itinerary-details h4 {
@@ -133,9 +143,9 @@ mat-card-actions {
         font-weight: bold;
       }
 
-      .mat-chip {
+      .tag {
         margin: 2px;
-        background-color: #8085AD;
+        background-color: #e0d0f1;
       }
 
       .mat-chip-listbox {
