@@ -57,7 +57,7 @@ public class User {
     @ManyToMany(mappedBy = "followers")
     private List<User> following = new ArrayList<>();
     @Column
-    private Boolean isEnabled;
+    private Boolean isEnabled = true;
     @Column
     private String role;
 

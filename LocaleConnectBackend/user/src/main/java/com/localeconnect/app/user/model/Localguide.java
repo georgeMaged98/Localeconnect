@@ -20,17 +20,16 @@ public class Localguide extends User {
     @Column
     private int ratingsCount;
 
+    @Column
+    private double averageRating;
+    private String role = "Localguide";
+
+    @Column(nullable = false)
+    private boolean registeredAsLocalGuide = true;
+
     public Localguide() {
         super();
     }
 
-    public void addRating(double rating) {
-        this.ratingsTotal += rating;
-        this.ratingsCount++;
-    }
-
-    public double getAverageRating() {
-        return (this.ratingsCount > 0) ? this.ratingsTotal / this.ratingsCount : 0;
-    }
 }
 

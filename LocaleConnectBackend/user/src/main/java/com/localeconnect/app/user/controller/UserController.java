@@ -85,7 +85,7 @@ public class UserController {
 
     @GetMapping("/filter-travelers-name")
     public ResponseEntity<Object> searchTravelers(@RequestParam("keyword") String keyword) {
-        List<UserDTO> travelers = userService.filterTravelersByFirstLastName(keyword);
+        List<UserDTO> travelers = userService.searchTravelersByFirstLastName(keyword);
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, travelers, null);
     }
@@ -108,5 +108,19 @@ public class UserController {
         UserDTO userFound = userService.getProfileDetails(userId);
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, userFound, null);
+    }
+
+    @GetMapping("/{userId}/rating")
+    public ResponseEntity<Object> getAverageRatingOfLocalGuide(@PathVariable("userId") Long userId) {
+        double averageRating = userService.getAverageRatingOfLocalGuide(userId);
+
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, averageRating, null);
+    }
+
+    @GetMapping("/{userId}/rating-count")
+    public ResponseEntity<Object> getRatingCountOfLocalGuide(@PathVariable("userId") Long userId) {
+        double ratingCount = userService.getRatingCountOfLocalGuide(userId);
+
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, ratingCount, null);
     }
 }
