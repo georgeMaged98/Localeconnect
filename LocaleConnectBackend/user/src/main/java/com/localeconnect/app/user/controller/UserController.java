@@ -103,4 +103,10 @@ public class UserController {
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, following, null);
     }
+    @GetMapping("/{userId}")
+    public ResponseEntity<Object> getProfile(@PathVariable("userId") Long userId) {
+        UserDTO userFound = userService.getProfileDetails(userId);
+
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, userFound, null);
+    }
 }

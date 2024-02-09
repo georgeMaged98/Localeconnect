@@ -49,6 +49,7 @@ public class UserService implements UserDetailsService {
         Traveler traveler = travelerMapper.toEntity(travelerDTO);
         traveler.setPassword(BCrypt.hashpw(traveler.getPassword(), BCrypt.gensalt()));
         userRepository.save(traveler);
+        travelerDTO = travelerMapper.toDomain(traveler);
 
         return travelerDTO;
     }
@@ -72,6 +73,7 @@ public class UserService implements UserDetailsService {
         Localguide localguide = localguideMapper.toEntity(localguideDTO);
         localguide.setPassword(BCrypt.hashpw(localguide.getPassword(), BCrypt.gensalt()));
         userRepository.save(localguide);
+        localguideDTO = localguideMapper.toDomain(localguide);
 
         return localguideDTO;
     }
@@ -202,6 +204,33 @@ public class UserService implements UserDetailsService {
         return user.getFollowing().stream()
                 .map(userMapper::toDomain)
                 .collect(Collectors.toList());
+    }
+
+    public UserDTO getProfileDetails(Long userId) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new UserDoesNotExistException("User with the given id does not exist"));
+
+            if(user.isRegisteredAsLocalGuide()) {
+                LocalguideDTO localguideDTO = LocalguideDTO.builder()
+                        .firstName(user.getFirstName())
+                        .lastName(user.getLastName())
+                        .userName(user.getUserName())
+                        .bio(user.getBio())
+                        .registeredAsLocalGuide(true)
+                        .build();
+
+                return localguideDTO;
+            }
+
+            TravelerDTO travelerDTO = TravelerDTO.builder()
+                    .firstName(user.getFirstName())
+                    .lastName(user.getLastName())
+                    .userName(user.getUserName())
+                    .bio(user.getBio())
+                    .registeredAsLocalGuide(false)
+                    .build();
+
+            return travelerDTO;
     }
 
     public boolean checkUserId(Long userId) {
