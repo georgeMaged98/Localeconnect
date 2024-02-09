@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Itinerary, Tag } from '../../../model/itinerary';
 import { ItineraryService } from '../../../service/itinerary.service';
 import * as DataHelper from 'src/app/helper/DataHelper';
 import { ImagesService } from '../../../service/image.service';
+import { ApiResponse } from 'src/app/model/apiResponse';
 @Component({
   selector: 'app-itinerary-dialog',
   templateUrl: 'itinerary-dialog.component.html',
@@ -23,13 +24,13 @@ export class ItineraryDialogComponent {
     private itineraryService: ItineraryService
   ) {
     this.itineraryForm = this.formBuilder.group({
-      name: ['', Validators.required],
-      description: ['', Validators.required],
+      name: [, Validators.required],
+      description: [, Validators.required],
       numberOfDays: ['1', [Validators.required, Validators.min(1)]],
-      tags: [''],
-      placesToVisit: ['', Validators.required],
-      dailyActivities: [''],
-      image: [''],
+      tags: [],
+      placesToVisit: [, Validators.required],
+      dailyActivities: [],
+      imageUrls: [],
     });
   }
 
@@ -40,31 +41,34 @@ export class ItineraryDialogComponent {
   onSubmit(): void {
     if (this.itineraryForm.valid) {
       const formData = this.itineraryForm.value;
-      formData.placesToVisit = DataHelper.dataToList(formData.placesToVisit);
-      formData.dailyActivities = DataHelper.dataToList(
-        formData.dailyActivities
-      );
-
       console.log(formData);
 
+      formData.placesToVisit = DataHelper.dataToList(formData.placesToVisit);
+      formData.dailyActivities =
+        formData.dailyActivities === null
+          ? []
+          : DataHelper.dataToList(formData.dailyActivities);
+
       const itinerary: Itinerary = {
-        id: 0, //TODO: get from backend
         userId: 1, //TODO: get from the user
         name: formData.name,
-        username: '',
         description: formData.description,
         numberOfDays: formData.numberOfDays,
-        tags: formData.tags.length === 0 ? [''] : formData.tags,
+        tags: formData.tags === null ? [] : formData.tags,
         mappedTags: formData.tags,
         placesToVisit: formData.placesToVisit,
         dailyActivities: formData.dailyActivities,
         expand: false,
-        imageUrls: formData.image.length === 0 ? [''] : formData.image,
+        imageUrls: formData.imageUrls === null ? [] : formData.imageUrls,
         rating: 0,
       };
 
-      this.itineraryService.changeItinerary(itinerary);
-      this.dialogRef.close();
+      this.itineraryService.addItinerary(itinerary).subscribe({
+        next: (res: ApiResponse) => {
+          this.dialogRef.close(res.data);
+        },
+        error: (error: any) => console.error(error),
+      });
     }
   }
 
@@ -78,7 +82,7 @@ export class ItineraryDialogComponent {
         reader.onload = (e: any) => {
           images.push(e.target.result);
           if (images.length === files.length) {
-            this.imageService.updateImages(images);
+            this.itineraryForm.value.imageUrls = images;
           }
         };
         reader.readAsDataURL(<Blob>file);

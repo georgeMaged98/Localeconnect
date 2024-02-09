@@ -1,4 +1,4 @@
-package gcpstorage;
+package gcpstorage.config;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Storage;
@@ -18,6 +18,11 @@ public class GcpConfig {
     private String credentialsPath;
 
     @Bean
+    public String getCredentialsPath() {
+        return credentialsPath;
+    }
+
+    @Bean
     public Storage googleCloudStorage() throws IOException {
 
         FileInputStream serviceAccountStream = new FileInputStream(credentialsPath);
@@ -25,8 +30,6 @@ public class GcpConfig {
         GoogleCredentials credentials = GoogleCredentials.fromStream(serviceAccountStream);
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
 
-        // Create a Storage client using default credentials
-//        Storage storage = StorageOptions.getDefaultInstance().getService();
         return storage;
     }
 }

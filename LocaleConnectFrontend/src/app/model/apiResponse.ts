@@ -1,5 +1,5 @@
 export interface ApiResponse {
-  responseObject: Object;
+  data: Object;
   message: String;
   errors: [String];
   status: Number;

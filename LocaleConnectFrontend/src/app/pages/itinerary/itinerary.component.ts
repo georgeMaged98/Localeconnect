@@ -60,39 +60,52 @@ export class ItineraryComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // this.allItineraries = this.itineraryService.getItinerariesMock();
     this.initializeDisplayedItineraries();
     //TODO: replace mock with api
     this.itineraryService.getItineraries().subscribe({
-      next: (data: ApiResponse) => {
-        this.allItineraries = data.responseObject as Itinerary[];
+      next: (itineraryRes: ApiResponse) => {
+        this.allItineraries = itineraryRes.data as Itinerary[];
         this.itineraries = [...this.allItineraries];
         this.totalLength = this.allItineraries.length;
         this.initializeDisplayedItineraries();
         this.filterItineraries = [...this.allItineraries];
+        this.allItineraries.forEach((itinerary) => {
+          // itinerary.mappedTags = this.itineraryService.mapTags(itinerary.tags);
+          // this.fetchUsername(itinerary);
+          if (itinerary.imageUrls.length > 0) {
+            if (itinerary.imageUrls[0].length > 0) {
+              // this.imageService.getImage(itinerary.imageUrls[0]).subscribe({
+              //   next: (gcpRes: ApiResponse) => {
+              //     itinerary.imageUrls = [];
+              //     itinerary.imageUrls.push(gcpRes.data.toString());
+              //   },
+              //   error: (errorMessage: ApiResponse) =>
+              //     console.error(errorMessage.errors),
+              // });
+            }
+          }
+        });
       },
       error: (errorMessage: ApiResponse) => console.error(errorMessage.errors),
     });
 
-    this.allItineraries.forEach((itinerary) => {
-      itinerary.mappedTags = this.itineraryService.mapTags(itinerary.tags);
-      this.fetchUsername(itinerary);
-    });
-    this.imageService.currentImages.subscribe((images) => {
-      this.images = images;
-    });
+    // this.imageService.currentImages.subscribe((images) => {
+    //   this.images = images;
+    // });
 
-    this.subscription = this.itineraryService.currentItinerary.subscribe(
-      (itinerary) => {
-        if (itinerary) {
-          this.addItinerary(itinerary);
-          itinerary.imageUrls = this.images;
-          this.fetchUsername(itinerary);
-          this.updateDisplayedItineraries();
-          this.cdr.detectChanges();
-        }
-      }
-    );
+    // this.subscription = this.itineraryService.currentItinerary.subscribe(
+    //   (itinerary) => {
+    //     console.log('WEIRD', itinerary);
+
+    //     if (itinerary) {
+    //       this.addItinerary(itinerary);
+    //       itinerary.imageUrls = this.images;
+    //       this.fetchUsername(itinerary);
+    //       this.updateDisplayedItineraries();
+    //       this.cdr.detectChanges();
+    //     }
+    //   }
+    // );
 
     this.searchControl.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged())
@@ -121,23 +134,20 @@ export class ItineraryComponent implements OnInit, OnDestroy {
     );
   }
 
-  addItineraryMock(itinerary: Itinerary) {
-    this.itineraryService.addItinerary(itinerary);
-    this.allItineraries.push(itinerary);
-    this.totalLength = this.allItineraries.length;
-    this.updateDisplayedItineraries();
-  }
+  // addItinerary(newItinerary: Itinerary): void {
+  //   console.log('ADD IT ', newItinerary);
 
-  addItinerary(newItinerary: Itinerary): void {
-    this.itineraryService.addItinerary(newItinerary).subscribe({
-      next: (itinerary: Itinerary) => {
-        this.allItineraries.push(itinerary);
-      },
-      error: (e: any) => {
-        console.error('Error adding itinerary', e);
-      },
-    });
-  }
+  //   this.itineraryService.addItinerary(newItinerary).subscribe({
+  //     next: (res: ApiResponse) => {
+  //       console.log(res);
+
+  //       // this.allItineraries.push(itinerary);
+  //     },
+  //     error: (e: any) => {
+  //       console.error('Error adding itinerary', e);
+  //     },
+  //   });
+  // }
 
   toggleDetails(itinerary: Itinerary): void {
     itinerary.expand = !itinerary.expand;
@@ -147,6 +157,10 @@ export class ItineraryComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(ItineraryDialogComponent, {
       width: '600px',
       height: '600px',
+    });
+
+    dialogRef.afterClosed().subscribe((newItinerary: Itinerary) => {
+      this.allItineraries.push(newItinerary);
     });
   }
 

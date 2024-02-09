@@ -1,14 +1,22 @@
-import {Component} from '@angular/core';
-import {MatDialogRef} from '@angular/material/dialog';
-import {AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators} from '@angular/forms';
-import {MeetupService} from "../../../service/meetup.service";
-import {Meetup} from "../../../model/meetup";
-import {LANGUAGES} from "../../../helper/DataHelper";
+import { Component } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
+import { MeetupService } from '../../../service/meetup.service';
+import { Meetup } from '../../../model/meetup';
+import { LANGUAGES } from '../../../helper/DataHelper';
+import { ApiResponse } from 'src/app/model/apiResponse';
 
 @Component({
   selector: 'app-meetup-dialog',
   templateUrl: 'meetup-dialog.component.html',
-  styleUrls: ['./meetup-dialog.component.scss']
+  styleUrls: ['./meetup-dialog.component.scss'],
 })
 export class MeetupDialogComponent {
   meetupForm: FormGroup;
@@ -22,11 +30,11 @@ export class MeetupDialogComponent {
       name: ['', Validators.required],
       description: ['', Validators.required],
       date: ['', Validators.required],
-      startTime: ['', [Validators.required,timeFormatValidator()]],
+      startTime: ['', [Validators.required, timeFormatValidator()]],
       endTime: ['', [Validators.required, timeFormatValidator()]],
       cost: ['', [Validators.min(0)]],
       location: ['', Validators.required],
-      spokenLanguages: ['', Validators.required]
+      spokenLanguages: ['', Validators.required],
     });
   }
 
@@ -40,23 +48,26 @@ export class MeetupDialogComponent {
 
       const newMeetup: Meetup = {
         ...formData,
-        id: 0, // TODO: get from backend
-        creatorName: '', //TODO: get from current user
+        creatorId: 1,
         meetupAttendees: [],
         rating: 0,
         ratingSubmitted: false,
         totalRatings: 0,
         averageRating: 0,
-        expand: false
+        expand: false,
       };
+      console.log(newMeetup);
 
-      this.meetupService.changeMeetup(newMeetup);
-      this.dialogRef.close();
+      this.meetupService.createMeetup(newMeetup).subscribe({
+        next: (res: ApiResponse) => {
+          this.dialogRef.close(res.data);
+        },
+        error: (error: any) => console.error(error),
+      });
     }
   }
 
-
-    protected readonly LANGUAGES = LANGUAGES;
+  protected readonly LANGUAGES = LANGUAGES;
 }
 
 export function timeFormatValidator(): ValidatorFn {
@@ -68,4 +79,3 @@ export function timeFormatValidator(): ValidatorFn {
     return isValidTime ? null : { invalidTimeFormat: true };
   };
 }
-

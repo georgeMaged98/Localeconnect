@@ -87,17 +87,14 @@ services:
     environment:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
       - GCP_CONFIG=./configurations
-    ports:
-      - '5005:5005'
 
   discovery-server:
-    image: georgemaged/discovery-server
+    image: georgemaged/discovery-server:latest
     pull_policy: always
     ports:
       - '8761:8761'
 
 
 volumes:
-
   postgres:
   pgadmin:

@@ -1,16 +1,13 @@
 package com.localeconnect.app.meetup.service;
 
-//import com.localeconnect.app.meetup.config.MeetupRabbitConfig;
-import com.localeconnect.app.meetup.dto.MeetupAttendDTO;
-import com.localeconnect.app.meetup.dto.MeetupDTO;
+import com.localeconnect.app.meetup.config.MeetupRabbitConfig;
+import com.localeconnect.app.meetup.dto.*;
 //import com.localeconnect.app.meetup.dto.MeetupEditDTO;
-import com.localeconnect.app.meetup.dto.MeetupEditDTO;
-import com.localeconnect.app.meetup.dto.NotificationDTO;
 import com.localeconnect.app.meetup.exceptions.LogicException;
 import com.localeconnect.app.meetup.exceptions.ResourceNotFoundException;
 import com.localeconnect.app.meetup.mapper.MeetupMapper;
 import com.localeconnect.app.meetup.model.Meetup;
-//import com.localeconnect.app.meetup.rabbit.RabbitMQMessageProducer;
+import com.localeconnect.app.meetup.rabbit.RabbitMQMessageProducer;
 import com.localeconnect.app.meetup.repository.MeetupRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,7 +18,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -30,7 +26,7 @@ public class MeetupService {
     private final MeetupRepository meetupRepository;
     private final MeetupMapper meetupMapper;
     private final WebClient webClient;
-//    private final RabbitMQMessageProducer rabbitMQMessageProducer;
+    private final RabbitMQMessageProducer rabbitMQMessageProducer;
 
     public MeetupDTO createMeetup(MeetupDTO meetupDTO) {
         Meetup meetup = meetupMapper.toEntity(meetupDTO);
@@ -78,17 +74,17 @@ public class MeetupService {
 
         meetupRepository.save(actualMeetup);
 
-//        List<Long> attendees = actualMeetup.getMeetupAttendees();
-//        for (Long att:attendees
-//             ) {
-//            NotificationDTO newNotification = new NotificationDTO();
-//            newNotification.setTitle("New Notification");
-//            newNotification.setMessage("Meetup " + meetupId +" Got Updated!");
-//            newNotification.setSentAt(LocalDateTime.now());
-//            newNotification.setReceiverID(att);
-//            newNotification.setSenderID(actualMeetup.getCreatorId());
-//            rabbitMQMessageProducer.publish(newNotification, MeetupRabbitConfig.EXCHANGE, MeetupRabbitConfig.ROUTING_KEY);
-//        }
+        List<Long> attendees = actualMeetup.getMeetupAttendees();
+        for (Long att : attendees
+        ) {
+            NotificationDTO newNotification = new NotificationDTO();
+            newNotification.setTitle("New Notification");
+            newNotification.setMessage("Meetup " + meetupId + " Got Updated!");
+            newNotification.setSentAt(LocalDateTime.now());
+            newNotification.setReceiverID(att);
+            newNotification.setSenderID(actualMeetup.getCreatorId());
+            rabbitMQMessageProducer.publish(newNotification, MeetupRabbitConfig.EXCHANGE, MeetupRabbitConfig.ROUTING_KEY);
+        }
         return meetupMapper.toDomain(actualMeetup);
     }
 
@@ -156,17 +152,17 @@ public class MeetupService {
         Meetup actualMeetup = optional.get();
         meetupRepository.deleteById(id);
 
-//        List<Long> attendees = actualMeetup.getMeetupAttendees();
-//        for (Long att:attendees
-//        ) {
-//            NotificationDTO newNotification = new NotificationDTO();
-//            newNotification.setTitle("New Notification");
-//            newNotification.setMessage("Meetup " + actualMeetup.getId() +" Got Updated!");
-//            newNotification.setSentAt(LocalDateTime.now());
-//            newNotification.setReceiverID(att);
-//            newNotification.setSenderID(actualMeetup.getCreatorId());
-//            rabbitMQMessageProducer.publish(newNotification, MeetupRabbitConfig.EXCHANGE, MeetupRabbitConfig.ROUTING_KEY);
-//        }
+        List<Long> attendees = actualMeetup.getMeetupAttendees();
+        for (Long att : attendees
+        ) {
+            NotificationDTO newNotification = new NotificationDTO();
+            newNotification.setTitle("New Notification");
+            newNotification.setMessage("Meetup " + actualMeetup.getId() + " Got Updated!");
+            newNotification.setSentAt(LocalDateTime.now());
+            newNotification.setReceiverID(att);
+            newNotification.setSenderID(actualMeetup.getCreatorId());
+            rabbitMQMessageProducer.publish(newNotification, MeetupRabbitConfig.EXCHANGE, MeetupRabbitConfig.ROUTING_KEY);
+        }
 
         MeetupDTO meetupDTO = meetupMapper.toDomain(optional.get());
         return meetupDTO;

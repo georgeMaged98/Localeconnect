@@ -1,5 +1,8 @@
 package com.localeconnect.app.itinerary.error_handler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.localeconnect.app.itinerary.dto.GCPResponseDTO;
 import com.localeconnect.app.itinerary.exception.*;
 import com.localeconnect.app.itinerary.response_handler.ResponseHandler;
 import org.springframework.http.HttpStatus;
@@ -7,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 
 import java.util.Arrays;
@@ -17,7 +21,7 @@ import java.util.stream.Collectors;
 public class ItineraryGlobalExceptionHandler {
 
     @ExceptionHandler({ResourceNotFoundException.class, ItineraryNotFoundException.class, ReviewNotFoundException.class})
-    public ResponseEntity<Object> handleEntityNotFoundExceptions(Exception e){
+    public ResponseEntity<Object> handleEntityNotFoundExceptions(Exception e) {
         HttpStatus status = HttpStatus.NOT_FOUND; //404
         List<String> errorMessages = Arrays.asList(e.getMessage());
         System.out.println("ResourceNotFoundException: " + errorMessages);
@@ -85,6 +89,45 @@ public class ItineraryGlobalExceptionHandler {
 
         List<String> errorMessages = Arrays.asList(e.getMessage());
         System.out.println("ItineraryAlreadyExistsException: " + errorMessages);
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                status,
+                errorMessages
+        );
+        return ResponseHandler.generateResponse("Error!", status, null, errorResponse);
+    }
+
+    @ExceptionHandler(GCPException.class)
+    public ResponseEntity<Object> handleGCPException(
+            Exception e
+    ) {
+        System.out.println(e);
+        HttpStatus status = HttpStatus.BAD_REQUEST; // 400
+
+        List<String> errorMessages = Arrays.asList(e.getMessage());
+        System.out.println("ItineraryAlreadyExistsException: " + errorMessages);
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                status,
+                errorMessages
+        );
+        return ResponseHandler.generateResponse("Error!", status, null, errorResponse);
+    }
+
+
+    @ExceptionHandler(WebClientResponseException.class)
+    public ResponseEntity<Object> handleWebClientException(
+            WebClientResponseException e
+    ) throws JsonProcessingException {
+        System.out.println("BODY " + e.getResponseBodyAsString());
+        String errorMsg = e.getResponseBodyAsString();
+        ObjectMapper objectMapper = new ObjectMapper();
+        GCPResponseDTO gcpResponseDTO = objectMapper.readValue(errorMsg, GCPResponseDTO.class);
+        System.out.println(gcpResponseDTO.getErrors());
+        HttpStatus status = HttpStatus.valueOf(gcpResponseDTO.getStatus()); // 400
+
+        List<String> errorMessages = gcpResponseDTO.getErrors().getErrors();
+        System.out.println("Error in GCP: " + errorMessages);
 
         ErrorResponse errorResponse = new ErrorResponse(
                 status,
