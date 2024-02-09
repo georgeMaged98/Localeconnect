@@ -1,5 +1,5 @@
 import {User} from "./user";
-import {Trip, TripPreview} from "./trip";
+import {TripPreview} from "./trip";
 
 export interface Guide extends User {
   city: string;
