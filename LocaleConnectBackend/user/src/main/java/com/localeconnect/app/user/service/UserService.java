@@ -163,7 +163,7 @@ public class UserService implements UserDetailsService {
         List<Localguide> guides = userRepository.findByRegisteredAsLocalGuide(true).stream()
                 .filter(Localguide.class::isInstance)
                 .map(Localguide.class::cast)
-                .collect(Collectors.toList());
+                .toList();
         return guides.stream()
                 .map(localguideMapper::toDomain)
                 .collect(Collectors.toList());
@@ -173,7 +173,7 @@ public class UserService implements UserDetailsService {
         List<Localguide> guides = userRepository.findByCityContainingIgnoreCase(keyword).stream()
                 .filter(Localguide.class::isInstance)
                 .map(Localguide.class::cast)
-                .collect(Collectors.toList());
+                .toList();
         return guides.stream()
                 .map(localguideMapper::toDomain)
                 .collect(Collectors.toList());
@@ -182,7 +182,7 @@ public class UserService implements UserDetailsService {
     public List<UserDTO> filterTravelersByFirstLastName(String keyword) {
         List<User> travelers = userRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(keyword, keyword).stream()
                 .filter(user -> !user.isRegisteredAsLocalGuide())
-                .collect(Collectors.toList());
+                .toList();
         return travelers.stream()
                 .map(userMapper::toDomain)
                 .collect(Collectors.toList());
