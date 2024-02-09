@@ -1,44 +1,9 @@
-#To access a route use the link: localhost:8080/path-to-service
-# Example: eureka -> localhost:8080/eureka/web
 server:
   port: 8080
 
 spring:
   application:
     name: api-gateway
-
-  cloud:
-    gateway:
-      routes:
-        - id: chat-service
-          uri: http://chat-service:8003
-          predicates:
-            - Path=/api/chat/**
-
-        - id: meetup-service
-          uri: http://meetup-service:7001
-          predicates:
-            - Path=/api/meetup/**
-
-        - id: user-service
-          uri: http://user-service:8084
-          predicates:
-            - Path=/api/user/**
-
-        - id: itinerary-service
-          uri: http://itinerary-service:8082
-          predicates:
-            - Path=/api/itinerary/**
-
-        - id: feed-service
-          uri: http://feed-service:8081
-          predicates:
-            - Path=/api/feed/**
-
-        - id: trip-service
-          uri: http://trip-service:8083
-          predicates:
-            - Path=/api/trip/**
 
 eureka:
   client:
@@ -53,5 +18,8 @@ logging:
     org.springframework.cloud.loadbalancer: DEBUG
     reactor.netty.http.client: DEBUG
 
-management.endpoints.web.exposure.include: "*"
-
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
