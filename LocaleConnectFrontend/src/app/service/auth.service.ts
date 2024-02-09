@@ -23,8 +23,8 @@ export class AuthService {
   public get currentUserValue(): User | null {
     return this.currentUserSubject.value;
   }
-  login(username: string, password: string): Observable<User> {
-    return this.http.post<User>(`${this.apiUrl}/login`, {username, password}).pipe(
+  login(email: string, password: string): Observable<User> {
+    return this.http.post<User>(`${this.apiUrl}/login`, {email, password}).pipe(
       tap(user => this.setSession(user)),
       map(user => {
         this.currentUserSubject.next(user);
