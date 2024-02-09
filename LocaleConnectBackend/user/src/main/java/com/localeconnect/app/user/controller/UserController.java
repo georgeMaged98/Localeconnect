@@ -12,7 +12,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+<<<<<<< HEAD
 @CrossOrigin
+=======
+import java.util.Map;
+
+>>>>>>> origin/integration-user
 @RestController
 @AllArgsConstructor
 @Slf4j

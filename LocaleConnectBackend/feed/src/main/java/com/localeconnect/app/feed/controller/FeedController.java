@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
-@CrossOrigin
 @RequestMapping("/api/feed")
 public class FeedController {
 

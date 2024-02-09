@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-@CrossOrigin
 @RestController
 @AllArgsConstructor
 @Slf4j
