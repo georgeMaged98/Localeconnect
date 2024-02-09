@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 public class Traveler extends User {
     private String role = "Traveler";
     @Column(nullable = false)
-    private boolean registeredAsLocalGuide = false;
+    private final boolean registeredAsLocalGuide = false;
     public Traveler() {
         super();
     }

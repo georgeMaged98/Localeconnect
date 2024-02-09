@@ -2,6 +2,7 @@ package com.localeconnect.app.user.controller;
 
 import com.localeconnect.app.user.dto.LocalguideDTO;
 import com.localeconnect.app.user.dto.UserDTO;
+import com.localeconnect.app.user.model.User;
 import com.localeconnect.app.user.response_handler.ResponseHandler;
 import com.localeconnect.app.user.service.UserService;
 import jakarta.validation.Valid;
@@ -12,12 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-<<<<<<< HEAD
-@CrossOrigin
-=======
-import java.util.Map;
-
->>>>>>> origin/integration-user
 @RestController
 @AllArgsConstructor
 @Slf4j
@@ -76,7 +71,7 @@ public class UserController {
     }
     @GetMapping("/guides")
     public ResponseEntity<Object> getAllGuides() {
-        List<LocalguideDTO> guides = userService.getAllGuides();
+        List<UserDTO> guides = userService.getAllGuides();
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, guides, null);
     }
@@ -88,7 +83,7 @@ public class UserController {
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, guides, null);
     }
 
-    @GetMapping("/filter-travelers-name")
+    @GetMapping("/search-traveler")
     public ResponseEntity<Object> searchTravelers(@RequestParam("keyword") String keyword) {
         List<UserDTO> travelers = userService.searchTravelersByFirstLastName(keyword);
 
@@ -108,7 +103,7 @@ public class UserController {
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, following, null);
     }
-    @GetMapping("/{userId}")
+    @GetMapping("/{userId}/profile")
     public ResponseEntity<Object> getProfile(@PathVariable("userId") Long userId) {
         UserDTO userFound = userService.getProfileDetails(userId);
 
@@ -124,7 +119,7 @@ public class UserController {
 
     @GetMapping("/{userId}/rating-count")
     public ResponseEntity<Object> getRatingCountOfLocalGuide(@PathVariable("userId") Long userId) {
-        double ratingCount = userService.getRatingCountOfLocalGuide(userId);
+        int ratingCount = userService.getRatingCountOfLocalGuide(userId);
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, ratingCount, null);
     }

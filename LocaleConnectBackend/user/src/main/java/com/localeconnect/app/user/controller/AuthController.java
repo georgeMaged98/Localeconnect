@@ -16,7 +16,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-
 @RestController
 @AllArgsConstructor
 @Slf4j
@@ -47,7 +46,7 @@ public class AuthController {
         log.info("************entred AUTH/LOGIN CONTROLLER**************");
         try {
             String token = authService.login(request);
-            return ResponseEntity.ok().body(Map.of("token", token));
+            return ResponseHandler.generateResponse("Logged In!", HttpStatus.OK, token, null);
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed");
         }

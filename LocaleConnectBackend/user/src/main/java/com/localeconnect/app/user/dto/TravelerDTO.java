@@ -10,7 +10,7 @@ import lombok.experimental.SuperBuilder;
 public class TravelerDTO extends UserDTO {
     private String role = "Traveler";
 
-    private boolean registeredAsLocalGuide = false;
+    private final boolean registeredAsLocalGuide = false;
     public TravelerDTO() {
         super();
     }

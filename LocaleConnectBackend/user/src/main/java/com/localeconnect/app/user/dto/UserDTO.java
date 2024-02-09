@@ -2,6 +2,11 @@ package com.localeconnect.app.user.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -10,6 +15,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -29,7 +35,9 @@ public class UserDTO {
     @Email(message = "Invalid email format")
     private String email;
     @NotNull(message = "This is a required field")
-    @JsonFormat(pattern="yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    //@JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate dateOfBirth;
     private String bio;
     @NotBlank(message = "This is a required field")
@@ -38,8 +46,8 @@ public class UserDTO {
     @NotNull(message = "This is a required field")
     private boolean registeredAsLocalGuide;
     private List<String> languages;
-    private List<Long> followerIds;
-    private List<Long> followingIds;
+    private List<UserDTO> followers;
+    private List<UserDTO> followings;
     private Boolean isEnabled;
     private String role;
 

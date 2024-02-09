@@ -25,7 +25,7 @@ public class Localguide extends User {
     private String role = "Localguide";
 
     @Column(nullable = false)
-    private boolean registeredAsLocalGuide = true;
+    private final boolean registeredAsLocalGuide = true;
 
     public Localguide() {
         super();
