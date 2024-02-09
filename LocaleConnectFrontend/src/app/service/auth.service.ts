@@ -4,13 +4,14 @@ import {BehaviorSubject, catchError, map, Observable, tap, throwError} from "rxj
 import {User} from "../model/user";
 import {Traveler} from "../model/traveler";
 import {Guide} from "../model/guide";
+import {environment} from "../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
 })
 
 export class AuthService {
-  private apiUrl = '/api/auth';
+  private apiUrl = `${environment.API_URL}/api/user/auth`;
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser: Observable<User | null>;
 
@@ -22,16 +23,17 @@ export class AuthService {
   public get currentUserValue(): User | null {
     return this.currentUserSubject.value;
   }
-
   login(username: string, password: string): Observable<User> {
-    return this.http.post<User>(`/api/login`, {username, password}).pipe(
+    return this.http.post<User>(`${this.apiUrl}/login`, {username, password}).pipe(
       tap(user => this.setSession(user)),
       map(user => {
         this.currentUserSubject.next(user);
         return user;
-      })
+      }),
+      catchError(this.handleError<User>('login'))
     );
   }
+
 
   logout(): void {
     localStorage.removeItem('currentUser');
@@ -46,11 +48,9 @@ export class AuthService {
   public isLoggedOut(): boolean {
     return !this.isLoggedIn();
   }
-
-
   registerTraveler(traveler: Traveler): Observable<Traveler> {
     const headers = new HttpHeaders({'Content-Type': 'application/json'});
-    return this.http.post<Traveler>(`${this.apiUrl}/register`, traveler, {headers})
+    return this.http.post<Traveler>(`${this.apiUrl}/register-traveler`, traveler, {headers})
       .pipe(
         catchError(this.handleError<Traveler>('register traveler'))
       );
@@ -58,12 +58,11 @@ export class AuthService {
 
   registerGuide(guide: Guide): Observable<Guide> {
     const headers = new HttpHeaders({'Content-Type': 'application/json'});
-    return this.http.post<Guide>(`${this.apiUrl}/register`, guide, {headers})
+    return this.http.post<Guide>(`${this.apiUrl}/register-localguide`, guide, {headers})
       .pipe(
         catchError(this.handleError<Guide>('register guide'))
       );
   }
-
 
   private getUserFromLocalStorage(): User | null {
     const storedUser = localStorage.getItem('currentUser');
@@ -74,7 +73,7 @@ export class AuthService {
   private setSession(authResult: User): void {
     localStorage.setItem('currentUser', JSON.stringify(authResult));
     //TODO: Set the time that the access token will expire at
-    const expiresAt = JSON.stringify((10000) + new Date().getTime());
+    const expiresAt = JSON.stringify((1000 * 60 * 30) + new Date().getTime());
     localStorage.setItem('expires_at', expiresAt);
   }
 
