@@ -1,6 +1,5 @@
 package com.localeconnect.app.feed.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.localeconnect.app.feed.dto.*;
 import com.localeconnect.app.feed.dto.UserFeedDTO;
 import com.localeconnect.app.feed.exceptions.LogicException;
@@ -18,13 +17,9 @@ import com.localeconnect.app.feed.type.PostType;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -225,21 +220,24 @@ public class FeedService {
     }
 
     public List<PostDTO> generateUserFeed(Long userId) {
-        // This blocks and waits for the list of following user IDs
-        List<UserFeedDTO> following = getFollowing(userId).block();
+        List<UserFeedDTO> following = getFollowing(userId);
 
-        // Stream over each followingId to fetch and process their posts
         return following.stream()
                 .map(UserFeedDTO::getId)
                 .flatMap(authorId -> getPostsByAuthorId(authorId).stream())
                 .collect(Collectors.toList());
     }
 
-    private Mono<List<UserFeedDTO>> getFollowing(Long userId) {
-        return webClient.get()
+    private List<UserFeedDTO> getFollowing(Long userId) {
+        if (!checkUserId(userId))
+            throw new ResourceNotFoundException("User with id " + userId + " does not exist!");
+
+        GetFollowingResponseDTO res =  webClient.get()
                 .uri("http://user-service:8084/api/user/secured/{userId}/following", userId)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<UserFeedDTO>>() {});
+                .bodyToMono(GetFollowingResponseDTO.class).block();
+
+        return res.getResponseObject();
     }
 
    /* public Mono<List<PostDTO>> generateUserFeed(Long userId) {
@@ -308,9 +306,12 @@ public class FeedService {
         if (!checkUserId(id))
             throw new ResourceNotFoundException("User with id " + id + " does not exist!");
 
-        return webClient.get()
+        GetUserByIdResponseDTO res =  this.webClient.get()
                     .uri("http://user-service:8084/api/user/secured/{userId}", id)
-                    .retrieve().bodyToMono(UserFeedDTO.class).block().getUserName();
+                    .retrieve().bodyToMono(GetUserByIdResponseDTO.class).block();
+
+        UserFeedDTO user = res.getResponseObject();
+        return user.getUserName();
     }
 
 }

@@ -9,15 +9,13 @@ import com.localeconnect.app.itinerary.model.Review;
 import com.localeconnect.app.itinerary.repository.ItineraryRepository;
 import com.localeconnect.app.itinerary.repository.ItinerarySpecification;
 import com.localeconnect.app.itinerary.repository.ReviewRepository;
+import jakarta.validation.ValidationException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -54,7 +52,7 @@ public class ItineraryService {
         List<String> images = itineraryDTO.getImageUrls();
 
         if (!images.isEmpty()) {
-            // Save image in GCP
+
             GCPResponseDTO gcpResponse = saveImageToGCP(itineraryDTO.getImageUrls().get(0));
             String imageUrl = gcpResponse.getData();
             itinerary.setImageUrls(List.of(imageUrl));
@@ -109,9 +107,10 @@ public class ItineraryService {
         if(!checkUserId(userId))
             throw new ResourceNotFoundException("User with id " + userId + " does not exist!");
 
-        return itineraryRepository.findByUserId(userId).stream().map(mapper::toDomain).toList();
+        Optional<List<Itinerary>> optionalItineraries = itineraryRepository.findByUserId(userId);
+        return optionalItineraries.map(itineraries -> itineraries.stream().map(mapper::toDomain).collect(Collectors.toList()))
+                .orElseThrow(() -> new ResourceNotFoundException("Itinerary not found"));
     }
-
 
     public ItineraryDTO getItineraryById(Long id) {
         Optional<Itinerary> optional = itineraryRepository.findById(id);
@@ -163,7 +162,8 @@ public class ItineraryService {
         if (name == null) {
             return null;
         }
-        List<Itinerary> itineraries = itineraryRepository.findAllIByNameIgnoreCaseLike(name);
+        List<Itinerary> itineraries = itineraryRepository.findAllIByNameIgnoreCaseLike(name)
+                .orElseThrow(() -> new ResourceNotFoundException("Itinerary not found with name: " + name));
         return itineraries.stream().map(mapper::toDomain).collect(Collectors.toList());
     }
 
@@ -173,7 +173,8 @@ public class ItineraryService {
         }
         Specification<Itinerary> spec = Specification.where(ItinerarySpecification.hasPlace(place))
                 .and(ItinerarySpecification.hasTag(tag)).and(ItinerarySpecification.maxNumberOfDays(days));
-        List<Itinerary> itineraries = itineraryRepository.findAll(spec);
+        List<Itinerary> itineraries = itineraryRepository.findAll(spec)
+                .orElseThrow(() -> new ResourceNotFoundException("Itinerary not found with these Specifications."));
         return itineraries.stream().map(mapper::toDomain).collect(Collectors.toList());
 
     }
@@ -183,7 +184,7 @@ public class ItineraryService {
                 .orElseThrow(() -> new ReviewNotFoundException("Review not found with id: " + id));
 
         if (!this.checkUserId(review.getUserId())) {
-            throw new UnauthorizedUserException("Only registered users can delete their reviews");
+            throw new ValidationException("Only registered users can delete their reviews");
         }
 
         reviewRepository.delete(review);
@@ -197,7 +198,6 @@ public class ItineraryService {
                 .collect(Collectors.toList());
     }
 
-    // TODO: add a shareItinerary method in the feed
     public String shareItinerary(Long itineraryId, Long authorId) {
         Itinerary itinerary = itineraryRepository.findById(itineraryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Itinerary not found with id: " + itineraryId));
@@ -210,6 +210,73 @@ public class ItineraryService {
         return postToFeed(shareDTO, authorId);
     }
 
+    public ItineraryDTO rateItinerary(Long itineraryId, Long userId, Double rating) {
+        Itinerary itinerary = itineraryRepository.findById(itineraryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Itinerary with id " + itineraryId + " does not exist"));
+
+        if (!checkUserId(userId))
+            throw new ResourceNotFoundException("User with id " + userId + " does not exist");
+
+        itinerary.addRating(rating);
+        itinerary.calcAverageRating();
+
+        itineraryRepository.save(itinerary);
+        return mapper.toDomain(itinerary);
+    }
+    public double getAverageRatingOfItinerary(Long itineraryId) {
+        Itinerary itinerary = itineraryRepository.findById(itineraryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Itinerary with id " + itineraryId + " does not exist"));
+
+        ItineraryDTO ratedItineraryDTO = mapper.toDomain(itinerary);
+
+        return ratedItineraryDTO.getAverageRating();
+    }
+
+    public int getRatingCountOfItinerary(Long itineraryId) {
+        Itinerary itinerary = itineraryRepository.findById(itineraryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Itinerary with id " + itineraryId + " does not exist"));
+
+        ItineraryDTO ratedItineraryDTO = mapper.toDomain(itinerary);
+
+        return ratedItineraryDTO.getRatingsCount();
+    }
+    public void attendItinerary(Long itineraryId, ItineraryAttendDTO itineraryAttendDTO) {
+        Optional<Itinerary> itinerary = itineraryRepository.findById(itineraryId);
+        if (itinerary.isEmpty())
+            throw new ResourceNotFoundException("No Itinerary Found with id: " + itineraryId + "!");
+
+        Long travellerId = itineraryAttendDTO.getTravellerId();
+
+        if (!checkUserId(travellerId))
+            throw new ResourceNotFoundException("No User Found with id: " + travellerId + "!");
+
+        Itinerary actualItinerary = itinerary.get();
+
+        if (actualItinerary.getItineraryAttendees().contains(travellerId))
+            throw new ValidationException("Traveller is ALREADY in itinerary attendees!");
+
+        actualItinerary.getItineraryAttendees().add(travellerId);
+        itineraryRepository.save(actualItinerary);
+    }
+
+    public void unattendItinerary(Long itineraryId, ItineraryAttendDTO itineraryAttendDTO) {
+        Optional<Itinerary> itinerary = itineraryRepository.findById(itineraryId);
+        if (itinerary.isEmpty())
+            throw new ResourceNotFoundException("No Itinerary Found with id: " + itineraryId + "!");
+
+        Long travellerId = itineraryAttendDTO.getTravellerId();
+        if (!checkUserId(travellerId))
+            throw new ResourceNotFoundException("No User Found with id: " + travellerId + "!");
+
+        Itinerary actualItinerary = itinerary.get();
+        if (!actualItinerary.getItineraryAttendees().contains(travellerId))
+            throw new ValidationException("Traveller is NOT in itinerary attendees!");
+
+        actualItinerary.getItineraryAttendees().remove(travellerId);
+        itineraryRepository.save(actualItinerary);
+    }
+
+    //Webclient Calls
     private boolean checkUserId(Long userId) {
         CheckUserExistsResponseDTO res = this.webClient.get()
                 .uri("http://user-service:8084/api/user/auth/exists/{userId}", userId)
@@ -225,12 +292,14 @@ public class ItineraryService {
                 .queryParam("authorId", authorId)
                 .toUriString();
 
-        return webClient.post()
+        ShareItineraryResponseDTO res = webClient.post()
                 .uri(url)
                 .bodyValue(itineraryShareDTO)
                 .retrieve()
-                .bodyToMono(String.class)
+                .bodyToMono(ShareItineraryResponseDTO.class)
                 .block();
+
+        return res.getResponseObject();
     }
 
     private GCPResponseDTO saveImageToGCP(String image) {

@@ -1,7 +1,7 @@
 package com.localeconnect.app.itinerary.controller;
 
+import com.localeconnect.app.itinerary.dto.ItineraryAttendDTO;
 import com.localeconnect.app.itinerary.dto.ItineraryDTO;
-import com.localeconnect.app.itinerary.dto.ItineraryShareDTO;
 import com.localeconnect.app.itinerary.dto.ReviewDTO;
 import com.localeconnect.app.itinerary.dto.Tag;
 import com.localeconnect.app.itinerary.response_handler.ResponseHandler;
@@ -11,7 +11,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -101,7 +100,41 @@ public class ItineraryController {
                                                  @RequestParam("authorId") @Valid Long authorId) {
         String res = itineraryService.shareItinerary(itineraryId, authorId);
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, res, null);
-
     }
+    @PostMapping("/{itineraryId}/rate/{userId}")
+    public ResponseEntity<Object> rateItinerary(@PathVariable("itineraryId") Long itineraryId,
+                                                 @PathVariable("userId") Long userId,
+                                                 @RequestParam("rating") Double rating) {
+        ItineraryDTO ratedItinerary = itineraryService.rateItinerary(itineraryId, userId, rating);
+
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, ratedItinerary, null);
+    }
+    @GetMapping("/{itineraryId}/rating")
+    public ResponseEntity<Object> getAverageRatingOfItinerary(@PathVariable("itineraryId") Long itineraryId) {
+        double averageRating = itineraryService.getAverageRatingOfItinerary(itineraryId);
+
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, averageRating, null);
+    }
+
+    @GetMapping("/{itineraryId}/rating-count")
+    public ResponseEntity<Object> getRatingCountOfItinerary(@PathVariable("itineraryId") Long itineraryId) {
+        int ratingCount = itineraryService.getRatingCountOfItinerary(itineraryId);
+
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, ratingCount, null);
+    }
+    @PostMapping("/{id}/attend")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Object> attendItinerary(@PathVariable("id") Long itineraryId, @RequestBody @Valid ItineraryAttendDTO itineraryAttendDTO) {
+        itineraryService.attendItinerary(itineraryId, itineraryAttendDTO);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, "Traveller added to itinerary attendees successfully!", null);
+    }
+
+    @PostMapping("/{id}/unattend")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Object> unattendItinerary(@PathVariable("id") Long itineraryId, @RequestBody @Valid ItineraryAttendDTO itineraryAttendDTO) {
+        itineraryService.unattendItinerary(itineraryId, itineraryAttendDTO);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, "Traveller removed from itinerary attendees successfully!", null);
+    }
+
 
 }
