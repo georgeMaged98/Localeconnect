@@ -130,7 +130,7 @@ public class UserController {
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, ratingCount, null);
     }
 
-    @GetMapping("/api/user/profile")
+    @GetMapping("/profile")
     public ResponseEntity<?> getUserProfile(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
         String token = null;
