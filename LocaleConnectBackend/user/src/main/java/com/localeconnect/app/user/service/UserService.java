@@ -95,6 +95,12 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UserDoesNotExistException("User with the given id does not exist"));
         return userMapper.toDomain(user);
     }
+    public UserDTO getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserDoesNotExistException("User with the given email does not exist"));
+        return userMapper.toDomain(user);
+    }
+
 
     public void deleteUser(Long userId) {
         User user = userRepository.findById(userId)

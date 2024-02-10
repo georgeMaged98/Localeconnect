@@ -5,6 +5,7 @@ import {User} from "../model/user";
 import {Traveler} from "../model/traveler";
 import {Guide} from "../model/guide";
 import {environment} from "../../environments/environment";
+import {Response} from "../model/response";
 
 @Injectable({
   providedIn: 'root'
@@ -23,16 +24,29 @@ export class AuthService {
   public get currentUserValue(): User | null {
     return this.currentUserSubject.value;
   }
-  login(email: string, password: string): Observable<User> {
-    return this.http.post<User>(`${this.apiUrl}/login`, {email, password}).pipe(
-      tap(user => this.setSession(user)),
-      map(user => {
-        this.currentUserSubject.next(user);
-        return user;
+
+  login(email: string, password: string): Observable<void> {
+    return this.http.post<Response>(`${this.apiUrl}/login`, {email, password}).pipe(
+      tap(response => {
+        console.log(response.responseObject);
+        this.setSession(response.responseObject);
+        console.log(localStorage.getItem('token'))
       }),
-      catchError(this.handleError<User>('login'))
+      catchError(this.handleError<any>('login'))
     );
   }
+
+  fetchCurrentUserProfile(): Observable<User> {
+    console.log(localStorage.getItem('token'));
+    return this.http.get<User>(`${environment.API_URL}/api/user/secured/profile`).pipe(
+      map(response => {
+        console.log(response)
+        return response;
+      }),
+      catchError(this.handleError<User>('fetchCurrentUserProfile'))
+    );
+  }
+
 
 
   logout(): void {
@@ -48,6 +62,7 @@ export class AuthService {
   public isLoggedOut(): boolean {
     return !this.isLoggedIn();
   }
+
   registerTraveler(traveler: Traveler): Observable<Traveler> {
     const headers = new HttpHeaders({'Content-Type': 'application/json'});
     return this.http.post<Traveler>(`${this.apiUrl}/register-traveler`, traveler, {headers})
@@ -63,19 +78,24 @@ export class AuthService {
         catchError(this.handleError<Guide>('register guide'))
       );
   }
+  isAuthenticated(): boolean {
+    const token = localStorage.getItem('token');
+    return !!token;
+  }
+
 
   private getUserFromLocalStorage(): User | null {
     const storedUser = localStorage.getItem('currentUser');
-    if (!storedUser) return null;
-    return JSON.parse(storedUser);
+    return storedUser ? JSON.parse(storedUser) : null;
   }
 
-  private setSession(authResult: User): void {
-    localStorage.setItem('currentUser', JSON.stringify(authResult));
-    //TODO: Set the time that the access token will expire at
+
+  private setSession(token: string): void {
     const expiresAt = JSON.stringify((1000 * 60 * 30) + new Date().getTime());
+    localStorage.setItem('token', token);
     localStorage.setItem('expires_at', expiresAt);
   }
+
 
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: HttpErrorResponse): Observable<T> => {

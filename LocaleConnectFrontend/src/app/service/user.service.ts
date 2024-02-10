@@ -4,19 +4,20 @@ import {Observable} from "rxjs";
 import {GuideProfile} from "../model/guide";
 import {TripPreview} from "../model/trip";
 import {User} from "../model/user";
+import {environment} from "../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = '/api/user';
+  private apiUrl = `${environment.API_URL}/api/user/secured`;
+
 
   constructor(private http: HttpClient) {
   }
 
-//TODO: add api endpoint to get user by id
   getUsername(userId: number): Observable<string> {
-    return this.http.get<string>(`${this.apiUrl}/secured/${userId}`);
+    return this.http.get<string>(`${this.apiUrl}/${userId}`);
   }
 
   searchGuides(searchTerm: string, searchGuides: GuideProfile[]): GuideProfile[] {
@@ -35,6 +36,9 @@ export class UserService {
 
   getUserById(userId: number): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/${userId}`);
+  }
+  getUserProfile(userId: number): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/${userId}/profile`);
   }
 
   getGuidesMock(): GuideProfile[] {
