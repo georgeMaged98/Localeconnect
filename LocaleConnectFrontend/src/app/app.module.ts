@@ -1,4 +1,4 @@
-import {LOCALE_ID, NgModule} from '@angular/core';
+import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 
 import {AppRoutingModule} from './app-routing.module';
@@ -12,7 +12,7 @@ import {MatInputModule} from "@angular/material/input";
 import {MatDialogModule} from "@angular/material/dialog";
 import {RegisterComponent} from './pages/register/register.component';
 import {MatButtonModule} from "@angular/material/button";
-import {HttpClientModule} from "@angular/common/http";
+import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {RegisterGuideComponent} from './pages/register-guide/register-guide.component';
 import {MatCheckboxModule} from "@angular/material/checkbox";
@@ -28,8 +28,16 @@ import {FeedComponent} from './pages/feed/feed.component';
 import {MatListModule} from "@angular/material/list";
 import {AddPostDialogComponent} from './pages/feed/add-post-dialog/add-post-dialog.component';
 import {PickerModule} from "@ctrl/ngx-emoji-mart";
-import { MeetupComponent } from './pages/meetup/meetup.component';
-import { MeetupDialogComponent } from './pages/meetup/meetup-dialog/meetup-dialog.component';
+import {MeetupComponent} from './pages/meetup/meetup.component';
+import {MeetupDialogComponent} from './pages/meetup/meetup-dialog/meetup-dialog.component';
+import {GuideComponent} from './pages/guide/guide.component';
+import {MatPaginatorModule} from "@angular/material/paginator";
+import {MatSnackBarModule} from "@angular/material/snack-bar";
+import {TripPreviewComponent} from './pages/guide/trip-preview/trip-preview.component';
+import {MatStepperModule} from "@angular/material/stepper";
+import {TripComponent} from './pages/trip/trip.component';
+import {TripDialogComponent} from './pages/trip/trip-dialog/trip-dialog.component';
+import {AuthInterceptor} from "./service/auth-interceptor";
 
 
 @NgModule({
@@ -45,7 +53,10 @@ import { MeetupDialogComponent } from './pages/meetup/meetup-dialog/meetup-dialo
     AddPostDialogComponent,
     MeetupComponent,
     MeetupDialogComponent,
-
+    GuideComponent,
+    TripPreviewComponent,
+    TripComponent,
+    TripDialogComponent,
 
 
   ],
@@ -69,10 +80,16 @@ import { MeetupDialogComponent } from './pages/meetup/meetup-dialog/meetup-dialo
     MatIconModule,
     MatChipsModule,
     MatListModule,
-    PickerModule
+    PickerModule,
+    MatPaginatorModule,
+    MatSnackBarModule,
+    MatStepperModule
+
 
   ],
-  providers: [MatDatepickerModule, {provide: MAT_DATE_LOCALE, useValue: 'de-DE'}],
+  providers: [MatDatepickerModule, {provide: MAT_DATE_LOCALE, useValue: 'de-DE'},    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
+
+
   bootstrap: [AppComponent]
 })
 export class AppModule {

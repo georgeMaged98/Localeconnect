@@ -1,23 +1,20 @@
 package com.localeconnect.app.trip.controller;
 
+import com.localeconnect.app.trip.dto.TripAttendDTO;
 import com.localeconnect.app.trip.dto.TripDTO;
 import com.localeconnect.app.trip.dto.TripReviewDTO;
-import com.localeconnect.app.trip.dto.TripShareDTO;
 import com.localeconnect.app.trip.response_handler.ResponseHandler;
 import com.localeconnect.app.trip.service.TripService;
-import feign.Response;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
 import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@CrossOrigin
 @Slf4j
 @RequestMapping("/api/trip")
 public class TripController {
@@ -94,9 +91,45 @@ public class TripController {
         return ResponseHandler.generateResponse("success!", HttpStatus.OK, reviews, null);
     }
     @PostMapping("/share/{tripId}")
-    public Mono<ResponseEntity<TripShareDTO>> shareItinerary(@PathVariable("tripId") Long tripId) {
-        return tripService.shareTrip(tripId)
-                .map(sharedItinerary -> ResponseEntity.ok().body(sharedItinerary))
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+    public ResponseEntity<Object> shareTrip(@PathVariable("tripId") Long tripId,
+                                            @RequestParam("authorId") @Valid Long authorId) {
+        String res = tripService.shareTrip(tripId, authorId);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, res, null);
     }
+
+    @PostMapping("/{tripId}/rate/{userId}")
+    public ResponseEntity<Object> rateTrip(@PathVariable("tripId") Long tripId,
+                                           @PathVariable("userId") Long userId,
+                                           @RequestParam("rating") Double rating) {
+        TripDTO ratedTrip = tripService.rateTrip(tripId, userId, rating);
+        return ResponseHandler.generateResponse("Successfully rated the trip!", HttpStatus.OK, ratedTrip, null);
+    }
+    @GetMapping("/{tripId}/rating")
+    public ResponseEntity<Object> getAverageRatingOfTrip(@PathVariable("tripId") Long tripId) {
+        double averageRating = tripService.getAverageRatingOfTrip(tripId);
+
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, averageRating, null);
+    }
+
+    @GetMapping("/{tripId}/rating-count")
+    public ResponseEntity<Object> getRatingCountOfTrip(@PathVariable("tripId") Long tripId) {
+        int ratingCount = tripService.getRatingCountOfTrip(tripId);
+
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, ratingCount, null);
+    }
+    @PostMapping("/{id}/attend")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Object> attendTrip(@PathVariable("id") Long tripId, @RequestBody @Valid TripAttendDTO tripAttendDTO) {
+        tripService.attendTrip(tripId, tripAttendDTO);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, "Traveller added to trip attendees successfully!", null);
+    }
+
+    @PostMapping("/{id}/unattend")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Object> unattendTrip(@PathVariable("id") Long tripId, @RequestBody @Valid TripAttendDTO tripAttendDTO) {
+        tripService.unattendTrip(tripId, tripAttendDTO);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, "Traveller removed from trip attendees successfully!", null);
+    }
+
+
 }

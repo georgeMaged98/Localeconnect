@@ -27,7 +27,6 @@ buildSrc/build
 spring-test/test-output/
 
 # Maven artifacts
-pom.xml
 */target/**
 /target/**
 */target/*

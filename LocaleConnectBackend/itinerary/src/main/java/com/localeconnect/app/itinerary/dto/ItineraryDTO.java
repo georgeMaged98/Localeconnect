@@ -1,16 +1,16 @@
 package com.localeconnect.app.itinerary.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 public class ItineraryDTO {
     private Long id;
     private Long userId;
@@ -19,10 +19,20 @@ public class ItineraryDTO {
     private String description;
     @Positive(message = "Number of days must be greater than or equal to 1")
     private Integer numberOfDays;
-    private List<Tag> tags;
+    private List<String> tags;
     @NotEmpty(message = "Provide at least one destination")
     private List<String> placesToVisit;
     private List<String> dailyActivities;
     private List<String> imageUrls;
+    private double ratingsTotal;
+    private int ratingsCount;
+    @Min(value = 0)
+    @Max(value = 5)
+    private double averageRating;
+    private List<Long> itineraryAttendees = new ArrayList<>();
+
+    public void calcAverageRating() {
+        this.averageRating = (this.ratingsCount > 0) ? this.ratingsTotal / this.ratingsCount : 0;
+    }
 
 }

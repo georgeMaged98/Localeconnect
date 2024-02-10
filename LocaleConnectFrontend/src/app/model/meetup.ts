@@ -1,6 +1,7 @@
 export interface Meetup {
   id: number;
-  creatorName: string;
+  creatorId: number;
+  creatorName?: string;
   name: string;
   description: string;
   date: Date;
@@ -15,4 +16,5 @@ export interface Meetup {
   totalRatings?: number;
   averageRating?: number;
   expand?: boolean;
+  isAttending?: boolean;
 }

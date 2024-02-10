@@ -2,6 +2,9 @@ package com.localeconnect.app.meetup.dto;
 
 
 //import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -52,4 +55,14 @@ public class MeetupDTO {
     private List<String> spokenLanguages= new ArrayList<>();
 
     private List<Long> meetupAttendees = new ArrayList<>();
+
+    private double ratingsTotal;
+    private int ratingsCount;
+    @Min(value = 0)
+    @Max(value = 5)
+    private double averageRating;
+
+    public void calcAverageRating() {
+        this.averageRating = (this.ratingsCount > 0) ? this.ratingsTotal / this.ratingsCount : 0;
+    }
 }

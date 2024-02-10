@@ -1,7 +1,6 @@
-version: "3.8"
+version: '3.8'
 
 services:
-
   postgres-service:
     image: postgres:latest
     container_name: postgres-service
@@ -13,7 +12,7 @@ services:
       - postgres:/data/postgres
       - ./init-scripts:/docker-entrypoint-initdb.d
     ports:
-      - "5432:5432"
+      - '5432:5432'
     restart: unless-stopped
 
   pgadmin:
@@ -26,26 +25,26 @@ services:
     volumes:
       - pgadmin:/var/lib/pgadmin
     ports:
-      - "5050:80"
+      - '5050:80'
     restart: unless-stopped
 
   api-gateway:
-    image: georgemaged/api-gateway
+    image: localeconnect/api-gateway
     pull_policy: always
     environment:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
     ports:
-      - "8080:8080"
+      - '8080:8080'
     restart: always
 
   chat-service:
-    image: georgemaged/chat-service:latest
+    image: localeconnect/chat-service:latest
     pull_policy: always
     environment:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
 
   meetup-service:
-    image: georgemaged/meetup-service:latest
+    image: localeconnect/meetup-service:latest
     pull_policy: always
     environment:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
@@ -53,28 +52,28 @@ services:
       - RABBITMQ_HOST=rabbitmq
 
   user-service:
-    image: georgemaged/user-service:latest
+    image: localeconnect/user-service:latest
     pull_policy: always
     environment:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
       - DB_HOST=postgres-service
 
   itinerary-service:
-    image: georgemaged/itinerary-service:latest
+    image: localeconnect/itinerary-service:latest
     pull_policy: always
     environment:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
       - DB_HOST=postgres-service
 
   feed-service:
-    image: georgemaged/feed-service:latest
+    image: localeconnect/feed-service:latest
     pull_policy: always
     environment:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
       - DB_HOST=postgres-service
 
   trip-service:
-    image: georgemaged/trip-service:latest
+    image: localeconnect/trip-service:latest
     pull_policy: always
     environment:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
@@ -87,10 +86,19 @@ services:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
       - DB_HOST=postgres-service
     ports:
-      - "7002:7002"
+      - '7002:7002'
+
+  gcp-service:
+    image: localeconnect/gcp-service:latest
+    pull_policy: always
+    volumes:
+      - /Users/georgemaged/.config/gcloud/legacy_credentials/g.maged327@gmail.com/adc.json:/configurations
+    environment:
+      - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
+      - GCP_CONFIG=./configurations
 
   discovery-server:
-    image: georgemaged/discovery-server
+    image: localeconnect/discovery-server:latest
     pull_policy: always
     ports:
       - '8761:8761'
@@ -99,8 +107,8 @@ services:
     image: rabbitmq:3.9.11-management-alpine
     container_name: rabbitmq
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - '5672:5672'
+      - '15672:15672'
 #    networks:
 #      - localeconnect-network
 

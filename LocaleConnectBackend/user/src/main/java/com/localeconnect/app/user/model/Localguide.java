@@ -13,9 +13,30 @@ import lombok.experimental.SuperBuilder;
 public class Localguide extends User {
     @Column
     private String city;
+
     @Column
-    private double rating;
+    private double ratingsTotal;
+
+    @Column
+    private int ratingsCount;
+
+    @Column
+    private double averageRating;
+    private String role = "Localguide";
+
+    @Column(nullable = false)
+    private final boolean registeredAsLocalGuide = true;
+
     public Localguide() {
         super();
     }
+    public void addRating(double rating) {
+        this.ratingsTotal += rating;
+        this.ratingsCount++;
+    }
+    public void calcAverageRating() {
+        this.averageRating = (this.ratingsCount > 0) ? this.ratingsTotal / this.ratingsCount : 0;
+    }
+
 }
+

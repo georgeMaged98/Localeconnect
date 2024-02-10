@@ -1,11 +1,13 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FeedService} from "../../service/feed.service";
-import {Comment, Profile, Post} from "../../model/feed";
+import {Comment, Post, Profile} from "../../model/feed";
 import {AddPostDialogComponent} from "./add-post-dialog/add-post-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 import {Subscription} from "rxjs";
 import {ImagesService} from "../../service/image.service";
-import {Itinerary} from "../../model/itinerary";
+import {User, UserProfile} from "../../model/user";
+import {UserService} from "../../service/user.service";
+import {AuthService} from "../../service/auth.service";
 
 @Component({
   selector: 'app-feed',
@@ -20,14 +22,18 @@ export class FeedComponent implements OnInit {
   showAllImages = false;
   subscription: Subscription = new Subscription();
   images: string[] = [];
+  currentUserProfile: UserProfile | null = null;
 
 
-  constructor(public dialog: MatDialog, private feedService: FeedService, private imageService: ImagesService) {
+  constructor(public dialog: MatDialog, private feedService: FeedService, private imageService: ImagesService, private userService: UserService, private authService: AuthService) {
   }
 
   ngOnInit(): void {
+    if (this.authService.isAuthenticated()) {
+      this.fetchCurrentUserProfile();
+    }
     this.fetchPosts();
-    this.fetchFollowers();
+   // this.fetchFollowers();
     this.subscription = this.feedService.currentPost.subscribe(post => {
       if (post) {
         //TODO: replace mock with backend
@@ -36,9 +42,9 @@ export class FeedComponent implements OnInit {
       }
 
     });
-    this.imageService.currentImages.subscribe(images => {
-      this.images = images;
-    });
+    // this.imageService.currentImages.subscribe(images => {
+    //   this.images = images;
+    // });
   }
 
   fetchPosts(): void {
@@ -54,17 +60,34 @@ export class FeedComponent implements OnInit {
     );
   }
 
-  fetchFollowers(): void {
-    //TODO: replace with api call
-    this.feedService.getFollowersMock().subscribe({
-        next: (data: Profile[]) => {
-          this.followers = data;
-        },
-        error: (err) => {
-          console.error(err);
-        }
+  // fetchFollowers(): void {
+  //   //TODO: replace with api call
+  //   if (this.currentUserProfile && this.currentUserProfile.id)
+  //     this.userService.getAllFollowingAsProfiles(this.currentUserProfile.id).subscribe({
+  //       next: (users: Profile[]) => {
+  //         this.followers = users;
+  //       },
+  //       error: (err) => console.error(err)
+  //     });
+  //
+  // }
+
+  fetchCurrentUserProfile(): void {
+
+    this.authService.fetchCurrentUserProfile().subscribe({
+      next: (currentUser: User) => {
+        this.currentUserProfile = {
+          id: currentUser.id,
+          name: `${currentUser.firstName} ${currentUser.lastName}`,
+          username: currentUser.userName,
+          bio: currentUser.bio,
+          imageUrl: currentUser.imageUrl,
+        };
+      },
+      error: (error) => {
+        console.error('Error fetching user profile:', error);
       }
-    );
+    });
   }
 
   //TODO: add api call
@@ -77,11 +100,13 @@ export class FeedComponent implements OnInit {
       post.likedByUser = true;
     }
   }
+
   addPostMock(post: Post) {
     this.feedService.createPost(post);
     this.posts.push(post);
 
   }
+
   //TODO: replace with api call
   toggleFollow(post: Post): void {
     post.author.isFollowing = !post.author.isFollowing;
@@ -102,7 +127,7 @@ export class FeedComponent implements OnInit {
       const newComment: Comment = {
         // TODO: get comment from backend
         id: 0,
-        author:{
+        author: {
           userId: 1,
           name: 'Alice Johnson',
           username: 'alicej',
@@ -132,12 +157,8 @@ export class FeedComponent implements OnInit {
     const dialogRef = this.dialog.open(AddPostDialogComponent, {
       width: '500px',
     });
-
-    dialogRef.afterClosed().subscribe(result => {
-      // Handle dialog close result, if necessary
-      console.log('The dialog was closed');
-    });
   }
+
 
 //TODO: configure image storage
   changeProfilePicture(event: any): void {

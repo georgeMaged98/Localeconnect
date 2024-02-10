@@ -28,7 +28,7 @@ export class ReviewService {
   getAllReviews(itineraryId: number): Observable<Review[]> {
     return this.http.get<Review[]>(`/api/all-reviews/${itineraryId}`);
   }
-  getRatingsForEntity(entityId: number, entityType: 'itinerary' | 'meetup'|'trip'): { averageRating: number, totalRatings: number } {
+  getRatingsForEntity(entityId: number, entityType: 'itinerary' | 'meetup'|'trip'|'guide'): { averageRating: number, totalRatings: number } {
     const filteredReviews = this.reviews.filter(review => review.entityId === entityId && review.entityType === entityType);
     const totalRatings = filteredReviews.length;
     const averageRating = filteredReviews.reduce((acc, curr) => acc + curr.rating, 0) / totalRatings || 0;
@@ -39,6 +39,7 @@ export class ReviewService {
   getReviewData() {
     return this.reviewData.asObservable();
   }
+
 }
 
 
