@@ -57,4 +57,5 @@ public class AuthController {
     public Boolean checkUserExists(@PathVariable("userId") Long userId) {
         return userService.checkUserId(userId);
     }
+
 }

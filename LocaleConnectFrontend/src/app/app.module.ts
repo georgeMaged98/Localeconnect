@@ -12,7 +12,7 @@ import {MatInputModule} from "@angular/material/input";
 import {MatDialogModule} from "@angular/material/dialog";
 import {RegisterComponent} from './pages/register/register.component';
 import {MatButtonModule} from "@angular/material/button";
-import {HttpClientModule} from "@angular/common/http";
+import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {RegisterGuideComponent} from './pages/register-guide/register-guide.component';
 import {MatCheckboxModule} from "@angular/material/checkbox";
@@ -33,10 +33,11 @@ import {MeetupDialogComponent} from './pages/meetup/meetup-dialog/meetup-dialog.
 import {GuideComponent} from './pages/guide/guide.component';
 import {MatPaginatorModule} from "@angular/material/paginator";
 import {MatSnackBarModule} from "@angular/material/snack-bar";
-import { TripPreviewComponent } from './pages/guide/trip-preview/trip-preview.component';
+import {TripPreviewComponent} from './pages/guide/trip-preview/trip-preview.component';
 import {MatStepperModule} from "@angular/material/stepper";
-import { TripComponent } from './pages/trip/trip.component';
-import { TripDialogComponent } from './pages/trip/trip-dialog/trip-dialog.component';
+import {TripComponent} from './pages/trip/trip.component';
+import {TripDialogComponent} from './pages/trip/trip-dialog/trip-dialog.component';
+import {AuthInterceptor} from "./service/auth-interceptor";
 
 
 @NgModule({
@@ -56,7 +57,6 @@ import { TripDialogComponent } from './pages/trip/trip-dialog/trip-dialog.compon
     TripPreviewComponent,
     TripComponent,
     TripDialogComponent,
-
 
 
   ],
@@ -87,7 +87,9 @@ import { TripDialogComponent } from './pages/trip/trip-dialog/trip-dialog.compon
 
 
   ],
-  providers: [MatDatepickerModule, {provide: MAT_DATE_LOCALE, useValue: 'de-DE'}],
+  providers: [MatDatepickerModule, {provide: MAT_DATE_LOCALE, useValue: 'de-DE'},    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
+
+
   bootstrap: [AppComponent]
 })
 export class AppModule {

@@ -2,7 +2,6 @@ package com.localeconnect.app.user.controller;
 
 import com.localeconnect.app.user.dto.LocalguideDTO;
 import com.localeconnect.app.user.dto.UserDTO;
-import com.localeconnect.app.user.model.Localguide;
 import com.localeconnect.app.user.model.User;
 import com.localeconnect.app.user.response_handler.ResponseHandler;
 import com.localeconnect.app.user.service.UserService;
@@ -14,8 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Locale;
-
 @RestController
 @AllArgsConstructor
 @Slf4j

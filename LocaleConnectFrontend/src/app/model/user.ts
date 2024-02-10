@@ -1,15 +1,24 @@
 export interface User {
-  id: number;
+  id?: number;
   firstName: string;
   lastName: string;
   userName: string;
+  password: string;
   email: string;
-  dateOfBirth: Date;
+  dateOfBirth:Date;
   bio?: string;
-  visitedCountries: string[];
-  languages: string[];
-  followerIds: number[];
-  followingIds: number[];
+  visitedCountries?: string[];
+  languages?: string[];
+  followerIds?: number[];
+  followingIds?: number[];
   token?: string;
+  imageUrl?: string;
+  isEnabled?: boolean;
+  role?: string;
+}
+export interface UserProfile {
+  name: string;
+  username: string;
+  bio?: string;
   imageUrl?: string;
 }

@@ -6,37 +6,38 @@ import {FeedComponent} from "./pages/feed/feed.component";
 import {MeetupComponent} from "./pages/meetup/meetup.component";
 import {GuideComponent} from "./pages/guide/guide.component";
 import {TripComponent} from "./pages/trip/trip.component";
+import {authGuard} from "./service/auth-guard";
 //TODO: uncomment guard
 const routes: Routes = [
   {
     path: '',
-    component:LandingPageComponent
-  },{
-  path: 'pages/itineraries',
+    component: LandingPageComponent
+  }, {
+    path: 'pages/itineraries',
     component: ItineraryComponent,
 
-//    canActivate:[authGuard]
+    canActivate: [authGuard]
   },
   {
     path: 'pages/home',
     component: FeedComponent,
-   // canActivate:[authGuard]
+    canActivate: [authGuard]
   },
   {
     path: 'pages/meetups',
     component: MeetupComponent,
-    // canActivate:[authGuard]
+    canActivate: [authGuard]
   },
 
   {
     path: 'pages/guides',
     component: GuideComponent,
-    // canActivate:[authGuard]
+    canActivate: [authGuard]
   },
   {
     path: 'pages/trips',
     component: TripComponent,
-    // canActivate:[authGuard]
+    canActivate: [authGuard]
   }
 ];
 
@@ -44,4 +45,5 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {
+}
