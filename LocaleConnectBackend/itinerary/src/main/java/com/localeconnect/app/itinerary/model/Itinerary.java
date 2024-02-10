@@ -28,6 +28,7 @@ public class Itinerary {
 
 //    @ElementCollection(targetClass = Tag.class)
 //    @Enumerated(EnumType.STRING)
+    @ElementCollection
     @CollectionTable(name = "itinerary_tags")
     private List<String> tags = new ArrayList<>();
 
