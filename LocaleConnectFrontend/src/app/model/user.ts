@@ -16,3 +16,9 @@ export interface User {
   isEnabled?: boolean;
   role?: string;
 }
+export interface UserProfile {
+  name: string;
+  username: string;
+  bio?: string;
+  imageUrl?: string;
+}

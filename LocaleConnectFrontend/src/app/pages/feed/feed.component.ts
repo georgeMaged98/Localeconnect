@@ -5,6 +5,9 @@ import {AddPostDialogComponent} from "./add-post-dialog/add-post-dialog.componen
 import {MatDialog} from "@angular/material/dialog";
 import {Subscription} from "rxjs";
 import {ImagesService} from "../../service/image.service";
+import {User, UserProfile} from "../../model/user";
+import {UserService} from "../../service/user.service";
+import {AuthService} from "../../service/auth.service";
 
 @Component({
   selector: 'app-feed',
@@ -19,12 +22,16 @@ export class FeedComponent implements OnInit {
   showAllImages = false;
   subscription: Subscription = new Subscription();
   images: string[] = [];
+  currentUserProfile: UserProfile | null = null;
 
 
-  constructor(public dialog: MatDialog, private feedService: FeedService, private imageService: ImagesService) {
+  constructor(public dialog: MatDialog, private feedService: FeedService, private imageService: ImagesService, private userService: UserService, private authService: AuthService) {
   }
 
   ngOnInit(): void {
+    if (this.authService.isAuthenticated()) {
+     this.fetchCurrentUserProfile();
+    }
     this.fetchPosts();
     this.fetchFollowers();
     this.subscription = this.feedService.currentPost.subscribe(post => {
@@ -66,6 +73,22 @@ export class FeedComponent implements OnInit {
     );
   }
 
+  fetchCurrentUserProfile(): void {
+
+    this.authService.fetchCurrentUserProfile().subscribe({
+      next: (currentUser: User) => {
+        this.currentUserProfile = {
+          name: `${currentUser.firstName} ${currentUser.lastName}`,
+          username: currentUser.userName,
+          bio: currentUser.bio,
+          imageUrl: currentUser.imageUrl,
+        };      },
+      error: (error) => {
+        console.error('Error fetching user profile:', error);
+      }
+    });
+  }
+
   //TODO: add api call
   likePost(post: Post): void {
     if (post.likedByUser) {
@@ -76,11 +99,13 @@ export class FeedComponent implements OnInit {
       post.likedByUser = true;
     }
   }
+
   addPostMock(post: Post) {
     this.feedService.createPost(post);
     this.posts.push(post);
 
   }
+
   //TODO: replace with api call
   toggleFollow(post: Post): void {
     post.author.isFollowing = !post.author.isFollowing;
@@ -101,7 +126,7 @@ export class FeedComponent implements OnInit {
       const newComment: Comment = {
         // TODO: get comment from backend
         id: 0,
-        author:{
+        author: {
           userId: 1,
           name: 'Alice Johnson',
           username: 'alicej',
@@ -132,6 +157,7 @@ export class FeedComponent implements OnInit {
       width: '500px',
     });
   }
+
 
 //TODO: configure image storage
   changeProfilePicture(event: any): void {

@@ -2,15 +2,14 @@
   <aside class="profile-sidebar">
     <div class="profile-header">
       <button mat-icon-button class="profile-image-upload" (click)="imageInput.click()">
-        <img [src]="profileImageSrc" alt="Profile Image" class="profile-image">
+        <img [src]="currentUserProfile?.imageUrl || 'assets/pictures/profil.png'" alt="Profile Image" class="profile-image">
       </button>
       <input type="file" #imageInput (change)="changeProfilePicture($event)" style="display: none;" accept="image/*">
-      <h2 class="profile-name">John Doe</h2>
-      <p class="profile-handle">@johndoe</p>
+      <h2 class="profile-name">{{ currentUserProfile?.name || 'Anonymous' }}</h2>
+      <p class="profile-handle">@{{ currentUserProfile?.username || 'user' }}</p>
     </div>
     <nav class="profile-nav">
       <button mat-raised-button class="make-post" (click)="openAddPostDialog()">Add a Post</button>
-
     </nav>
   </aside>
 

@@ -57,4 +57,5 @@ public class AuthController {
         boolean exists = userService.checkUserId(userId);
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, exists, null);
     }
+
 }
