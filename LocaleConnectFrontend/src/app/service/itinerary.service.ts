@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Itinerary, Tag } from '../model/itinerary';
 import { ApiResponse } from '../model/apiResponse';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -13,18 +14,25 @@ export class ItineraryService {
 
   private apiUrl = 'http://localhost:8080/api/itinerary';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
   // changeItinerary(itinerary: any) {
   //   if (itinerary) {
   //     this.itinerarySource.next(itinerary);
   //   }
   // }
   getItineraries(): Observable<ApiResponse> {
-    return this.http.get<ApiResponse>(`${this.apiUrl}/all`);
+    const httpHeaders = this.authService.getHttpHeaders();
+    return this.http.get<ApiResponse>(`${this.apiUrl}/all`, {
+      headers: httpHeaders,
+    });
   }
 
   addItinerary(itinerary: Itinerary): Observable<ApiResponse> {
-    return this.http.post<ApiResponse>(`${this.apiUrl}/create`, itinerary);
+    const httpHeaders = this.authService.getHttpHeaders();
+
+    return this.http.post<ApiResponse>(`${this.apiUrl}/create`, itinerary, {
+      headers: httpHeaders,
+    });
   }
 
   filterItineraries(

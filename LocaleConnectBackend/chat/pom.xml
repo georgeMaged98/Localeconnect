@@ -52,7 +52,7 @@
                         <image>openjdk:17-jdk-slim</image>
                     </from>
                     <to>
-                        <image>registry.hub.docker.com/localeconnect/chat-service</image>
+                        <image>registry.hub.docker.com/georgemaged/chat-service</image>
                         <tags>latest</tags>
                     </to>
                 </configuration>

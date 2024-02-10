@@ -168,10 +168,13 @@ public class MeetupService {
         return meetupDTO;
     }
 
-    private Boolean checkUserId(Long userId) {
-        Boolean check = this.webClient.get()
+    private boolean checkUserId(Long userId) {
+        System.out.println(userId);
+        CheckUserExistsResponseDTO res = this.webClient.get()
                 .uri("http://user-service:8084/api/user/auth/exists/{userId}", userId)
-                .retrieve().bodyToMono(Boolean.class).block();
+                .retrieve().bodyToMono(CheckUserExistsResponseDTO.class).block();
+
+        Boolean check = res.getResponseObject();
         return check != null && check;
     }
 

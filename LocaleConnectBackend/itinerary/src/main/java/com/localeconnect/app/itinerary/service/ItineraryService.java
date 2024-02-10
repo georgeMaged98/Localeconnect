@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,7 @@ public class ItineraryService {
 
     public ItineraryDTO createItinerary(ItineraryDTO itineraryDTO, Long userId) {
         Itinerary itinerary = mapper.toEntity(itineraryDTO);
+
         if (itinerary == null) {
             throw new ItineraryNotFoundException("Itinerary data is invalid");
         }
@@ -45,19 +47,22 @@ public class ItineraryService {
         if (this.itineraryRepository.existsByUserIdAndName(userId, itineraryDTO.getName())) {
             throw new ItineraryAlreadyExistsException("This user already created this itinerary.");
         }
+
         List<String> images = itineraryDTO.getImageUrls();
 
         if (!images.isEmpty()) {
             // Save image in GCP
             GCPResponseDTO gcpResponse = saveImageToGCP(itineraryDTO.getImageUrls().get(0));
             String imageUrl = gcpResponse.getData();
-
             itinerary.setImageUrls(List.of(imageUrl));
-        }else{
+
+        } else {
             itinerary.setImageUrls(new ArrayList<>());
         }
+
         itinerary.setUserId(userId);
         itineraryRepository.save(itinerary);
+
         return mapper.toDomain(itinerary);
     }
 
@@ -210,10 +215,13 @@ public class ItineraryService {
     }
 
 
-    private Boolean checkUserId(Long userId) {
-        Boolean check = this.webClient.get()
+    private boolean checkUserId(Long userId) {
+        System.out.println(userId);
+        CheckUserExistsResponseDTO res = this.webClient.get()
                 .uri("http://user-service:8084/api/user/auth/exists/{userId}", userId)
-                .retrieve().bodyToMono(Boolean.class).block();
+                .retrieve().bodyToMono(CheckUserExistsResponseDTO.class).block();
+
+        Boolean check = res.getResponseObject();
         return check != null && check;
     }
 

@@ -50,16 +50,11 @@ export class MeetupDialogComponent {
         ...formData,
         creatorId: 1,
         meetupAttendees: [],
-        rating: 0,
-        ratingSubmitted: false,
-        totalRatings: 0,
-        averageRating: 0,
-        expand: false,
       };
-      console.log(newMeetup);
 
       this.meetupService.createMeetup(newMeetup).subscribe({
         next: (res: ApiResponse) => {
+          console.log(res);
           this.dialogRef.close(res.data);
         },
         error: (error: any) => console.error(error),
