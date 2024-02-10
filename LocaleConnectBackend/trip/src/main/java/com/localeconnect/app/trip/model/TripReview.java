@@ -25,5 +25,4 @@ public class TripReview {
 
     private LocalDateTime timestamp;
 
-    private Double rating;
 }

@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -72,4 +73,20 @@ public class MeetupController {
         MeetupDTO deletedMeetupDTO = meetupService.deleteMeetupById(id);
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, deletedMeetupDTO, null);
     }
+    @PostMapping("/{meetupId}/rate/{travelerId}")
+    public ResponseEntity<Object> rateMeetup(@PathVariable("meetupId") Long meetupId,
+                                           @PathVariable("travelerId") Long travelerId,
+                                           @RequestParam("rating") Double rating) {
+        MeetupDTO ratedMeetup = meetupService.rateMeetup(meetupId, travelerId, rating);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, ratedMeetup, null);
+    }
+
+
+//TODO finish share Meetup
+//    @PostMapping("/share/{tripId}")
+//    public Mono<ResponseEntity<MeetupDTO>> shareItinerary(@PathVariable("meetupId") Long meetupId,
+//                                                          @RequestParam("authorId") @Valid Long authorId) {
+//        return meetupService.shareMeetup(meetupId, authorId);
+//    }
+
 }

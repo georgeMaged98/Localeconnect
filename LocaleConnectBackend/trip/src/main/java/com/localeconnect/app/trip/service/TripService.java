@@ -202,5 +202,19 @@ public class TripService {
                 .retrieve().bodyToMono(Boolean.class).block();
         return check != null && check;
     }
+    public TripDTO rateTrip(Long tripId, Long travelerId, Double rating) {
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new ResourceNotFoundException("Trip with id " + tripId + " does not exist"));
+
+        if (!checkUserId(travelerId))
+            throw new ResourceNotFoundException("Traveler with id " + travelerId + " does not exist");
+
+        trip.addRating(rating);
+        trip.calcAverageRating();
+
+        tripRepository.save(trip);
+        return tripMapper.toDomain(trip);
+    }
+
 
 }

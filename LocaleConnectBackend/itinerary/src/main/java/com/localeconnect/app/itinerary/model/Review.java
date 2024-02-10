@@ -27,6 +27,5 @@ public class Review {
 
     private LocalDateTime timestamp;
 
-    private Double rating;
 
 }

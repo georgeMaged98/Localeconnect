@@ -93,9 +93,17 @@ public class TripController {
         return ResponseHandler.generateResponse("success!", HttpStatus.OK, reviews, null);
     }
     @PostMapping("/share/{tripId}")
-    public Mono<ResponseEntity<TripShareDTO>> shareItinerary(@PathVariable("tripId") Long tripId) {
+    public Mono<ResponseEntity<TripShareDTO>> shareTrip(@PathVariable("tripId") Long tripId) {
         return tripService.shareTrip(tripId)
-                .map(sharedItinerary -> ResponseEntity.ok().body(sharedItinerary))
+                .map(sharedTrip -> ResponseEntity.ok().body(sharedTrip))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
+    @PostMapping("/{tripId}/rate/{travelerId}")
+    public ResponseEntity<Object> rateTrip(@PathVariable("tripId") Long tripId,
+                                           @PathVariable("travelerId") Long travelerId,
+                                           @RequestParam("rating") Double rating) {
+        TripDTO ratedTrip = tripService.rateTrip(tripId, travelerId, rating);
+        return ResponseHandler.generateResponse("Successfully rated the trip!", HttpStatus.OK, ratedTrip, null);
+    }
+
 }

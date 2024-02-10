@@ -15,6 +15,7 @@ import com.localeconnect.app.meetup.repository.MeetupRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -172,11 +173,43 @@ public class MeetupService {
         return meetupDTO;
     }
 
+    public MeetupDTO rateMeetup(Long meetupId, Long travelerId, Double rating) {
+        Meetup meetup = meetupRepository.findById(meetupId)
+                .orElseThrow(() -> new ResourceNotFoundException("Meetup with id " + meetupId + " does not exist"));
+
+        if (!checkUserId(travelerId))
+            throw new ResourceNotFoundException("Traveler with id " + travelerId + " does not exist");
+
+        meetup.addRating(rating);
+        meetup.calcAverageRating();
+
+        meetupRepository.save(meetup);
+        return meetupMapper.toDomain(meetup);
+    }
+//    public String shareMeetup(Long meetupId, Long authorId) {
+//        Meetup meetup = meetupRepository.findById(meetupId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Meetup not found with id: " + meetupId));
+//
+//        if (!checkUserId(authorId))
+//            throw new ResourceNotFoundException("User with id " + authorId + " does not exist!");
+//
+//        MeetupDTO shareDTO = meetupMapper.toDomain(meetup);
+//
+//        return postToFeed(shareDTO, authorId);
+//    }
+
     private Boolean checkUserId(Long userId) {
         Boolean check = this.webClient.get()
                 .uri("http://user-service:8084/api/user/auth/exists/{userId}", userId)
                 .retrieve().bodyToMono(Boolean.class).block();
         return check != null && check;
+    }
+    private Mono<MeetupDTO> postToFeed(MeetupDTO meetupShareDTO) {
+        return webClient.post()
+                .uri("http://feed-service:8081/api/feed/share-meetup")
+                .bodyValue(meetupShareDTO)
+                .retrieve()
+                .bodyToMono(MeetupDTO.class);
     }
 
 }

@@ -21,8 +21,5 @@ public class ReviewDTO {
     private String text;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime timestamp;
-    @Min(value = 0)
-    @Max(value = 5)
-    private Double rating;
 }
 

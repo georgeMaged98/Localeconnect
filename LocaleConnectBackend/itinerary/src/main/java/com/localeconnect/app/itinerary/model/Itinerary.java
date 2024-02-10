@@ -39,6 +39,22 @@ public class Itinerary {
 
     @ElementCollection
     private List<String> imageUrls = new ArrayList<>();
+
+    @Column
+    private double ratingsTotal;
+
+    @Column
+    private int ratingsCount;
+
+    @Column
+    private double averageRating;
+    public void addRating(double rating) {
+        this.ratingsTotal += rating;
+        this.ratingsCount++;
+    }
+    public void calcAverageRating() {
+        this.averageRating = (this.ratingsCount > 0) ? this.ratingsTotal / this.ratingsCount : 0;
+    }
 }
 
 

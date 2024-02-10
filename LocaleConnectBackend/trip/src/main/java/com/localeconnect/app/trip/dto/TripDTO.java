@@ -54,4 +54,14 @@ public class TripDTO {
     @ElementCollection
     private List<String> imageUrls = new ArrayList<>();
 
+    private double ratingsTotal;
+    private int ratingsCount;
+    @Min(value = 0)
+    @Max(value = 5)
+    private double averageRating;
+
+    public void calcAverageRating() {
+        this.averageRating = (this.ratingsCount > 0) ? this.ratingsTotal / this.ratingsCount : 0;
+    }
+
 }
