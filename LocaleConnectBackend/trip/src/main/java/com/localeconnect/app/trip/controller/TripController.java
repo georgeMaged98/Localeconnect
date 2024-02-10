@@ -98,12 +98,25 @@ public class TripController {
                 .map(sharedTrip -> ResponseEntity.ok().body(sharedTrip))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
-    @PostMapping("/{tripId}/rate/{travelerId}")
+    @PostMapping("/{tripId}/rate/{userId}")
     public ResponseEntity<Object> rateTrip(@PathVariable("tripId") Long tripId,
-                                           @PathVariable("travelerId") Long travelerId,
+                                           @PathVariable("userId") Long userId,
                                            @RequestParam("rating") Double rating) {
-        TripDTO ratedTrip = tripService.rateTrip(tripId, travelerId, rating);
+        TripDTO ratedTrip = tripService.rateTrip(tripId, userId, rating);
         return ResponseHandler.generateResponse("Successfully rated the trip!", HttpStatus.OK, ratedTrip, null);
+    }
+    @GetMapping("/{tripId}/rating")
+    public ResponseEntity<Object> getAverageRatingOfTrip(@PathVariable("tripId") Long tripId) {
+        double averageRating = tripService.getAverageRatingOfTrip(tripId);
+
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, averageRating, null);
+    }
+
+    @GetMapping("/{tripId}/rating-count")
+    public ResponseEntity<Object> getRatingCountOfTrip(@PathVariable("tripId") Long tripId) {
+        int ratingCount = tripService.getRatingCountOfTrip(tripId);
+
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, ratingCount, null);
     }
 
 }

@@ -73,12 +73,26 @@ public class MeetupController {
         MeetupDTO deletedMeetupDTO = meetupService.deleteMeetupById(id);
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, deletedMeetupDTO, null);
     }
-    @PostMapping("/{meetupId}/rate/{travelerId}")
+    @PostMapping("/{meetupId}/rate/{userId}")
     public ResponseEntity<Object> rateMeetup(@PathVariable("meetupId") Long meetupId,
-                                           @PathVariable("travelerId") Long travelerId,
+                                           @PathVariable("userId") Long userId,
                                            @RequestParam("rating") Double rating) {
-        MeetupDTO ratedMeetup = meetupService.rateMeetup(meetupId, travelerId, rating);
+        MeetupDTO ratedMeetup = meetupService.rateMeetup(meetupId, userId, rating);
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, ratedMeetup, null);
+    }
+
+    @GetMapping("/{meetupId}/rating")
+    public ResponseEntity<Object> getAverageRatingOfMeetup(@PathVariable("meetupId") Long meetupId) {
+        double averageRating = meetupService.getAverageRatingOfMeetup(meetupId);
+
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, averageRating, null);
+    }
+
+    @GetMapping("/{meetupId}/rating-count")
+    public ResponseEntity<Object> getRatingCountOfItinerary(@PathVariable("meetupId") Long meetupId) {
+        int ratingCount = meetupService.getRatingCountOfMeetup(meetupId);
+
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, ratingCount, null);
     }
 
 

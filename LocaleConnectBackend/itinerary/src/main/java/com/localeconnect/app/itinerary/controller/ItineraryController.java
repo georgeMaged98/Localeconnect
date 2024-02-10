@@ -101,7 +101,28 @@ public class ItineraryController {
                                                  @RequestParam("authorId") @Valid Long authorId) {
         String res = itineraryService.shareItinerary(itineraryId, authorId);
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, res, null);
-
     }
+    @PostMapping("/{itineraryId}/rate/{userId}")
+    public ResponseEntity<Object> rateItinerary(@PathVariable("itineraryId") Long itineraryId,
+                                                 @PathVariable("userId") Long userId,
+                                                 @RequestParam("rating") Double rating) {
+        ItineraryDTO ratedItinerary = itineraryService.rateItinerary(itineraryId, userId, rating);
+
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, ratedItinerary, null);
+    }
+    @GetMapping("/{itineraryId}/rating")
+    public ResponseEntity<Object> getAverageRatingOfItinerary(@PathVariable("itineraryId") Long itineraryId) {
+        double averageRating = itineraryService.getAverageRatingOfItinerary(itineraryId);
+
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, averageRating, null);
+    }
+
+    @GetMapping("/{itineraryId}/rating-count")
+    public ResponseEntity<Object> getRatingCountOfItinerary(@PathVariable("itineraryId") Long itineraryId) {
+        int ratingCount = itineraryService.getRatingCountOfItinerary(itineraryId);
+
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, ratingCount, null);
+    }
+
 
 }

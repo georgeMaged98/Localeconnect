@@ -205,12 +205,12 @@ public class TripService {
         Boolean check = res.getResponseObject();
         return check != null && check;
     }
-    public TripDTO rateTrip(Long tripId, Long travelerId, Double rating) {
+    public TripDTO rateTrip(Long tripId, Long userId, Double rating) {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new ResourceNotFoundException("Trip with id " + tripId + " does not exist"));
 
-        if (!checkUserId(travelerId))
-            throw new ResourceNotFoundException("Traveler with id " + travelerId + " does not exist");
+        if (!checkUserId(userId))
+            throw new ResourceNotFoundException("User with id " + userId + " does not exist");
 
         trip.addRating(rating);
         trip.calcAverageRating();
@@ -218,6 +218,25 @@ public class TripService {
         tripRepository.save(trip);
         return tripMapper.toDomain(trip);
     }
+
+    public double getAverageRatingOfTrip(Long tripId) {
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new ResourceNotFoundException("Trip with id " + tripId + " does not exist"));
+
+        TripDTO ratedTripDTO = tripMapper.toDomain(trip);
+
+        return ratedTripDTO.getAverageRating();
+    }
+
+    public int getRatingCountOfTrip(Long tripId) {
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new ResourceNotFoundException("Trip with id " + tripId + " does not exist"));
+
+        TripDTO ratedTripDTO = tripMapper.toDomain(trip);
+
+        return ratedTripDTO.getRatingsCount();
+    }
+
 
 
 }

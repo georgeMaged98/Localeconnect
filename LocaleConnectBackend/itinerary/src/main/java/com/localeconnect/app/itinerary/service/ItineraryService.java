@@ -242,5 +242,35 @@ public class ItineraryService {
                 .block();
         return responseEntity.getBody();
     }
+    public ItineraryDTO rateItinerary(Long itineraryId, Long userId, Double rating) {
+        Itinerary itinerary = itineraryRepository.findById(itineraryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Itinerary with id " + itineraryId + " does not exist"));
+
+        if (!checkUserId(userId))
+            throw new ResourceNotFoundException("User with id " + userId + " does not exist");
+
+        itinerary.addRating(rating);
+        itinerary.calcAverageRating();
+
+        itineraryRepository.save(itinerary);
+        return mapper.toDomain(itinerary);
+    }
+    public double getAverageRatingOfItinerary(Long itineraryId) {
+        Itinerary itinerary = itineraryRepository.findById(itineraryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Itinerary with id " + itineraryId + " does not exist"));
+
+        ItineraryDTO ratedItineraryDTO = mapper.toDomain(itinerary);
+
+        return ratedItineraryDTO.getAverageRating();
+    }
+
+    public int getRatingCountOfItinerary(Long itineraryId) {
+        Itinerary itinerary = itineraryRepository.findById(itineraryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Itinerary with id " + itineraryId + " does not exist"));
+
+        ItineraryDTO ratedItineraryDTO = mapper.toDomain(itinerary);
+
+        return ratedItineraryDTO.getRatingsCount();
+    }
 }
 

@@ -177,12 +177,12 @@ public class MeetupService {
         Boolean check = res.getResponseObject();
         return check != null && check;
     }
-    public MeetupDTO rateMeetup(Long meetupId, Long travelerId, Double rating) {
+    public MeetupDTO rateMeetup(Long meetupId, Long userId, Double rating) {
         Meetup meetup = meetupRepository.findById(meetupId)
                 .orElseThrow(() -> new ResourceNotFoundException("Meetup with id " + meetupId + " does not exist"));
 
-        if (!checkUserId(travelerId))
-            throw new ResourceNotFoundException("Traveler with id " + travelerId + " does not exist");
+        if (!checkUserId(userId))
+            throw new ResourceNotFoundException("User with id " + userId + " does not exist");
 
         meetup.addRating(rating);
         meetup.calcAverageRating();
@@ -190,6 +190,26 @@ public class MeetupService {
         meetupRepository.save(meetup);
         return meetupMapper.toDomain(meetup);
     }
+
+    public double getAverageRatingOfMeetup(Long meetupId) {
+        Meetup meetup = meetupRepository.findById(meetupId)
+                .orElseThrow(() -> new ResourceNotFoundException("Meetup with id " + meetupId + " does not exist"));
+
+        MeetupDTO ratedMeetupDTO = meetupMapper.toDomain(meetup);
+
+        return ratedMeetupDTO.getAverageRating();
+    }
+
+    public int getRatingCountOfMeetup(Long meetupId) {
+        Meetup meetup = meetupRepository.findById(meetupId)
+                .orElseThrow(() -> new ResourceNotFoundException("Meetup with id " + meetupId + " does not exist"));
+
+        MeetupDTO ratedMeetupDTO = meetupMapper.toDomain(meetup);
+
+        return ratedMeetupDTO.getRatingsCount();
+    }
+
+
 //    private Mono<MeetupDTO> postToFeed(MeetupDTO meetupShareDTO) {
 //        return webClient.post()
 //                .uri("http://feed-service:8081/api/feed/share-meetup")
