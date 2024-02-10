@@ -113,7 +113,7 @@ export class ItineraryComponent implements OnInit, OnDestroy {
       });
   }
   checkUserItinerariesBeforeDeletion(itineraryId: number): void {
-    this.itineraryService.getUserItineraries(this.itineraryService.getCurrentUserId()).subscribe({
+    this.itineraryService.getUserItineraries(this.userService.getCurrentUserId()).subscribe({
       next: (itineraries) => {
         const userHasItineraries = itineraries.some(itinerary => itinerary.id === itineraryId);
         if (userHasItineraries) {

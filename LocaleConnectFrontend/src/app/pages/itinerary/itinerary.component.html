@@ -101,13 +101,14 @@
         </mat-card-content>
         <mat-card-actions>
           <div *ngIf="itinerary.id">
+            <button mat-button (click)="toggleDetails(itinerary)">
+              {{ itinerary.expand ? 'Hide Details' : 'View Details' }}
+            </button>
           <button mat-button (click)="checkUserItinerariesBeforeDeletion(itinerary.id)">
             Delete
           </button>
           </div>
-          <button mat-button (click)="toggleDetails(itinerary)">
-            {{ itinerary.expand ? 'Hide Details' : 'View Details' }}
-          </button>
+
         </mat-card-actions>
       </div>
     </div>

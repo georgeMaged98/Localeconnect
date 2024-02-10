@@ -4,12 +4,13 @@ import { Meetup } from '../model/meetup';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ApiResponse } from '../model/apiResponse';
 import { AuthService } from './auth.service';
+import {environment} from "../../environments/environment";
 
 @Injectable({
   providedIn: 'root',
 })
 export class MeetupService {
-  private apiUrl = 'http://localhost:8080/api/meetup';
+  private apiUrl = `${environment.API_URL}/api/meetup`;
 
   private meetupSource = new BehaviorSubject<Meetup | null>(null);
   currentMeetup = this.meetupSource.asObservable();
@@ -29,7 +30,13 @@ export class MeetupService {
       headers: httpHeaders,
     });
   }
+  getCreatorMeetups(id: number) {
+    const httpHeaders = this.authService.getHttpHeaders();
 
+    return this.http.get<ApiResponse>(`${this.apiUrl}/allByCreator/${id}`, {
+      headers: httpHeaders,
+    });
+  }
   getMeetupById(id: number) {
     const httpHeaders = this.authService.getHttpHeaders();
     return this.http.get<Meetup>(`${this.apiUrl}/${id}`, {

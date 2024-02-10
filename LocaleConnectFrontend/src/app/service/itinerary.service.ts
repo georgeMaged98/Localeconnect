@@ -30,9 +30,7 @@ export class ItineraryService {
       headers: httpHeaders,
     });
   }
-  getCurrentUserId(): number{
-   return this.authService.currentUserValue?.id ? this.authService.currentUserValue.id : 0;
-  }
+
 
   addItinerary(itinerary: Itinerary): Observable<ApiResponse> {
     const httpHeaders = this.authService.getHttpHeaders();

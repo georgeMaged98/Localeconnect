@@ -72,4 +72,9 @@ public class MeetupController {
         MeetupDTO deletedMeetupDTO = meetupService.deleteMeetupById(id);
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, deletedMeetupDTO, null);
     }
+    @GetMapping(path = "/allByCreator/{userId}")
+    public ResponseEntity<Object> getUserItineraries(@PathVariable("userId") Long userId) {
+        List<MeetupDTO> itineraries = meetupService.getAllMeetupsByCreator(userId);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, itineraries, null);
+    }
 }
