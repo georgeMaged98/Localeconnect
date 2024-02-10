@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 @RestController
 @AllArgsConstructor
 @Slf4j
@@ -29,10 +28,8 @@ public class UserController {
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, users, null);
     }
     @GetMapping("/{userId}")
-    public ResponseEntity<Object> getUserById(@PathVariable("userId") Long userId) {
-            UserDTO userFound = userService.getUserById(userId);
-
-            return ResponseHandler.generateResponse("Success!", HttpStatus.OK, userFound, null);
+    public UserDTO getUserById(@PathVariable("userId") Long userId) {
+            return userService.getUserById(userId);
     }
 
     @PutMapping("/update")
@@ -48,16 +45,16 @@ public class UserController {
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, null, null);
     }
 
-    @PostMapping("/{userId}/follow/{followerId}")
-    public ResponseEntity<Object> followUser(@PathVariable("userId") Long userId, @PathVariable("followerId") Long followerId) {
-        userService.followUser(userId, followerId);
+    @PostMapping("/{followerId}/follow/{userId}")
+    public ResponseEntity<Object> followUser(@PathVariable("followerId") Long followerId, @PathVariable("userId") Long userId) {
+        userService.followUser(followerId, userId);
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, null, null);
     }
 
-    @PostMapping("/{userId}/unfollow/{followeeId}")
-    public ResponseEntity<Object> unfollowUser(@PathVariable("userId") Long userId, @PathVariable("followeeId") Long followeeId) {
-        userService.unfollowUser(userId, followeeId);
+    @PostMapping("/{followerId}/unfollow/{userId}")
+    public ResponseEntity<Object> unfollowUser(@PathVariable("followerId") Long followerId, @PathVariable("userId") Long userId) {
+        userService.unfollowUser(followerId, userId);
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, null, null);
     }
@@ -65,14 +62,14 @@ public class UserController {
     @PostMapping("/{guideId}/rate/{travelerId}")
     public ResponseEntity<Object> rateLocalGuide(@PathVariable("guideId") Long guideId,
                                                  @PathVariable("travelerId") Long travelerId,
-                                                 @RequestBody Double rating) {
+                                                 @RequestParam("rating") Double rating) {
         LocalguideDTO ratedLocalGuide = userService.rateLocalGuide(guideId, travelerId, rating);
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, ratedLocalGuide, null);
     }
     @GetMapping("/guides")
     public ResponseEntity<Object> getAllGuides() {
-        List<UserDTO> guides = userService.getAllGuides();
+        List<LocalguideDTO> guides = userService.getAllGuides();
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, guides, null);
     }
@@ -92,17 +89,17 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/followers")
-    public ResponseEntity<Object> getFollowers(@PathVariable("userId") Long userId) {
+    public List<UserDTO> getFollowers(@PathVariable("userId") Long userId) {
         List<UserDTO> followers = userService.getFollowers(userId);
 
-        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, followers, null);
+        return followers;
     }
 
     @GetMapping("/{userId}/following")
-    public ResponseEntity<Object> getFollowing(@PathVariable("userId") Long userId) {
+    public List<UserDTO> getFollowing(@PathVariable("userId") Long userId) {
         List<UserDTO> following = userService.getFollowing(userId);
 
-        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, following, null);
+        return following;
     }
     @GetMapping("/{userId}/profile")
     public ResponseEntity<Object> getProfile(@PathVariable("userId") Long userId) {

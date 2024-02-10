@@ -51,8 +51,8 @@ public class ItineraryController {
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, itineraries, null);
     }
 
-    @GetMapping(path = "/allByUser/{user}")
-    public ResponseEntity<Object> getUserItineraries(@PathVariable("user") Long userId) {
+    @GetMapping(path = "/allByUser/{userId}")
+    public ResponseEntity<Object> getUserItineraries(@PathVariable("userId") Long userId) {
         List<ItineraryDTO> itineraries = itineraryService.getAllItinerariesByUser(userId);
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, itineraries, null);
     }
@@ -95,10 +95,9 @@ public class ItineraryController {
     }
 
     @PostMapping("/share/{itineraryId}")
-    public Mono<ResponseEntity<ItineraryShareDTO>> shareItinerary(@PathVariable("itineraryId") Long itineraryId) {
-            return itineraryService.shareItinerary(itineraryId)
-                    .map(sharedItinerary -> ResponseEntity.ok().body(sharedItinerary))
-                    .defaultIfEmpty(ResponseEntity.notFound().build());
+    public String shareItinerary(@PathVariable("itineraryId") Long itineraryId,
+                                 @RequestParam("authorId") @Valid Long authorId) {
+            return itineraryService.shareItinerary(itineraryId, authorId);
     }
 
 }

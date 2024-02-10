@@ -4,6 +4,7 @@ package com.localeconnect.app.user.service;
 import com.localeconnect.app.user.auth.AuthenticationResponse;
 import com.localeconnect.app.user.dto.LocalguideDTO;
 import com.localeconnect.app.user.dto.TravelerDTO;
+import com.localeconnect.app.user.exception.ValidationException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -52,7 +53,7 @@ public class AuthenticationService {
             log.info("************Validated TOKEN**************");
             return token;
         } else {
-            throw new RuntimeException("Authentication failed");
+            throw new ValidationException("Authentication failed");
         }
     }
 
