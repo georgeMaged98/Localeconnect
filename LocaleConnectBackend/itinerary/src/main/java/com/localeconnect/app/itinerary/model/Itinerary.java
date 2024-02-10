@@ -49,6 +49,9 @@ public class Itinerary {
 
     @Column
     private double averageRating;
+
+    @ElementCollection
+    private List<Long> itineraryAttendees = new ArrayList<>();
     public void addRating(double rating) {
         this.ratingsTotal += rating;
         this.ratingsCount++;

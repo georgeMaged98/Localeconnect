@@ -59,6 +59,7 @@ public class TripDTO {
     @Min(value = 0)
     @Max(value = 5)
     private double averageRating;
+    private List<Long> tripAttendees = new ArrayList<>();
 
     public void calcAverageRating() {
         this.averageRating = (this.ratingsCount > 0) ? this.ratingsTotal / this.ratingsCount : 0;

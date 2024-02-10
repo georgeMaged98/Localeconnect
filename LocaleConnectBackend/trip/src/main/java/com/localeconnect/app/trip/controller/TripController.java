@@ -1,5 +1,6 @@
 package com.localeconnect.app.trip.controller;
 
+import com.localeconnect.app.trip.dto.TripAttendDTO;
 import com.localeconnect.app.trip.dto.TripDTO;
 import com.localeconnect.app.trip.dto.TripReviewDTO;
 import com.localeconnect.app.trip.response_handler.ResponseHandler;
@@ -116,5 +117,19 @@ public class TripController {
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, ratingCount, null);
     }
+    @PostMapping("/{id}/attend")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Object> attendTrip(@PathVariable("id") Long tripId, @RequestBody @Valid TripAttendDTO tripAttendDTO) {
+        tripService.attendTrip(tripId, tripAttendDTO);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, "Traveller added to trip attendees successfully!", null);
+    }
+
+    @PostMapping("/{id}/unattend")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Object> unattendTrip(@PathVariable("id") Long tripId, @RequestBody @Valid TripAttendDTO tripAttendDTO) {
+        tripService.unattendTrip(tripId, tripAttendDTO);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, "Traveller removed from trip attendees successfully!", null);
+    }
+
 
 }

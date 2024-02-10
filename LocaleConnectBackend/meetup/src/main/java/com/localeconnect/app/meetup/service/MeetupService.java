@@ -5,6 +5,7 @@ import com.localeconnect.app.meetup.dto.*;
 //import com.localeconnect.app.meetup.dto.MeetupEditDTO;
 import com.localeconnect.app.meetup.exceptions.LogicException;
 import com.localeconnect.app.meetup.exceptions.ResourceNotFoundException;
+import com.localeconnect.app.meetup.exceptions.ValidationException;
 import com.localeconnect.app.meetup.mapper.MeetupMapper;
 import com.localeconnect.app.meetup.model.Meetup;
 import com.localeconnect.app.meetup.rabbit.RabbitMQMessageProducer;
@@ -15,6 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -98,7 +100,6 @@ public class MeetupService {
 
         Long travellerId = meetupAttendDTO.getTravellerId();
 
-        // check traverllerId is valid
         if (!checkUserId(travellerId))
             throw new ResourceNotFoundException("No User Found with id: " + travellerId + "!");
 
@@ -118,7 +119,7 @@ public class MeetupService {
             throw new ResourceNotFoundException("No Meetup Found with id: " + meetupId + "!");
 
         Long travellerId = meetupAttendDTO.getTravellerId();
-        // check traverllerId is valid
+
         if (!checkUserId(travellerId))
             throw new ResourceNotFoundException("No User Found with id: " + travellerId + "!");
 
@@ -143,6 +144,13 @@ public class MeetupService {
             throw new ResourceNotFoundException("No Meetup Found with id: " + id + "!");
 
         return meetupMapper.toDomain(optional.get());
+    }
+
+    public List<MeetupDTO> getMeetupsByUserId(Long userId) {
+        if (!this.checkUserId(userId))
+            throw new ValidationException("Register to create a Meetup");
+        Optional<List<Meetup>> meetups = meetupRepository.findByCreatorId(userId);
+        return meetups.map(tripList -> tripList.stream().map(meetupMapper::toDomain).collect(Collectors.toList())).orElseGet(ArrayList::new);
     }
 
     public MeetupDTO deleteMeetupById(Long id) {
@@ -210,6 +218,12 @@ public class MeetupService {
         MeetupDTO shareDTO = meetupMapper.toDomain(meetup);
 
         return postToFeed(shareDTO, authorId);
+    }
+    public List<MeetupDTO> searchByName(String name) {
+
+        List<Meetup> meetups = meetupRepository.findAllByNameIgnoreCaseLike(name)
+                .orElseThrow(() -> new ResourceNotFoundException("Meetup not found with name: " + name));
+        return meetups.stream().map(meetupMapper::toDomain).collect(Collectors.toList());
     }
 
     private String postToFeed(MeetupDTO meetupShareDTO, Long authorId) {

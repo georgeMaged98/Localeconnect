@@ -3,6 +3,7 @@ package com.localeconnect.app.itinerary.dto;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 @Getter
 @Setter
@@ -28,6 +29,7 @@ public class ItineraryDTO {
     @Min(value = 0)
     @Max(value = 5)
     private double averageRating;
+    private List<Long> itineraryAttendees = new ArrayList<>();
 
     public void calcAverageRating() {
         this.averageRating = (this.ratingsCount > 0) ? this.ratingsTotal / this.ratingsCount : 0;
