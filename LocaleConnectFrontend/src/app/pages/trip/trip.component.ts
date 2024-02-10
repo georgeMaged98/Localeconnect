@@ -77,6 +77,35 @@ export class TripComponent implements OnInit, OnDestroy {
     this.displayedTrips = this.trips.slice(startIndex, endIndex);
   }
 
+  checkGuideTripsAndDelete(id: number): void {
+    this.tripService.getLocalguideTrips(this.userService.getCurrentUserId()).subscribe({
+      next: (trips) => {
+        const userHasTrips = trips.some(trip => trip.id === id);
+        if (userHasTrips) {
+          this.deleteTrip(id);
+        } else {
+          this.notificationService.showSuccess('No permission to delete this Trip or it doesn\'t belong to the user.');
+        }
+      },
+      error: (error) => console.error('Error fetching user trips', error),
+    });
+  }
+  deleteTrip(id: number): void {
+    const confirmDelete = confirm('Are you sure you want to delete this trip?');
+    if (confirmDelete) {
+      this.tripService.deleteTrip(id).subscribe({
+        next: () => {
+          this.notificationService.showSuccess('Trip deleted successfully!');
+          this.trips = this.trips.filter(trip => trip.id !== id);
+          this.updateDisplayedTrips();
+        },
+        error: (error) => {
+          console.error('Error deleting itinerary', error);
+          this.notificationService.showError('Failed to delete itinerary.');
+        }
+      });
+    }
+  }
   performSearch(searchTerm: string | null = ''): void {
     if (searchTerm) {
       this.tripService.searchTrip(searchTerm).subscribe(data => {

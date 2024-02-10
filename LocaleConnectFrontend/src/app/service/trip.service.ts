@@ -51,5 +51,8 @@ export class TripService {
   searchTrip(tripName: string): Observable<Trip[]> {
     return this.http.get<Trip[]>(`${this.apiUrl}/search?name=${tripName}`);
   }
+  getLocalguideTrips(localguideId: number): Observable<Trip[]> {
 
+    return this.http.get<Trip[]>(`${this.apiUrl}/allByLocalguide/${localguideId}`);
+  }
 }

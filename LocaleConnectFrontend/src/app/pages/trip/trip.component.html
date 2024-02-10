@@ -82,6 +82,9 @@
             <button mat-button (click)="toggleDetails(trip)">{{ trip.expand ? 'Hide Details' : 'View Details' }}
             </button>
             <button mat-button (click)="toggleJoin(trip)">{{ trip.isAttending ? 'Leave' : 'Join' }}</button>
+            <button mat-button (click)="checkGuideTripsAndDelete(trip.id)">
+              Delete
+            </button>
           </mat-card-actions>
         </div>
       </div>
