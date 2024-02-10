@@ -6,6 +6,7 @@ import {TripPreview} from "../model/trip";
 import {User} from "../model/user";
 import {environment} from "../../environments/environment";
 import {Profile} from "../model/feed";
+import {AuthService} from "./auth.service";
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,7 @@ export class UserService {
   private apiUrl = `${environment.API_URL}/api/user/secured`;
 
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private authService: AuthService) {
   }
 
   getUsername(userId: number): Observable<string> {
@@ -36,6 +37,10 @@ export class UserService {
 
   getUserById(userId: number): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/${userId}`);
+  }
+
+  getCurrentUserId(): number {
+    return this.authService.currentUserValue?.id ? this.authService.currentUserValue.id : 0;
   }
 
   updateUser(user: User): Observable<User> {

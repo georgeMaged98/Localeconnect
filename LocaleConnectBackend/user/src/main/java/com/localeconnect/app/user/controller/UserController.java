@@ -2,9 +2,10 @@ package com.localeconnect.app.user.controller;
 
 import com.localeconnect.app.user.dto.LocalguideDTO;
 import com.localeconnect.app.user.dto.UserDTO;
-import com.localeconnect.app.user.model.User;
 import com.localeconnect.app.user.response_handler.ResponseHandler;
+import com.localeconnect.app.user.service.JwtUtil;
 import com.localeconnect.app.user.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,12 +14,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @RestController
 @AllArgsConstructor
 @Slf4j
 @RequestMapping("/api/user/secured")
 public class UserController {
     private final UserService userService;
+    private final JwtUtil jwtUtil;
 
     @GetMapping("/all")
     public ResponseEntity<Object> getAllUsers() {
@@ -71,6 +74,7 @@ public class UserController {
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, ratedLocalGuide, null);
     }
+
     @GetMapping("/guides")
     public ResponseEntity<Object> getAllGuides() {
         List<LocalguideDTO> guides = userService.getAllGuides();
@@ -125,4 +129,26 @@ public class UserController {
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, ratingCount, null);
     }
+
+    @GetMapping("/api/user/profile")
+    public ResponseEntity<?> getUserProfile(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader("Authorization");
+        String token = null;
+        String email = null;
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            token = authorizationHeader.substring(7);
+            email = jwtUtil.extractEmail(token);
+        }
+
+        if (email != null) {
+            UserDTO user = userService.getUserByEmail(email);
+            return ResponseEntity.ok(user);
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+    }
+
 }
+
+
