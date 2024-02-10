@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {
   HttpClient,
   HttpErrorResponse,
@@ -12,11 +12,11 @@ import {
   tap,
   throwError,
 } from 'rxjs';
-import { User } from '../model/user';
-import { Traveler } from '../model/traveler';
-import { Guide } from '../model/guide';
-import { environment } from '../../environments/environment';
-import { Response } from '../model/response';
+import {User} from '../model/user';
+import {Traveler} from '../model/traveler';
+import {Guide} from '../model/guide';
+import {environment} from '../../environments/environment';
+import {Response} from '../model/response';
 
 @Injectable({
   providedIn: 'root',
@@ -39,7 +39,7 @@ export class AuthService {
 
   login(email: string, password: string): Observable<void> {
     return this.http
-      .post<Response>(`${this.apiUrl}/login`, { email, password })
+      .post<Response>(`${this.apiUrl}/login`, {email, password})
       .pipe(
         tap((response) => {
           console.log(response.responseObject);
@@ -51,9 +51,10 @@ export class AuthService {
   }
 
   fetchCurrentUserProfile(): Observable<User> {
-    console.log(localStorage.getItem('token'));
+    const httpHeaders = this.getHttpHeaders();
+    console.log(localStorage.getItem('token'))
     return this.http
-      .get<User>(`${environment.API_URL}/api/user/secured/profile`)
+      .get<User>(`${environment.API_URL}/api/user/secured/profile`, {headers: httpHeaders})
       .pipe(
         map((response) => {
           console.log(response);
@@ -80,18 +81,19 @@ export class AuthService {
   }
 
   registerTraveler(traveler: Traveler): Observable<Traveler> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const headers = new HttpHeaders({'Content-Type': 'application/json'});
     return this.http
-      .post<Traveler>(`${this.apiUrl}/register-traveler`, traveler, { headers })
+      .post<Traveler>(`${this.apiUrl}/register-traveler`, traveler, {headers})
       .pipe(catchError(this.handleError<Traveler>('register traveler')));
   }
 
   registerGuide(guide: Guide): Observable<Guide> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const headers = new HttpHeaders({'Content-Type': 'application/json'});
     return this.http
-      .post<Guide>(`${this.apiUrl}/register-localguide`, guide, { headers })
+      .post<Guide>(`${this.apiUrl}/register-localguide`, guide, {headers})
       .pipe(catchError(this.handleError<Guide>('register guide')));
   }
+
   isAuthenticated(): boolean {
     const token = localStorage.getItem('token');
     return !!token;
@@ -141,17 +143,20 @@ export class AuthService {
     };
   }
 
+  // public getTokenFromLocalStorage(): string | null {
+  //   const storedUser = localStorage.getItem('currentUser');
+  //   if (!storedUser) return null;
+  //   const token = JSON.parse(storedUser).responseObject;
+  //   return token;
+  // }
   public getTokenFromLocalStorage(): string | null {
-    const storedUser = localStorage.getItem('currentUser');
-    if (!storedUser) return null;
-    const token = JSON.parse(storedUser).responseObject;
-    return token;
+    return localStorage.getItem('token');
   }
 
   public getHttpHeaders(): HttpHeaders {
     const token = this.getTokenFromLocalStorage();
     const httpOptions = new HttpHeaders({
-      Authorization: `Bearer ${token}`,
+      'Authorization': `Bearer ${token}`
     });
     return httpOptions;
   }

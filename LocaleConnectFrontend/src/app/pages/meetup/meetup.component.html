@@ -65,8 +65,8 @@
           <button mat-button (click)="changeMeetupAttendance(meetup.id)">
             {{ meetup.isAttending ? "UnAttend" : "Attend" }}
           </button>
-          <button mat-button (click)="toggleAttend(meetup)">
-            {{ meetup.isAttending ? "Unfollow" : "Follow" }}
+          <button mat-button (click)="checkUserMeetupsBeforeDeletion(meetup.id)">
+            Delete
           </button>
 
         </mat-card-actions>

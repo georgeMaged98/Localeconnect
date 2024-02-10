@@ -30,10 +30,10 @@ export class FeedComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.authService.isAuthenticated()) {
-     this.fetchCurrentUserProfile();
+      this.fetchCurrentUserProfile();
     }
     this.fetchPosts();
-    this.fetchFollowers();
+   // this.fetchFollowers();
     this.subscription = this.feedService.currentPost.subscribe(post => {
       if (post) {
         //TODO: replace mock with backend
@@ -60,29 +60,30 @@ export class FeedComponent implements OnInit {
     );
   }
 
-  fetchFollowers(): void {
-    //TODO: replace with api call
-    this.feedService.getFollowersMock().subscribe({
-        next: (data: Profile[]) => {
-          this.followers = data;
-        },
-        error: (err) => {
-          console.error(err);
-        }
-      }
-    );
-  }
+  // fetchFollowers(): void {
+  //   //TODO: replace with api call
+  //   if (this.currentUserProfile && this.currentUserProfile.id)
+  //     this.userService.getAllFollowingAsProfiles(this.currentUserProfile.id).subscribe({
+  //       next: (users: Profile[]) => {
+  //         this.followers = users;
+  //       },
+  //       error: (err) => console.error(err)
+  //     });
+  //
+  // }
 
   fetchCurrentUserProfile(): void {
 
     this.authService.fetchCurrentUserProfile().subscribe({
       next: (currentUser: User) => {
         this.currentUserProfile = {
+          id: currentUser.id,
           name: `${currentUser.firstName} ${currentUser.lastName}`,
           username: currentUser.userName,
           bio: currentUser.bio,
           imageUrl: currentUser.imageUrl,
-        };      },
+        };
+      },
       error: (error) => {
         console.error('Error fetching user profile:', error);
       }

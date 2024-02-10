@@ -100,9 +100,15 @@
           </div>
         </mat-card-content>
         <mat-card-actions>
-          <button mat-button (click)="toggleDetails(itinerary)">
-            {{ itinerary.expand ? 'Hide Details' : 'View Details' }}
+          <div *ngIf="itinerary.id">
+            <button mat-button (click)="toggleDetails(itinerary)">
+              {{ itinerary.expand ? 'Hide Details' : 'View Details' }}
+            </button>
+          <button mat-button (click)="checkUserItinerariesBeforeDeletion(itinerary.id)">
+            Delete
           </button>
+          </div>
+
         </mat-card-actions>
       </div>
     </div>

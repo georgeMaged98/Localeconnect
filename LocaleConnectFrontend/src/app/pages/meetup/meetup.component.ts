@@ -106,6 +106,22 @@ export class MeetupComponent implements OnInit, OnDestroy {
       ? this.meetupService.searchMeetups(searchTerm, this.searchMeetups)
       : [...this.searchMeetups];
   }
+  deleteMeetup(id: number): void {
+    const confirmDelete = confirm('Are you sure you want to delete this Meetup?');
+    if (confirmDelete) {
+      this.meetupService.deleteMeetup(id).subscribe({
+        next: () => {
+          this.notificationService.showSuccess('Meetup deleted successfully!');
+          this.meetups = this.meetups.filter(itinerary => itinerary.id !== id);
+          this.updateDisplayedMeetups();
+        },
+        error: (error) => {
+          console.error('Error deleting itinerary', error);
+          this.notificationService.showError('Failed to delete itinerary.');
+        }
+      });
+    }
+  }
 
   attendMeetup(meetupId: number): void {
     const travellerId = this.getTravellerId();
@@ -122,7 +138,20 @@ export class MeetupComponent implements OnInit, OnDestroy {
       error: (errorMessage: ApiResponse) => console.error(errorMessage.errors),
     });
   }
-
+  checkUserMeetupsBeforeDeletion(id: number): void {
+    this.meetupService.getCreatorMeetups(this.userService.getCurrentUserId()).subscribe({
+      next: (res) => {
+        const meetups: Meetup[] = res.data as Meetup[];
+        const userHasMeetups = meetups.some(itinerary => itinerary.id === id);
+        if (userHasMeetups) {
+          this.deleteMeetup(id);
+        } else {
+          this.notificationService.showSuccess('No permission to delete this itinerary or it doesn\'t belong to the user.');
+        }
+      },
+      error: (error) => console.error('Error fetching user itineraries', error),
+    });
+  }
   changeMeetupAttendance(meetupId: number): void {
     const currentMeetup = this.meetups.find((meetup) => meetup.id === meetupId);
     console.log(currentMeetup);

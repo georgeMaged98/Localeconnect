@@ -43,7 +43,12 @@ public class MeetupService {
         // return saved meetup
         return meetupMapper.toDomain(createdMeetup);
     }
+    public List<MeetupDTO> getAllMeetupsByCreator(Long userId) {
+        if(!checkUserId(userId))
+            throw new ResourceNotFoundException("User with id " + userId + " does not exist!");
 
+        return meetupRepository.findByCreatorId(userId).stream().map(meetupMapper::toDomain).toList();
+    }
     public MeetupDTO updateMeetup(MeetupEditDTO meetupEditDTO, Long meetupId) {
 
         Optional<Meetup> optional = meetupRepository.findById(meetupId);

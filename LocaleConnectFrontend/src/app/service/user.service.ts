@@ -1,10 +1,12 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {Observable} from "rxjs";
+import {map, Observable} from "rxjs";
 import {GuideProfile} from "../model/guide";
 import {TripPreview} from "../model/trip";
 import {User} from "../model/user";
 import {environment} from "../../environments/environment";
+import {Profile} from "../model/feed";
+import {AuthService} from "./auth.service";
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +15,7 @@ export class UserService {
   private apiUrl = `${environment.API_URL}/api/user/secured`;
 
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private authService: AuthService) {
   }
 
   getUsername(userId: number): Observable<string> {
@@ -29,7 +31,6 @@ export class UserService {
     );
   }
 
-
   getAllUsers(): Observable<User[]> {
     return this.http.get<User[]>(`${this.apiUrl}/all`);
   }
@@ -37,8 +38,73 @@ export class UserService {
   getUserById(userId: number): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/${userId}`);
   }
-  getUserProfile(userId: number): Observable<User> {
+
+  getCurrentUserId(): number {
+    return this.authService.currentUserValue?.id ? this.authService.currentUserValue.id : 0;
+  }
+
+  updateUser(user: User): Observable<User> {
+    return this.http.put<User>(`${this.apiUrl}/update`, user);
+  }
+
+  deleteUser(userId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/delete/${userId}`);
+  }
+
+  followUser(userId: number, followerId: number): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/${userId}/follow/${followerId}`, {});
+  }
+
+  unfollowUser(userId: number, followeeId: number): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/${userId}/unfollow/${followeeId}`, {});
+  }
+
+  rateLocalGuide(guideId: number, travelerId: number, rating: number): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/${guideId}/rate/${travelerId}`, {rating});
+  }
+
+  getAllGuides(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/guides`);
+  }
+
+  filterLocalGuideByCity(keyword: string): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/filter-guides-city?keyword=${keyword}`);
+  }
+
+  searchTravelers(keyword: string): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/search-traveler?keyword=${keyword}`);
+  }
+
+  getFollowers(userId: number): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/${userId}/followers`);
+  }
+
+  getFollowing(userId: number): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/${userId}/following`);
+  }
+
+  getProfile(userId: number): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/${userId}/profile`);
+  }
+
+  getAllFollowingAsProfiles(userId: number): Observable<Profile[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/${userId}/following`).pipe(
+      map(users => users.map(user => ({
+        userId: user.id,
+        name: `${user.firstName} ${user.lastName}`,
+        username: user.userName,
+        isFollowing: false,
+        profileImage: user.imageUrl || 'https://www.profilebakery.com/wp-content/uploads/2023/04/AI-Profile-Picture.jpg',
+      })))
+    );
+  }
+
+  getAverageRatingOfLocalGuide(userId: number): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/${userId}/rating`);
+  }
+
+  getRatingCountOfLocalGuide(userId: number): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/${userId}/rating-count`);
   }
 
   getGuidesMock(): GuideProfile[] {

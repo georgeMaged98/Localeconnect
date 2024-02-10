@@ -7,7 +7,6 @@ import {MeetupComponent} from "./pages/meetup/meetup.component";
 import {GuideComponent} from "./pages/guide/guide.component";
 import {TripComponent} from "./pages/trip/trip.component";
 import {authGuard} from "./service/auth-guard";
-//TODO: uncomment guard
 const routes: Routes = [
   {
     path: '',
@@ -15,8 +14,7 @@ const routes: Routes = [
   }, {
     path: 'pages/itineraries',
     component: ItineraryComponent,
-
-    canActivate: [authGuard]
+   canActivate: [authGuard]
   },
   {
     path: 'pages/home',
@@ -26,7 +24,7 @@ const routes: Routes = [
   {
     path: 'pages/meetups',
     component: MeetupComponent,
-    canActivate: [authGuard]
+   canActivate: [authGuard]
   },
 
   {
