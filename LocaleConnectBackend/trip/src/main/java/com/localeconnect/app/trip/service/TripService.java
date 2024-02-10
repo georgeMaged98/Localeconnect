@@ -13,8 +13,10 @@ import com.localeconnect.app.trip.repository.TripReviewRepository;
 import com.localeconnect.app.trip.repository.TripSpecification;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 
@@ -34,16 +36,33 @@ public class TripService {
     private final TripReviewRepository tripReviewRepository;
 
     public TripDTO createTrip(TripDTO tripDTO) {
-        //check if creator (localguide) exists
+        Trip trip = tripMapper.toEntity(tripDTO);
+
+        if (trip == null) {
+            throw new ResourceNotFoundException("Trip data is invalid");
+        }
+
         if (!this.checkUserId(tripDTO.getLocalguideId()))
             throw new ValidationException("Register as a Localguide to create a Trip");
 
-        //check if this Trip already exists
         if (tripRepository.findByLocalguideIdAndName(tripDTO.getLocalguideId(), tripDTO.getName()).isPresent())
-            throw new LogicException("A Trip with this name already exists");
+            throw new LogicException("This user already created this trip.");
 
-        tripRepository.save(tripMapper.toEntity(tripDTO));
-        return tripDTO;
+        List<String> images = tripDTO.getImageUrls();
+
+        if (!images.isEmpty()) {
+
+            GCPResponseDTO gcpResponse = saveImageToGCP(tripDTO.getImageUrls().get(0));
+            String imageUrl = gcpResponse.getData();
+            trip.setImageUrls(List.of(imageUrl));
+
+        } else {
+            trip.setImageUrls(new ArrayList<>());
+        }
+
+        tripRepository.save(trip);
+
+        return tripMapper.toDomain(trip);
     }
 
     public List<TripDTO> getAllTrips() {
@@ -171,29 +190,43 @@ public class TripService {
                 .collect(Collectors.toList());
     }
 
-    // TODO: add shareTrip method in feed
-    public Mono<TripShareDTO> shareTrip(Long tripId) {
-        return Mono.just(tripRepository.findById(tripId))
-                .map(trip -> {
-                    TripShareDTO shareDTO
-                            = new TripShareDTO();
-                    if (trip.isPresent()) {
-                        shareDTO.setId(trip.get().getId());
-                        shareDTO.setName(trip.get().getName());
-                        shareDTO.setDescription(trip.get().getDescription());
-                    }
-                    return shareDTO;
-                })
-                .flatMap(this::postToFeed)
-                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Trip not found with id: " + tripId)));
+    public String shareTrip(Long tripId, Long authorId) {
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new ResourceNotFoundException("Trip not found with id: " + tripId));
+
+        if (!checkUserId(authorId))
+            throw new ResourceNotFoundException("User with id " + authorId + " does not exist!");
+
+        TripDTO shareDTO = tripMapper.toDomain(trip);
+
+        return postToFeed(shareDTO, authorId);
     }
 
-    private Mono<TripShareDTO> postToFeed(TripShareDTO tripShareDTO) {
-        return webClient.post()
-                .uri("http://feed-service:8081/api/feed/share-trip")
+
+    private String postToFeed(TripDTO tripShareDTO, Long authorId) {
+        String url = UriComponentsBuilder
+                .fromUriString("http://feed-service:8081/api/feed/share-trip")
+                .queryParam("authorId", authorId)
+                .toUriString();
+
+        ShareTripResponseDTO res = webClient.post()
+                .uri(url)
                 .bodyValue(tripShareDTO)
                 .retrieve()
-                .bodyToMono(TripShareDTO.class);
+                .bodyToMono(ShareTripResponseDTO.class)
+                .block();
+
+        return res.getResponseObject();
+    }
+    private GCPResponseDTO saveImageToGCP(String image) {
+        ResponseEntity<GCPResponseDTO> responseEntity = webClient.post()
+                .uri("http://gcp-service:5005/api/gcp/?filename=trip")
+                .bodyValue(image)
+                .retrieve()
+                .toEntity(GCPResponseDTO.class)
+                .block();
+
+        return responseEntity.getBody();
     }
 
     private boolean checkUserId(Long userId) {
@@ -236,7 +269,5 @@ public class TripService {
 
         return ratedTripDTO.getRatingsCount();
     }
-
-
 
 }

@@ -54,7 +54,7 @@ public class ItineraryService {
         List<String> images = itineraryDTO.getImageUrls();
 
         if (!images.isEmpty()) {
-            // Save image in GCP
+
             GCPResponseDTO gcpResponse = saveImageToGCP(itineraryDTO.getImageUrls().get(0));
             String imageUrl = gcpResponse.getData();
             itinerary.setImageUrls(List.of(imageUrl));
@@ -197,7 +197,6 @@ public class ItineraryService {
                 .collect(Collectors.toList());
     }
 
-    // TODO: add a shareItinerary method in the feed
     public String shareItinerary(Long itineraryId, Long authorId) {
         Itinerary itinerary = itineraryRepository.findById(itineraryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Itinerary not found with id: " + itineraryId));
@@ -225,12 +224,14 @@ public class ItineraryService {
                 .queryParam("authorId", authorId)
                 .toUriString();
 
-        return webClient.post()
+        ShareItineraryResponseDTO res = webClient.post()
                 .uri(url)
                 .bodyValue(itineraryShareDTO)
                 .retrieve()
-                .bodyToMono(String.class)
+                .bodyToMono(ShareItineraryResponseDTO.class)
                 .block();
+
+        return res.getResponseObject();
     }
 
     private GCPResponseDTO saveImageToGCP(String image) {

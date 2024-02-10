@@ -12,6 +12,7 @@ import com.localeconnect.app.meetup.repository.MeetupRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -168,15 +169,6 @@ public class MeetupService {
         return meetupDTO;
     }
 
-    private boolean checkUserId(Long userId) {
-        System.out.println(userId);
-        CheckUserExistsResponseDTO res = this.webClient.get()
-                .uri("http://user-service:8084/api/user/auth/exists/{userId}", userId)
-                .retrieve().bodyToMono(CheckUserExistsResponseDTO.class).block();
-
-        Boolean check = res.getResponseObject();
-        return check != null && check;
-    }
     public MeetupDTO rateMeetup(Long meetupId, Long userId, Double rating) {
         Meetup meetup = meetupRepository.findById(meetupId)
                 .orElseThrow(() -> new ResourceNotFoundException("Meetup with id " + meetupId + " does not exist"));
@@ -208,14 +200,43 @@ public class MeetupService {
 
         return ratedMeetupDTO.getRatingsCount();
     }
+    public String shareMeetup(Long meetupId, Long authorId) {
+        Meetup meetup = meetupRepository.findById(meetupId)
+                .orElseThrow(() -> new ResourceNotFoundException("Meetup not found with id: " + meetupId));
 
+        if (!checkUserId(authorId))
+            throw new ResourceNotFoundException("User with id " + authorId + " does not exist!");
 
-//    private Mono<MeetupDTO> postToFeed(MeetupDTO meetupShareDTO) {
-//        return webClient.post()
-//                .uri("http://feed-service:8081/api/feed/share-meetup")
-//                .bodyValue(meetupShareDTO)
-//                .retrieve()
-//                .bodyToMono(MeetupDTO.class);
-//    }
+        MeetupDTO shareDTO = meetupMapper.toDomain(meetup);
+
+        return postToFeed(shareDTO, authorId);
+    }
+
+    private String postToFeed(MeetupDTO meetupShareDTO, Long authorId) {
+        String url = UriComponentsBuilder
+                .fromUriString("http://feed-service:8081/api/feed/share-meetup")
+                .queryParam("authorId", authorId)
+                .toUriString();
+
+        ShareMeetupResponseDTO res = webClient.post()
+                .uri(url)
+                .bodyValue(meetupShareDTO)
+                .retrieve()
+                .bodyToMono(ShareMeetupResponseDTO.class)
+                .block();
+
+        return res.getResponseObject();
+    }
+
+    private boolean checkUserId(Long userId) {
+        System.out.println(userId);
+        CheckUserExistsResponseDTO res = this.webClient.get()
+                .uri("http://user-service:8084/api/user/auth/exists/{userId}", userId)
+                .retrieve().bodyToMono(CheckUserExistsResponseDTO.class).block();
+
+        Boolean check = res.getResponseObject();
+        return check != null && check;
+    }
+
 
 }

@@ -1,7 +1,6 @@
 package com.localeconnect.app.itinerary.controller;
 
 import com.localeconnect.app.itinerary.dto.ItineraryDTO;
-import com.localeconnect.app.itinerary.dto.ItineraryShareDTO;
 import com.localeconnect.app.itinerary.dto.ReviewDTO;
 import com.localeconnect.app.itinerary.dto.Tag;
 import com.localeconnect.app.itinerary.response_handler.ResponseHandler;

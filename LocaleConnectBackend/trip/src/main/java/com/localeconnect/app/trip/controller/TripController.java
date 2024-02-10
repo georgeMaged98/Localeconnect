@@ -2,17 +2,14 @@ package com.localeconnect.app.trip.controller;
 
 import com.localeconnect.app.trip.dto.TripDTO;
 import com.localeconnect.app.trip.dto.TripReviewDTO;
-import com.localeconnect.app.trip.dto.TripShareDTO;
 import com.localeconnect.app.trip.response_handler.ResponseHandler;
 import com.localeconnect.app.trip.service.TripService;
-import feign.Response;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
 import java.util.List;
 
 @RestController
@@ -93,11 +90,12 @@ public class TripController {
         return ResponseHandler.generateResponse("success!", HttpStatus.OK, reviews, null);
     }
     @PostMapping("/share/{tripId}")
-    public Mono<ResponseEntity<TripShareDTO>> shareTrip(@PathVariable("tripId") Long tripId) {
-        return tripService.shareTrip(tripId)
-                .map(sharedTrip -> ResponseEntity.ok().body(sharedTrip))
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+    public ResponseEntity<Object> shareTrip(@PathVariable("tripId") Long tripId,
+                                            @RequestParam("authorId") @Valid Long authorId) {
+        String res = tripService.shareTrip(tripId, authorId);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, res, null);
     }
+
     @PostMapping("/{tripId}/rate/{userId}")
     public ResponseEntity<Object> rateTrip(@PathVariable("tripId") Long tripId,
                                            @PathVariable("userId") Long userId,

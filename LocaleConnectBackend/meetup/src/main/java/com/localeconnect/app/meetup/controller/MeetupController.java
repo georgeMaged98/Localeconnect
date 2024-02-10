@@ -73,6 +73,13 @@ public class MeetupController {
         MeetupDTO deletedMeetupDTO = meetupService.deleteMeetupById(id);
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, deletedMeetupDTO, null);
     }
+    @PostMapping("/share/{meetupId}")
+    public ResponseEntity<Object> shareMeetup(@PathVariable("meetupId") Long meetupId,
+                                              @RequestParam("authorId") @Valid Long authorId) {
+        String res = meetupService.shareMeetup(meetupId, authorId);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, res, null);
+    }
+
     @PostMapping("/{meetupId}/rate/{userId}")
     public ResponseEntity<Object> rateMeetup(@PathVariable("meetupId") Long meetupId,
                                            @PathVariable("userId") Long userId,
@@ -95,12 +102,5 @@ public class MeetupController {
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, ratingCount, null);
     }
 
-
-//TODO finish share Meetup
-//    @PostMapping("/share/{tripId}")
-//    public Mono<ResponseEntity<MeetupDTO>> shareItinerary(@PathVariable("meetupId") Long meetupId,
-//                                                          @RequestParam("authorId") @Valid Long authorId) {
-//        return meetupService.shareMeetup(meetupId, authorId);
-//    }
 
 }
