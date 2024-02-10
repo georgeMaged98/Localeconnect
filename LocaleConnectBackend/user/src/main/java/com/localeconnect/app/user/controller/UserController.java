@@ -31,10 +31,8 @@ public class UserController {
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, users, null);
     }
     @GetMapping("/{userId}")
-    public ResponseEntity<Object> getUserById(@PathVariable("userId") Long userId) {
-            UserDTO userFound = userService.getUserById(userId);
-
-            return ResponseHandler.generateResponse("Success!", HttpStatus.OK, userFound, null);
+    public UserDTO getUserById(@PathVariable("userId") Long userId) {
+            return userService.getUserById(userId);
     }
 
     @PutMapping("/update")
@@ -50,16 +48,16 @@ public class UserController {
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, null, null);
     }
 
-    @PostMapping("/{userId}/follow/{followerId}")
-    public ResponseEntity<Object> followUser(@PathVariable("userId") Long userId, @PathVariable("followerId") Long followerId) {
-        userService.followUser(userId, followerId);
+    @PostMapping("/{followerId}/follow/{userId}")
+    public ResponseEntity<Object> followUser(@PathVariable("followerId") Long followerId, @PathVariable("userId") Long userId) {
+        userService.followUser(followerId, userId);
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, null, null);
     }
 
-    @PostMapping("/{userId}/unfollow/{followeeId}")
-    public ResponseEntity<Object> unfollowUser(@PathVariable("userId") Long userId, @PathVariable("followeeId") Long followeeId) {
-        userService.unfollowUser(userId, followeeId);
+    @PostMapping("/{followerId}/unfollow/{userId}")
+    public ResponseEntity<Object> unfollowUser(@PathVariable("followerId") Long followerId, @PathVariable("userId") Long userId) {
+        userService.unfollowUser(followerId, userId);
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, null, null);
     }

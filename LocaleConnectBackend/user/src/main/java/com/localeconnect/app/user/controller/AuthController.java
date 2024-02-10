@@ -54,8 +54,7 @@ public class AuthController {
     }
 
     @GetMapping("/exists/{userId}")
-    public ResponseEntity<Object> checkUserExists(@PathVariable("userId") Long userId) {
-        boolean exists = userService.checkUserId(userId);
-        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, exists, null);
+    public Boolean checkUserExists(@PathVariable("userId") Long userId) {
+        return userService.checkUserId(userId);
     }
 }

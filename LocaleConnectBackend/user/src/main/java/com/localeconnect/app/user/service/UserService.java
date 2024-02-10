@@ -98,38 +98,40 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UserDoesNotExistException("User not found"));
         userRepository.delete(user);
     }
-    public void followUser(Long userId, Long followerId) {
+    public void followUser(Long followerId, Long userId) {
         User userToFollow = userRepository.findById(userId)
                 .orElseThrow(() -> new UserDoesNotExistException("User not found"));
         User follower = userRepository.findById(followerId)
                 .orElseThrow(() -> new UserDoesNotExistException("Follower not found"));
-        if(userId.equals(followerId)) {
-            throw new IllegalArgumentException("User cannot unfollow themselves");
+        if (userId.equals(followerId)) {
+            throw new IllegalArgumentException("User cannot follow themselves");
         }
         if (!userToFollow.getFollowers().contains(follower)) {
             userToFollow.getFollowers().add(follower);
+            follower.getFollowing().add(userToFollow);
             userRepository.save(userToFollow);
+            userRepository.save(follower);
             // ToDo Notify the user about the new follower
         } else {
             throw new ValidationException("Already following this user");
         }
     }
-    public void unfollowUser(Long userId, Long followeeId) {
-        if(userId.equals(followeeId)) {
+    public void unfollowUser(Long followerId, Long userId) {
+        if (userId.equals(followerId)) {
             throw new IllegalArgumentException("User cannot unfollow themselves");
         }
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserDoesNotExistException("User not found"));
-        User followee = userRepository.findById(followeeId)
-                .orElseThrow(() -> new UserDoesNotExistException("Followee not found"));
+        User follower = userRepository.findById(followerId)
+                .orElseThrow(() -> new UserDoesNotExistException("Follower not found"));
 
-        if(user.getFollowing().contains(followee)) {
-            user.getFollowing().remove(followee);
-            followee.getFollowers().remove(user);
+        if (user.getFollowers().contains(follower)) {
+            user.getFollowing().remove(follower);
+            follower.getFollowing().remove(user);
 
             userRepository.save(user);
-            userRepository.save(followee);
+            userRepository.save(follower);
         } else {
             throw new ValidationException("User is not following the specified followee");
         }
@@ -152,7 +154,7 @@ public class UserService implements UserDetailsService {
                 .map(user -> (Localguide) user)
                 .orElseThrow(() -> new UserDoesNotExistException("LocalGuide with id " + guideId + " does not exist"));
 
-        if(!checkUserId(travelerId))
+        if (!checkUserId(travelerId))
             throw new UserDoesNotExistException("Traveler with id " + travelerId + " does not exist");
 
         localguide.addRating(rating);
@@ -211,7 +213,7 @@ public class UserService implements UserDetailsService {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new UserDoesNotExistException("User with the given id does not exist"));
 
-            if(user instanceof Localguide) {
+            if (user instanceof Localguide) {
                 LocalguideDTO localguideDTO = LocalguideDTO.builder()
                         .firstName(user.getFirstName())
                         .lastName(user.getLastName())
