@@ -30,7 +30,7 @@ export class FeedComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.authService.isAuthenticated()) {
-     this.fetchCurrentUserProfile();
+      this.fetchCurrentUserProfile();
     }
     this.fetchPosts();
     this.fetchFollowers();
@@ -62,15 +62,14 @@ export class FeedComponent implements OnInit {
 
   fetchFollowers(): void {
     //TODO: replace with api call
-    this.feedService.getFollowersMock().subscribe({
-        next: (data: Profile[]) => {
-          this.followers = data;
+    if (this.currentUserProfile && this.currentUserProfile.id)
+      this.userService.getAllFollowingAsProfiles(this.currentUserProfile.id).subscribe({
+        next: (users: Profile[]) => {
+          this.followers = users;
         },
-        error: (err) => {
-          console.error(err);
-        }
-      }
-    );
+        error: (err) => console.error(err)
+      });
+
   }
 
   fetchCurrentUserProfile(): void {
@@ -78,11 +77,13 @@ export class FeedComponent implements OnInit {
     this.authService.fetchCurrentUserProfile().subscribe({
       next: (currentUser: User) => {
         this.currentUserProfile = {
+          id: currentUser.id,
           name: `${currentUser.firstName} ${currentUser.lastName}`,
           username: currentUser.userName,
           bio: currentUser.bio,
           imageUrl: currentUser.imageUrl,
-        };      },
+        };
+      },
       error: (error) => {
         console.error('Error fetching user profile:', error);
       }

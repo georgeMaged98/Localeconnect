@@ -18,7 +18,7 @@ export interface Comment {
   text: string;
 }
 export interface Profile {
-  userId: number,
+  userId?: number,
   name: string,
   username: string,
   isFollowing: boolean,
