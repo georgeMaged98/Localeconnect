@@ -1,7 +1,5 @@
 package com.localeconnect.app.itinerary.dto;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -11,6 +9,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 public class ItineraryDTO {
     private Long id;
     private Long userId;
@@ -19,8 +18,7 @@ public class ItineraryDTO {
     private String description;
     @Positive(message = "Number of days must be greater than or equal to 1")
     private Integer numberOfDays;
-    @Enumerated(EnumType.STRING)
-    private List<Tag> tags;
+    private List<String> tags;
     @NotEmpty(message = "Provide at least one destination")
     private List<String> placesToVisit;
     private List<String> dailyActivities;

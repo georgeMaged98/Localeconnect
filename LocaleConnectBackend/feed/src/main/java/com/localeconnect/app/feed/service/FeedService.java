@@ -48,12 +48,11 @@ public class FeedService {
     private final ReactiveRedisTemplate<String, String> reactiveRedisTemplate;
 
     public PostDTO createPost(RegularPostDTO regularPost){
-        log.info("************entred CREATE FEED SERVICE **************");
         Post post = postMapper.toEntity(regularPost);
         long authorId = post.getAuthorID();
         if (!checkUserId(authorId))
             throw new ResourceNotFoundException("No User Found with id: " + authorId + "!");
-        log.info("************BACK FROM USER SERVICE **************");
+
         Post createdPost = postRepository.save(post);
 
         return postMapper.toDomain(createdPost);
@@ -135,6 +134,7 @@ public class FeedService {
         Post createdPost = postRepository.save(post);
         return postMapper.toDomain(createdPost);
     }
+
     public PostDTO shareMeetup(MeetupDTO meetup, Long authorId) {
         if(!checkUserId(authorId))
             throw new ResourceNotFoundException("User with id " + authorId + " does not exist!");
@@ -185,6 +185,8 @@ public class FeedService {
         postRepository.save(postToFind);
         return postMapper.toDomain(postToFind);
     }
+
+
     public PostDTO unlikePost(Long postId, LikeDTO likeDTO) {
         Post postToFind = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("No Post Found with id: " + postId + "!"));
@@ -292,10 +294,13 @@ public class FeedService {
                 ", Cost: " + String.format("%.2f", dto.getCost());
     }
 
-    private Boolean checkUserId(Long userId) {
-        Boolean check = this.webClient.get()
+    private boolean checkUserId(Long userId) {
+        System.out.println(userId);
+        CheckUserExistsResponseDTO res = this.webClient.get()
                 .uri("http://user-service:8084/api/user/auth/exists/{userId}", userId)
-                .retrieve().bodyToMono(Boolean.class).block();
+                .retrieve().bodyToMono(CheckUserExistsResponseDTO.class).block();
+
+        Boolean check = res.getResponseObject();
         return check != null && check;
     }
 

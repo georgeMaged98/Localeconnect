@@ -26,9 +26,7 @@ public class FeedController {
 
     @PostMapping("/create")
     public ResponseEntity<Object> createRegularPost(@RequestBody @Valid RegularPostDTO regularPost) {
-        log.info("************entred CREATE POST FEED CONTROLLER**************");
         PostDTO newPostDTO = feedService.createPost(regularPost);
-
         return ResponseHandler.generateResponse("Success!", HttpStatus.CREATED, newPostDTO, null);
     }
 
@@ -53,28 +51,27 @@ public class FeedController {
     }
 
     @PostMapping("/share-trip")
-    public String shareTrip(@RequestBody @Valid TripDTO tripToShare,
+    public ResponseEntity<Object> shareTrip(@RequestBody @Valid TripDTO tripToShare,
                             @RequestParam(value = "authorId") @Valid Long authorId) {
         feedService.shareTrip(tripToShare, authorId);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, "Successfully shared to feed!", null);
 
-        return "Successfully shared to feed!";
     }
 
     @PostMapping("/share-itinerary")
-    public String shareItinerary(@RequestBody @Valid ItineraryDTO itineraryToShare,
+    public ResponseEntity<Object> shareItinerary(@RequestBody @Valid ItineraryDTO itineraryToShare,
                                  @RequestParam(value = "authorId") @Valid Long authorId) {
         log.info("************entred SHARE ITI FEEDCONTROLLER **************");
         feedService.shareItinerary(itineraryToShare, authorId);
         log.info("************saved ITI POST IN REPO**************");
-        return "Successfully shared to feed!";
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, "Successfully shared to feed!", null);
     }
 
     @PostMapping("/share-meetup")
-    public String shareMeetup(@RequestBody @Valid MeetupDTO meetupToShare,
+    public ResponseEntity<Object> shareMeetup(@RequestBody @Valid MeetupDTO meetupToShare,
                               @RequestParam(value = "authorId") @Valid Long authorId) {
         feedService.shareMeetup(meetupToShare, authorId);
-
-        return "Successfully shared to feed!";
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, "Successfully shared to feed!", null);
     }
 
     @GetMapping(path = "/{postId}")
@@ -83,6 +80,7 @@ public class FeedController {
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, foundPost, null);
     }
+
     @GetMapping("/{postId}/like-list")
     public ResponseEntity<Object> getPostLikes(@PathVariable("postId") Long postId) {
         List<String> usersLiked = feedService.getPostLikes(postId);
@@ -105,6 +103,7 @@ public class FeedController {
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, postUnliked, null);
     }
+
     @GetMapping( "/author/{authorId}")
     public ResponseEntity<Object> getPostsByAuthorId(@PathVariable("authorId") Long authorId) {
         List<PostDTO> foundPost = feedService.getPostsByAuthorId(authorId);
@@ -126,11 +125,13 @@ public class FeedController {
         List<PostDTO> filteredPosts = feedService.filterPosts(postType);
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, filteredPosts, null);
     }
+
     @GetMapping("/home/{userId}")
     public ResponseEntity<Object> getUserFeed(@PathVariable("userId") Long userId) {
         List<PostDTO> feed =  feedService.generateUserFeed(userId);
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, feed, null);
     }
+
     @GetMapping("/{postId}/like-count")
     public ResponseEntity<Object> getPostLikeCount(@PathVariable("postId") Long postId) {
         int count = feedService.getPostLikes(postId).size();

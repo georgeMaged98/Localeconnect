@@ -1,9 +1,6 @@
 package com.localeconnect.app.trip.service;
 
-import com.localeconnect.app.trip.dto.NotificationDTO;
-import com.localeconnect.app.trip.dto.TripDTO;
-import com.localeconnect.app.trip.dto.TripReviewDTO;
-import com.localeconnect.app.trip.dto.TripShareDTO;
+import com.localeconnect.app.trip.dto.*;
 import com.localeconnect.app.trip.exceptions.ResourceNotFoundException;
 import com.localeconnect.app.trip.exceptions.ValidationException;
 import com.localeconnect.app.trip.exceptions.LogicException;
@@ -38,21 +35,21 @@ public class TripService {
 
     public TripDTO createTrip(TripDTO tripDTO) {
         //check if creator (localguide) exists
-        if(!this.checkUserId(tripDTO.getLocalguideId()))
+        if (!this.checkUserId(tripDTO.getLocalguideId()))
             throw new ValidationException("Register as a Localguide to create a Trip");
 
         //check if this Trip already exists
         if (tripRepository.findByLocalguideIdAndName(tripDTO.getLocalguideId(), tripDTO.getName()).isPresent())
-                throw new LogicException("A Trip with this name already exists");
+            throw new LogicException("A Trip with this name already exists");
 
         tripRepository.save(tripMapper.toEntity(tripDTO));
         return tripDTO;
     }
 
     public List<TripDTO> getAllTrips() {
-       return tripRepository.findAll().stream()
-               .map(tripMapper::toDomain)
-               .collect(Collectors.toList());
+        return tripRepository.findAll().stream()
+                .map(tripMapper::toDomain)
+                .collect(Collectors.toList());
     }
 
     public TripDTO getById(Long tripId) {
@@ -68,7 +65,7 @@ public class TripService {
         return trips.map(tripList -> tripList.stream().map(tripMapper::toDomain).collect(Collectors.toList())).orElseGet(ArrayList::new);
     }
 
-    public TripDTO updateTrip( Long tripId, TripDTO tripDTO) {
+    public TripDTO updateTrip(Long tripId, TripDTO tripDTO) {
         Trip tripToUpdate = tripRepository.findById(tripId)
                 .orElseThrow(() -> new ResourceNotFoundException("A trip with the id " + tripId + " does not exist!"));
 
@@ -79,7 +76,7 @@ public class TripService {
         for (Long traveler : travelers) {
             NotificationDTO newNotification = new NotificationDTO();
             newNotification.setTitle("New Notification");
-            newNotification.setMessage("Meetup " + tripId +" Got Updated!");
+            newNotification.setMessage("Meetup " + tripId + " Got Updated!");
             newNotification.setSentAt(LocalDateTime.now());
             newNotification.setReceiver(traveler);
             newNotification.setSender(tripToUpdate.getLocalguideId());
@@ -97,7 +94,7 @@ public class TripService {
         for (Long traveler : travelers) {
             NotificationDTO newNotification = new NotificationDTO();
             newNotification.setTitle("New Notification");
-            newNotification.setMessage("Meetup " + tripId +" Got Deleted!");
+            newNotification.setMessage("Meetup " + tripId + " Got Deleted!");
             newNotification.setSentAt(LocalDateTime.now());
             newNotification.setReceiver(traveler);
             newNotification.setSender(tripToDelete.getLocalguideId());
@@ -123,9 +120,9 @@ public class TripService {
     }
 
     public TripReviewDTO createReview(TripReviewDTO tripReviewDTO, Long userId, Long tripId) {
-        if(!this.checkUserId(userId))
+        if (!this.checkUserId(userId))
             throw new ValidationException("Register to create a Review");
-        if(tripId == null || !tripRepository.existsById(tripId))
+        if (tripId == null || !tripRepository.existsById(tripId))
             throw new ResourceNotFoundException("Trip with this ID does not exist");
         TripReview tripReview = tripReviewMapper.toEntity(tripReviewDTO);
         tripReview.setTripId(tripId);
@@ -173,6 +170,7 @@ public class TripService {
                         tripReviewMapper::toDomain)
                 .collect(Collectors.toList());
     }
+
     // TODO: add shareTrip method in feed
     public Mono<TripShareDTO> shareTrip(Long tripId) {
         return Mono.just(tripRepository.findById(tripId))
@@ -189,6 +187,7 @@ public class TripService {
                 .flatMap(this::postToFeed)
                 .switchIfEmpty(Mono.error(new ResourceNotFoundException("Trip not found with id: " + tripId)));
     }
+
     private Mono<TripShareDTO> postToFeed(TripShareDTO tripShareDTO) {
         return webClient.post()
                 .uri("http://feed-service:8081/api/feed/share-trip")
@@ -196,10 +195,14 @@ public class TripService {
                 .retrieve()
                 .bodyToMono(TripShareDTO.class);
     }
-    private Boolean checkUserId(Long userId) {
-        Boolean check = this.webClient.get()
-                .uri("http://user-service:8084/api/user/exists/{userId}", userId)
-                .retrieve().bodyToMono(Boolean.class).block();
+
+    private boolean checkUserId(Long userId) {
+        System.out.println(userId);
+        CheckUserExistsResponseDTO res = this.webClient.get()
+                .uri("http://user-service:8084/api/user/auth/exists/{userId}", userId)
+                .retrieve().bodyToMono(CheckUserExistsResponseDTO.class).block();
+
+        Boolean check = res.getResponseObject();
         return check != null && check;
     }
     public TripDTO rateTrip(Long tripId, Long travelerId, Double rating) {

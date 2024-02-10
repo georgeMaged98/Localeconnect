@@ -1,6 +1,7 @@
 package com.localeconnect.app.apigateway.config;
 
 //import com.localeconnect.app.apigateway.filter.AuthenticationFilter;
+
 import com.localeconnect.app.apigateway.filter.AuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.route.RouteLocator;
@@ -11,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class GatewayConfig {
     @Autowired
-   private AuthenticationFilter filter;
+    private AuthenticationFilter filter;
 
     @Bean
     public RouteLocator routes(RouteLocatorBuilder builder) {
@@ -38,7 +39,10 @@ public class GatewayConfig {
                         .uri("http://trip-service:8083"))
                 .route("notification-service", r -> r.path("/api/notification/**")
                         .filters(f -> f.filter(filter))
-                       .uri("http://notification-service:7002"))
+                        .uri("http://notification-service:7002"))
+                .route("gcp-service", r -> r.path("/api/gcp/**")
+                        .filters(f -> f.filter(filter))
+                        .uri("http://gcp-service:5005"))
                 .build();
     }
 }

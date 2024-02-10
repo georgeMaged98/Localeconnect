@@ -27,19 +27,23 @@ public class UserController {
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, users, null);
     }
+
     @GetMapping("/{userId}")
-    public UserDTO getUserById(@PathVariable("userId") Long userId) {
-            return userService.getUserById(userId);
+    public ResponseEntity<Object> getUserById(@PathVariable("userId") Long userId) {
+        UserDTO userDTO = userService.getUserById(userId);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, userDTO, null);
+
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateUser(@RequestBody @Valid UserDTO userDTO) {
+    public ResponseEntity<Object> updateUser(@RequestBody @Valid UserDTO userDTO) {
         UserDTO userFound = userService.updateUser(userDTO);
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, userFound, null);
     }
+
     @DeleteMapping("/delete/{userId}")
-    public ResponseEntity<?> deleteUser(@PathVariable("userId") Long userId) {
+    public ResponseEntity<Object> deleteUser(@PathVariable("userId") Long userId) {
         userService.deleteUser(userId);
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, null, null);
@@ -89,18 +93,18 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/followers")
-    public List<UserDTO> getFollowers(@PathVariable("userId") Long userId) {
+    public ResponseEntity<Object> getFollowers(@PathVariable("userId") Long userId) {
         List<UserDTO> followers = userService.getFollowers(userId);
 
-        return followers;
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, followers, null);
     }
 
     @GetMapping("/{userId}/following")
-    public List<UserDTO> getFollowing(@PathVariable("userId") Long userId) {
+    public ResponseEntity<Object> getFollowing(@PathVariable("userId") Long userId) {
         List<UserDTO> following = userService.getFollowing(userId);
-
-        return following;
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, following, null);
     }
+
     @GetMapping("/{userId}/profile")
     public ResponseEntity<Object> getProfile(@PathVariable("userId") Long userId) {
         UserDTO userFound = userService.getProfileDetails(userId);

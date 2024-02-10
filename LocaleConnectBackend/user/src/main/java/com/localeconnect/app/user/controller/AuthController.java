@@ -36,14 +36,14 @@ public class AuthController {
 
     @PostMapping("/register-localguide")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> registerLocalGuide(@RequestBody @Valid LocalguideDTO localguideDTO) {
+    public ResponseEntity<Object> registerLocalGuide(@RequestBody @Valid LocalguideDTO localguideDTO) {
         AuthenticationResponse response = authService.registerLocalguide(localguideDTO);
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, response, null);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid AuthenticationRequest request) {
+    public ResponseEntity<Object> login(@RequestBody @Valid AuthenticationRequest request) {
         log.info("************entred AUTH/LOGIN CONTROLLER**************");
         try {
             String token = authService.login(request);
@@ -54,8 +54,9 @@ public class AuthController {
     }
 
     @GetMapping("/exists/{userId}")
-    public Boolean checkUserExists(@PathVariable("userId") Long userId) {
-        return userService.checkUserId(userId);
+    public ResponseEntity<Object> checkUserExists(@PathVariable("userId") Long userId) {
+        boolean exists = userService.checkUserId(userId);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, exists, null);
     }
 
 }
