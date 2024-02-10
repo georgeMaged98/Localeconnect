@@ -20,17 +20,12 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
-  data:
-    redis:
-      port: 6379
-      host: localhost
-
-
-#  rabbitmq:
-#    host: rabbitmq
-#    port: 5672
-#    username: guest
-#    password: guest
+#  data:
+#    redis:
+#      host: redis-service
+#      port: 6379
+#      username: guest
+#      password: guest
 
 eureka:
   client:

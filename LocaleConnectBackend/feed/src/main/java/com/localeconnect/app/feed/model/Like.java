@@ -5,9 +5,10 @@ import jakarta.persistence.*;
 
 
 import lombok.*;
+import org.springframework.data.redis.core.RedisHash;
 
 @Entity
-@Table(name = "like")
+@Table(name = "like_tab")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,8 +30,8 @@ public class Like {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Comment )) return false;
-        return id != null && id.equals(((Comment) o).getId());
+        if (!(o instanceof Like )) return false;
+        return id != null && id.equals(((Like) o).getId());
     }
 
     @Override

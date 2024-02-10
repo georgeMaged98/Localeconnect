@@ -13,11 +13,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findByContentContainingIgnoreCase(String contentKeyword);
 
-    List<Post> findByAuthorIDAndPostTypeAndDateBetween(
-            Long authorID,
-            PostType postType,
-            LocalDateTime startDate,
-            LocalDateTime endDate);
+    List<Post> findByPostType(PostType postType);
 
 
 }

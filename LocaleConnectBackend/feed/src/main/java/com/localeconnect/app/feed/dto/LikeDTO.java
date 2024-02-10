@@ -19,7 +19,7 @@ public class LikeDTO {
     @NotNull(message = "This is a required field")
     private Long likerId;
 
-    @NotNull(message = "This is a required field")
+    @JsonIgnoreProperties("likes")
     private Post post;
 
 }

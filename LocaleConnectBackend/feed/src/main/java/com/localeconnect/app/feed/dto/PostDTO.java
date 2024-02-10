@@ -1,6 +1,8 @@
 package com.localeconnect.app.feed.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.localeconnect.app.feed.model.Comment;
 import com.localeconnect.app.feed.model.Like;
 import com.localeconnect.app.feed.type.PostType;
@@ -25,8 +27,8 @@ public class PostDTO implements Serializable{
     private Long authorID;
 
     @NotNull(message = "This is a required field")
-    @JsonFormat
-            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime date;
 
     @NotBlank(message = "This is a required field")
@@ -37,6 +39,7 @@ public class PostDTO implements Serializable{
     private List<Comment> comments = new ArrayList<>();
 
     @NotNull(message = "Post type cannot be null")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private PostType postType;
 
     private List<Like> likes = new ArrayList<>();

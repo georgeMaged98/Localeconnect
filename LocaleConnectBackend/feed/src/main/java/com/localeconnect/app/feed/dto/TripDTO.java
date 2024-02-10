@@ -1,6 +1,8 @@
 package com.localeconnect.app.feed.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import jakarta.persistence.ElementCollection;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -20,10 +22,11 @@ public class TripDTO {
 
     @NotBlank(message = "Trip name is required")
     private String name;
-
+    @NotBlank(message = "This is a required field")
     private String description;
 
     @FutureOrPresent(message = "Departure time cannot be in the past")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDate departureTime;
 
