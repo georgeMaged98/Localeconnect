@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {RegisterComponent} from "../register/register.component";
 import {MatDialog} from "@angular/material/dialog";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {AuthService} from "../../service/auth.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-login',
@@ -12,18 +13,21 @@ import {AuthService} from "../../service/auth.service";
 export class LoginComponent {
   loginForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private authService: AuthService,public dialog: MatDialog) {
+  constructor(private fb: FormBuilder, private authService: AuthService, public dialog: MatDialog, private router: Router) {
     this.loginForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(3)]],
+      email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 
   onSubmit(): void {
     if (this.loginForm.valid) {
-      this.authService.login( this.loginForm.value.username, this.loginForm.value.password).subscribe(
+      this.authService.login(this.loginForm.value.email, this.loginForm.value.password).subscribe(
         {
           next: (user) => {
+            this.router.navigate(['pages/home']).then(r => this.dialog.closeAll()
+            );
+
             return user;
           },
           error: (errorMessage) => {
@@ -35,15 +39,16 @@ export class LoginComponent {
 
     }
   }
+
   openRegisterDialog(): void {
-     this.dialog.open(RegisterComponent, {
-      width: '400px', height:'700px'
+    this.dialog.open(RegisterComponent, {
+      width: '400px', height: '700px'
     });
   }
 
   private handleError(errorMessage: string) {
-    if (errorMessage.includes('username not found')) {
-      this.loginForm.controls['username'].setErrors({userDoesntExist: true});
+    if (errorMessage.includes('email not found')) {
+      this.loginForm.controls['email'].setErrors({userDoesntExist: true});
     }
     if (errorMessage.includes('wrong password')) {
       this.loginForm.controls['password'].setErrors({wrongPassword: true});

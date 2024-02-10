@@ -16,7 +16,7 @@ export class UserService {
 
 //TODO: add api endpoint to get user by id
   getUsername(userId: number): Observable<string> {
-    return this.http.get<string>(`${this.apiUrl}/${userId}/username`);
+    return this.http.get<string>(`${this.apiUrl}/secured/${userId}`);
   }
 
   searchGuides(searchTerm: string, searchGuides: GuideProfile[]): GuideProfile[] {

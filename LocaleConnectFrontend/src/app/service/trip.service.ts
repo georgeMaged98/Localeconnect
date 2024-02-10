@@ -4,12 +4,13 @@ import { HttpClient } from '@angular/common/http';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {Trip} from "../model/trip";
 import {Itinerary} from "../model/itinerary";
+import {environment} from "../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
 })
 export class TripService {
-  private apiUrl = 'http://localhost:8080/api/trip';
+  private apiUrl =`${environment.API_URL}/api/trip`;
   private tripSource = new BehaviorSubject<Trip | null>(null);
   currentTrip = this.tripSource.asObservable();
 
