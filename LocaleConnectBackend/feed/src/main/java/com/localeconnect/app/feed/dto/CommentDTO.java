@@ -2,6 +2,8 @@ package com.localeconnect.app.feed.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.localeconnect.app.feed.model.Comment;
 import com.localeconnect.app.feed.model.Post;
 import jakarta.persistence.*;
@@ -26,8 +28,8 @@ public class CommentDTO {
     private Long authorID;
 
     @NotNull(message = "This is a required field")
-    @JsonFormat
-            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime date;
 
     @NotBlank(message = "This is a required field")

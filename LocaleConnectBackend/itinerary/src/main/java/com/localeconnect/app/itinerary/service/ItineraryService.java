@@ -11,9 +11,12 @@ import com.localeconnect.app.itinerary.repository.ItinerarySpecification;
 import com.localeconnect.app.itinerary.repository.ReviewRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
@@ -103,9 +106,10 @@ public class ItineraryService {
     }
 
     public List<ItineraryDTO> getAllItinerariesByUser(Long userId) {
+        if(!checkUserId(userId))
+            throw new ResourceNotFoundException("User with id " + userId + " does not exist!");
 
-        List<Itinerary> itineraries = itineraryRepository.findByUserId(userId);
-        return itineraries != null ? itineraries.stream().map(mapper::toDomain).collect(Collectors.toList()) : new ArrayList<>();
+        return itineraryRepository.findByUserId(userId).stream().map(mapper::toDomain).toList();
     }
 
 
@@ -114,7 +118,6 @@ public class ItineraryService {
         return optional.map(mapper::toDomain).orElseThrow(() -> new ItineraryNotFoundException("Itinerary not found"));
 
     }
-
 
     //TODO: combine the user information and the review in the frontend
     public ReviewDTO createReview(ReviewDTO reviewDto, Long userId, Long itineraryId) {
@@ -137,7 +140,6 @@ public class ItineraryService {
         return reviewMapper.toDomain(review);
     }
 
-
     public ReviewDTO updateReview(ReviewDTO reviewDTO, Long id) {
         Review existingReview = reviewRepository.findById(id)
                 .orElseThrow(() -> new ReviewNotFoundException("Review not found with id: " + id));
@@ -156,7 +158,6 @@ public class ItineraryService {
         Review updatedReview = reviewRepository.save(reviewToUpdate);
         return reviewMapper.toDomain(updatedReview);
     }
-
 
     public List<ItineraryDTO> searchByName(String name) {
         if (name == null) {
@@ -196,27 +197,20 @@ public class ItineraryService {
                 .collect(Collectors.toList());
     }
 
-
     // TODO: add a shareItinerary method in the feed
-    public Mono<ItineraryShareDTO> shareItinerary(Long itineraryId) {
-        return Mono.just(itineraryRepository.findById(itineraryId))
-                .map(itinerary -> {
-                    ItineraryShareDTO shareDTO
-                            = new ItineraryShareDTO();
-                    if (itinerary.isPresent()) {
-                        shareDTO.setId(itinerary.get().getId());
-                        shareDTO.setName(itinerary.get().getName());
-                        shareDTO.setDescription(itinerary.get().getDescription());
-                    }
-                    return shareDTO;
-                })
-                .flatMap(this::postToFeed)
-                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Itinerary not found with id: " + itineraryId)));
+    public String shareItinerary(Long itineraryId, Long authorId) {
+        Itinerary itinerary = itineraryRepository.findById(itineraryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Itinerary not found with id: " + itineraryId));
+
+        if (!checkUserId(authorId))
+            throw new ResourceNotFoundException("User with id " + authorId + " does not exist!");
+
+        ItineraryDTO shareDTO = mapper.toDomain(itinerary);
+
+        return postToFeed(shareDTO, authorId);
     }
 
-
     private boolean checkUserId(Long userId) {
-        System.out.println(userId);
         CheckUserExistsResponseDTO res = this.webClient.get()
                 .uri("http://user-service:8084/api/user/auth/exists/{userId}", userId)
                 .retrieve().bodyToMono(CheckUserExistsResponseDTO.class).block();
@@ -225,13 +219,18 @@ public class ItineraryService {
         return check != null && check;
     }
 
+    private String postToFeed(ItineraryDTO itineraryShareDTO, Long authorId) {
+        String url = UriComponentsBuilder
+                .fromUriString("http://feed-service:8081/api/feed/share-itinerary")
+                .queryParam("authorId", authorId)
+                .toUriString();
 
-    private Mono<ItineraryShareDTO> postToFeed(ItineraryShareDTO itineraryShareDTO) {
         return webClient.post()
-                .uri("http://feed-service:8081/api/feed/share-itinerary")
+                .uri(url)
                 .bodyValue(itineraryShareDTO)
                 .retrieve()
-                .bodyToMono(ItineraryShareDTO.class);
+                .bodyToMono(String.class)
+                .block();
     }
 
     private GCPResponseDTO saveImageToGCP(String image) {

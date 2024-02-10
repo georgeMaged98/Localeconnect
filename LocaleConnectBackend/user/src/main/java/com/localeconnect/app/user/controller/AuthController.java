@@ -4,6 +4,7 @@ import com.localeconnect.app.user.auth.AuthenticationRequest;
 import com.localeconnect.app.user.auth.AuthenticationResponse;
 import com.localeconnect.app.user.dto.LocalguideDTO;
 import com.localeconnect.app.user.dto.TravelerDTO;
+import com.localeconnect.app.user.exception.UserDoesNotExistException;
 import com.localeconnect.app.user.response_handler.ResponseHandler;
 import com.localeconnect.app.user.service.AuthenticationService;
 import com.localeconnect.app.user.service.UserService;
@@ -35,20 +36,20 @@ public class AuthController {
 
     @PostMapping("/register-localguide")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> registerLocalGuide(@RequestBody @Valid LocalguideDTO localguideDTO) {
+    public ResponseEntity<Object> registerLocalGuide(@RequestBody @Valid LocalguideDTO localguideDTO) {
         AuthenticationResponse response = authService.registerLocalguide(localguideDTO);
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, response, null);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid AuthenticationRequest request) {
+    public ResponseEntity<Object> login(@RequestBody @Valid AuthenticationRequest request) {
         log.info("************entred AUTH/LOGIN CONTROLLER**************");
         try {
             String token = authService.login(request);
             return ResponseHandler.generateResponse("Logged In!", HttpStatus.OK, token, null);
-        } catch (AuthenticationException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed");
+        } catch (UserDoesNotExistException e) {
+            throw new UserDoesNotExistException("False credentials! Please try to login again.");
         }
     }
 
