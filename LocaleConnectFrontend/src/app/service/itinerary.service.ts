@@ -1,9 +1,11 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { Itinerary, Tag } from '../model/itinerary';
-import { ApiResponse } from '../model/apiResponse';
-import { AuthService } from './auth.service';
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {Itinerary, Tag} from '../model/itinerary';
+import {ApiResponse} from '../model/apiResponse';
+import {AuthService} from './auth.service';
+import {environment} from "../../environments/environment";
+import {UserProfile} from "../model/user";
 
 @Injectable({
   providedIn: 'root',
@@ -11,10 +13,12 @@ import { AuthService } from './auth.service';
 export class ItineraryService {
   // private itinerarySource = new BehaviorSubject<Itinerary | null>(null);
   // currentItinerary = this.itinerarySource.asObservable();
+  currentUserId: number | null = null;
+  private apiUrl = `${environment.API_URL}/api/itinerary`;
 
-  private apiUrl = 'http://localhost:8080/api/itinerary';
+  constructor(private http: HttpClient, private authService: AuthService) {
+  }
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
   // changeItinerary(itinerary: any) {
   //   if (itinerary) {
   //     this.itinerarySource.next(itinerary);
@@ -26,6 +30,9 @@ export class ItineraryService {
       headers: httpHeaders,
     });
   }
+  getCurrentUserId(): number{
+   return this.authService.currentUserValue?.id ? this.authService.currentUserValue.id : 0;
+  }
 
   addItinerary(itinerary: Itinerary): Observable<ApiResponse> {
     const httpHeaders = this.authService.getHttpHeaders();
@@ -33,6 +40,12 @@ export class ItineraryService {
     return this.http.post<ApiResponse>(`${this.apiUrl}/create`, itinerary, {
       headers: httpHeaders,
     });
+  }
+  deleteItinerary(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/delete/${id}`);
+  }
+  getUserItineraries(userId: number): Observable<Itinerary[]> {
+    return this.http.get<Itinerary[]>(`${this.apiUrl}/allByUser/${userId}`);
   }
 
   filterItineraries(
@@ -50,9 +63,11 @@ export class ItineraryService {
       return matchesPlace && matchesTag && matchesDays;
     });
   }
+
   mapTags(tags: Tag[]): string[] {
     return tags.map((tag) => Tag[tag]);
   }
+
   searchItineraries(
     searchTerm: string,
     searchItineraries: Itinerary[]

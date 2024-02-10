@@ -51,7 +51,6 @@ export class AuthService {
   }
 
   fetchCurrentUserProfile(): Observable<User> {
-    console.log(localStorage.getItem('token'));
     return this.http
       .get<User>(`${environment.API_URL}/api/user/secured/profile`)
       .pipe(

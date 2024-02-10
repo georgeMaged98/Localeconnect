@@ -15,7 +15,6 @@ const routes: Routes = [
   }, {
     path: 'pages/itineraries',
     component: ItineraryComponent,
-
     canActivate: [authGuard]
   },
   {

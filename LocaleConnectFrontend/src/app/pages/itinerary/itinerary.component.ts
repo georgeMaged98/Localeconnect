@@ -61,7 +61,6 @@ export class ItineraryComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.initializeDisplayedItineraries();
-    //TODO: replace mock with api
     this.itineraryService.getItineraries().subscribe({
       next: (itineraryRes: ApiResponse) => {
         this.allItineraries = itineraryRes.data as Itinerary[];
@@ -112,6 +111,37 @@ export class ItineraryComponent implements OnInit, OnDestroy {
       .subscribe((searchTerm) => {
         this.performSearch(searchTerm);
       });
+  }
+  checkUserItinerariesBeforeDeletion(itineraryId: number): void {
+    this.itineraryService.getUserItineraries(this.itineraryService.getCurrentUserId()).subscribe({
+      next: (itineraries) => {
+        const userHasItineraries = itineraries.some(itinerary => itinerary.id === itineraryId);
+        if (userHasItineraries) {
+          this.deleteItinerary(itineraryId);
+        } else {
+          this.notificationService.showSuccess('No permission to delete this itinerary or it doesn\'t belong to the user.');
+        }
+      },
+      error: (error) => console.error('Error fetching user itineraries', error),
+    });
+  }
+
+  deleteItinerary(id: number): void {
+    const confirmDelete = confirm('Are you sure you want to delete this itinerary?');
+    if (confirmDelete) {
+      this.itineraryService.deleteItinerary(id).subscribe({
+        next: () => {
+          this.notificationService.showSuccess('Itinerary deleted successfully!');
+          this.itineraries = this.itineraries.filter(itinerary => itinerary.id !== id);
+          this.allItineraries = this.allItineraries.filter(itinerary => itinerary.id !== id);
+          this.updateDisplayedItineraries();
+        },
+        error: (error) => {
+          console.error('Error deleting itinerary', error);
+          this.notificationService.showError('Failed to delete itinerary.');
+        }
+      });
+    }
   }
 
   performSearch(searchTerm: string | null = ''): void {
@@ -183,6 +213,7 @@ export class ItineraryComponent implements OnInit, OnDestroy {
     const endIndex = startIndex + this.paginator.pageSize;
     this.displayedItineraries = this.allItineraries.slice(startIndex, endIndex);
   }
+
 
   fetchUsername(itinerary: Itinerary): void {
     // this.userService.getUsername(itinerary.userId).subscribe({

@@ -33,7 +33,7 @@ export class FeedComponent implements OnInit {
       this.fetchCurrentUserProfile();
     }
     this.fetchPosts();
-    this.fetchFollowers();
+   // this.fetchFollowers();
     this.subscription = this.feedService.currentPost.subscribe(post => {
       if (post) {
         //TODO: replace mock with backend
@@ -60,17 +60,17 @@ export class FeedComponent implements OnInit {
     );
   }
 
-  fetchFollowers(): void {
-    //TODO: replace with api call
-    if (this.currentUserProfile && this.currentUserProfile.id)
-      this.userService.getAllFollowingAsProfiles(this.currentUserProfile.id).subscribe({
-        next: (users: Profile[]) => {
-          this.followers = users;
-        },
-        error: (err) => console.error(err)
-      });
-
-  }
+  // fetchFollowers(): void {
+  //   //TODO: replace with api call
+  //   if (this.currentUserProfile && this.currentUserProfile.id)
+  //     this.userService.getAllFollowingAsProfiles(this.currentUserProfile.id).subscribe({
+  //       next: (users: Profile[]) => {
+  //         this.followers = users;
+  //       },
+  //       error: (err) => console.error(err)
+  //     });
+  //
+  // }
 
   fetchCurrentUserProfile(): void {
 
