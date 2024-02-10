@@ -1,23 +1,23 @@
 export interface Itinerary {
-  id: number,
-  userId: number,
-  username:string,
-  name: string,
-  description: string,
-  numberOfDays: number,
-  tags:Tag[],
-  mappedTags:string[],
-  placesToVisit: string[],
-  dailyActivities: string[],
-  imageUrls:string[],
-  expand:boolean,
-  rating:number;
+  id?: number;
+  userId?: number;
+  username?: string;
+  name: string;
+  description: string;
+  numberOfDays: number;
+  tags: Tag[];
+  mappedTags: string[];
+  placesToVisit: string[];
+  dailyActivities: string[];
+  imageUrls: string[];
+  expand: boolean;
+  rating: number;
   ratingSubmitted?: boolean;
   totalRatings?: number;
   averageRating?: number;
 }
 
-export enum Tag{
+export enum Tag {
   ADVENTURE,
   BEACH,
   CULTURAL,
@@ -37,5 +37,5 @@ export enum Tag{
   NIGHTLIFE,
   SHOPPING,
   WINTER_SPORTS,
-  WATER_SPORTS
+  WATER_SPORTS,
 }

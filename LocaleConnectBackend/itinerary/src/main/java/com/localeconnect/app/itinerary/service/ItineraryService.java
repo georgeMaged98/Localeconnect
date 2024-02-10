@@ -1,9 +1,6 @@
 package com.localeconnect.app.itinerary.service;
 
-import com.localeconnect.app.itinerary.dto.ItineraryDTO;
-import com.localeconnect.app.itinerary.dto.ItineraryShareDTO;
-import com.localeconnect.app.itinerary.dto.ReviewDTO;
-import com.localeconnect.app.itinerary.dto.Tag;
+import com.localeconnect.app.itinerary.dto.*;
 import com.localeconnect.app.itinerary.exception.*;
 import com.localeconnect.app.itinerary.mapper.ItineraryMapper;
 import com.localeconnect.app.itinerary.mapper.ReviewMapper;
@@ -16,6 +13,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -26,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 @Service
 @AllArgsConstructor
 public class ItineraryService {
@@ -39,6 +38,7 @@ public class ItineraryService {
 
     public ItineraryDTO createItinerary(ItineraryDTO itineraryDTO, Long userId) {
         Itinerary itinerary = mapper.toEntity(itineraryDTO);
+
         if (itinerary == null) {
             throw new ItineraryNotFoundException("Itinerary data is invalid");
         }
@@ -51,8 +51,21 @@ public class ItineraryService {
             throw new ItineraryAlreadyExistsException("This user already created this itinerary.");
         }
 
+        List<String> images = itineraryDTO.getImageUrls();
+
+        if (!images.isEmpty()) {
+            // Save image in GCP
+            GCPResponseDTO gcpResponse = saveImageToGCP(itineraryDTO.getImageUrls().get(0));
+            String imageUrl = gcpResponse.getData();
+            itinerary.setImageUrls(List.of(imageUrl));
+
+        } else {
+            itinerary.setImageUrls(new ArrayList<>());
+        }
+
         itinerary.setUserId(userId);
         itineraryRepository.save(itinerary);
+
         return mapper.toDomain(itinerary);
     }
 
@@ -197,10 +210,12 @@ public class ItineraryService {
         return postToFeed(shareDTO, authorId);
     }
 
-    private Boolean checkUserId(Long userId) {
-        Boolean check = this.webClient.get()
+    private boolean checkUserId(Long userId) {
+        CheckUserExistsResponseDTO res = this.webClient.get()
                 .uri("http://user-service:8084/api/user/auth/exists/{userId}", userId)
-                .retrieve().bodyToMono(Boolean.class).block();
+                .retrieve().bodyToMono(CheckUserExistsResponseDTO.class).block();
+
+        Boolean check = res.getResponseObject();
         return check != null && check;
     }
 
@@ -216,6 +231,16 @@ public class ItineraryService {
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
+    }
+
+    private GCPResponseDTO saveImageToGCP(String image) {
+        ResponseEntity<GCPResponseDTO> responseEntity = webClient.post()
+                .uri("http://gcp-service:5005/api/gcp/?filename=itinerary")
+                .bodyValue(image)
+                .retrieve()
+                .toEntity(GCPResponseDTO.class)
+                .block();
+        return responseEntity.getBody();
     }
 }
 

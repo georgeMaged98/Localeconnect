@@ -26,10 +26,10 @@ public class Itinerary {
     private String description;
     private Integer numberOfDays;
 
-    @ElementCollection(targetClass = Tag.class)
-    @Enumerated(EnumType.STRING)
+//    @ElementCollection(targetClass = Tag.class)
+//    @Enumerated(EnumType.STRING)
     @CollectionTable(name = "itinerary_tags")
-    private List<Tag> tags = new ArrayList<>();
+    private List<String> tags = new ArrayList<>();
 
     @ElementCollection
     private List<String> placesToVisit = new ArrayList<>();

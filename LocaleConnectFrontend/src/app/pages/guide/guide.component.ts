@@ -1,37 +1,37 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {FormControl} from "@angular/forms";
-import {debounceTime, distinctUntilChanged} from "rxjs";
-import {MatDialog} from "@angular/material/dialog";
-import {ReviewService} from "../../service/review.service";
-import {UserService} from "../../service/user.service";
-import {ImagesService} from "../../service/image.service";
-import {GuideProfile} from "../../model/guide";
-import {NotificationService} from "../../service/notification.service";
-import {MatPaginator} from "@angular/material/paginator";
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { ReviewService } from '../../service/review.service';
+import { UserService } from '../../service/user.service';
+import { ImagesService } from '../../service/image.service';
+import { GuideProfile } from '../../model/guide';
+import { NotificationService } from '../../service/notification.service';
+import { MatPaginator } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-guide',
   templateUrl: './guide.component.html',
-  styleUrls: ['./guide.component.scss']
+  styleUrls: ['./guide.component.scss'],
 })
-export class GuideComponent implements OnInit{
+export class GuideComponent implements OnInit {
   guides: GuideProfile[] = [];
   searchGuides: GuideProfile[] = [];
-  images: string[]=[];
+  images: string[] = [];
   searchControl = new FormControl('');
-  totalLength=0;
+  totalLength = 0;
   displayedGuides: GuideProfile[] = [];
-  pageSize=10;
-
+  pageSize = 10;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-
-
-
-  constructor(private notificationService: NotificationService, private imageService: ImagesService, private dialog: MatDialog, private reviewService: ReviewService, private userService: UserService) {
-  }
-
+  constructor(
+    private notificationService: NotificationService,
+    private imageService: ImagesService,
+    private dialog: MatDialog,
+    private reviewService: ReviewService,
+    private userService: UserService
+  ) {}
 
   ngOnInit(): void {
     this.guides = this.userService.getGuidesMock();
@@ -48,15 +48,14 @@ export class GuideComponent implements OnInit{
     });
 
      */
-    this.imageService.currentImages.subscribe(images => {
-      this.images = images;
-    });
-    this.searchControl.valueChanges.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-    ).subscribe(searchTerm => {
-      this.performSearch(searchTerm);
-    });
+    // this.imageService.currentImages.subscribe(images => {
+    //   this.images = images;
+    // });
+    this.searchControl.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe((searchTerm) => {
+        this.performSearch(searchTerm);
+      });
   }
   ngAfterViewInit() {
     this.paginator.page.subscribe(() => {
@@ -77,7 +76,6 @@ export class GuideComponent implements OnInit{
       : [...this.searchGuides];
   }
 
-
   toggleDetails(guide: GuideProfile): void {
     guide.expand = !guide.expand;
   }
@@ -87,12 +85,16 @@ export class GuideComponent implements OnInit{
       guide.ratingSubmitted = true;
       guide.rating = rating;
       if (guide.averageRating && guide.totalRatings && guide.totalRatings > 0) {
-        guide.averageRating = ((guide.averageRating * guide.totalRatings) + rating) / (guide.totalRatings + 1);
+        guide.averageRating =
+          (guide.averageRating * guide.totalRatings + rating) /
+          (guide.totalRatings + 1);
       } else {
         guide.averageRating = rating;
       }
       guide.totalRatings = (guide.totalRatings || 0) + 1;
-      this.notificationService.showSuccess('You submitted the review successfully!');
+      this.notificationService.showSuccess(
+        'You submitted the review successfully!'
+      );
 
       //TODO: uncomment for api call
       /*
@@ -113,7 +115,7 @@ export class GuideComponent implements OnInit{
     }
   }
   //TODO: uncomment for api call
-  toggleFollow(guide : GuideProfile): void {
+  toggleFollow(guide: GuideProfile): void {
     guide.isFollowing = !guide.isFollowing;
     /*  if (guide.isFollowing) {
         this.userService.unfollowUser(guide.id).subscribe(() => {

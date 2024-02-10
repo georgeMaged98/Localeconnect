@@ -4,7 +4,6 @@ import com.localeconnect.app.itinerary.dto.ItineraryDTO;
 import com.localeconnect.app.itinerary.dto.ItineraryShareDTO;
 import com.localeconnect.app.itinerary.dto.ReviewDTO;
 import com.localeconnect.app.itinerary.dto.Tag;
-import com.localeconnect.app.itinerary.exception.*;
 import com.localeconnect.app.itinerary.response_handler.ResponseHandler;
 import com.localeconnect.app.itinerary.service.ItineraryService;
 import jakarta.validation.Valid;
@@ -21,6 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ItineraryController {
     private final ItineraryService itineraryService;
+
     @PostMapping("/create")
     public ResponseEntity<Object> createItinerary(@RequestBody @Valid ItineraryDTO itineraryDTO) {
         ItineraryDTO itinerary = itineraryService.createItinerary(itineraryDTO, itineraryDTO.getUserId());
@@ -28,13 +28,13 @@ public class ItineraryController {
     }
 
     @PutMapping(path = "/update/{id}")
-    public ResponseEntity<?> updateItinerary(@PathVariable("id") Long id, @RequestBody @Valid ItineraryDTO itineraryDTO) {
+    public ResponseEntity<Object> updateItinerary(@PathVariable("id") Long id, @RequestBody @Valid ItineraryDTO itineraryDTO) {
         ItineraryDTO itinerary = itineraryService.updateItinerary(itineraryDTO, id);
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, itinerary, null);
     }
 
     @DeleteMapping(path = "/delete/{id}")
-    public ResponseEntity<?> deleteItinerary(@PathVariable("id") Long id) {
+    public ResponseEntity<Object> deleteItinerary(@PathVariable("id") Long id) {
         itineraryService.deleteItinerary(id);
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, null, null);
     }
@@ -62,6 +62,7 @@ public class ItineraryController {
         List<ItineraryDTO> itineraries = itineraryService.searchByName(name);
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, itineraries, null);
     }
+
     @GetMapping("/filter")
     public ResponseEntity<Object> filterItineraries(
             @RequestParam(value = "place", required = false) String place,
@@ -70,6 +71,7 @@ public class ItineraryController {
         List<ItineraryDTO> itineraries = itineraryService.filter(place, tag, days);
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, itineraries, null);
     }
+
     @PostMapping("/create-review")
     public ResponseEntity<Object> createReview(@RequestBody @Valid ReviewDTO reviewDto) {
         ReviewDTO review = itineraryService.createReview(reviewDto, reviewDto.getUserId(), reviewDto.getItineraryId());
@@ -95,9 +97,11 @@ public class ItineraryController {
     }
 
     @PostMapping("/share/{itineraryId}")
-    public String shareItinerary(@PathVariable("itineraryId") Long itineraryId,
-                                 @RequestParam("authorId") @Valid Long authorId) {
-            return itineraryService.shareItinerary(itineraryId, authorId);
+    public ResponseEntity<Object> shareItinerary(@PathVariable("itineraryId") Long itineraryId,
+                                                 @RequestParam("authorId") @Valid Long authorId) {
+        String res = itineraryService.shareItinerary(itineraryId, authorId);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, res, null);
+
     }
 
 }

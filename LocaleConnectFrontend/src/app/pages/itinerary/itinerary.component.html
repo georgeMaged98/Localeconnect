@@ -22,6 +22,20 @@
 <ng-container class="main-container" *ngFor="let itinerary of displayedItineraries">
   <mat-card class="itinerary-card">
     <div class="card-content">
+      <div class="image-container">
+        <img
+          *ngIf="itinerary.imageUrls.length > 0; else fallbackImage"
+          [src]="itinerary.imageUrls[0]"
+          alt="Itinerary image"
+        />
+        <ng-template #fallbackImage>
+          <img
+            src="assets/pictures/not_available.png"
+            alt="Default itinerary image"
+          />
+        </ng-template>
+      </div>
+
       <div class="details-container">
         <mat-card-header>
           <mat-card-title>{{ itinerary.name }}</mat-card-title>
@@ -37,11 +51,8 @@
               </div>
               <div *ngIf="!itinerary.averageRating">
                 <app-review [readOnly]="true" [rating]="0"></app-review>
-                <span
-                  class="average-rating"> No
-                ratings yet</span>
+                <span class="average-rating"> No ratings yet</span>
               </div>
-
             </div>
           </div>
         </mat-card-header>
