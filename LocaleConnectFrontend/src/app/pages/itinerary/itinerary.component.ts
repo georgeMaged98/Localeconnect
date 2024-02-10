@@ -74,14 +74,14 @@ export class ItineraryComponent implements OnInit, OnDestroy {
           // this.fetchUsername(itinerary);
           if (itinerary.imageUrls.length > 0) {
             if (itinerary.imageUrls[0].length > 0) {
-              // this.imageService.getImage(itinerary.imageUrls[0]).subscribe({
-              //   next: (gcpRes: ApiResponse) => {
-              //     itinerary.imageUrls = [];
-              //     itinerary.imageUrls.push(gcpRes.data.toString());
-              //   },
-              //   error: (errorMessage: ApiResponse) =>
-              //     console.error(errorMessage.errors),
-              // });
+              this.imageService.getImage(itinerary.imageUrls[0]).subscribe({
+                next: (gcpRes: ApiResponse) => {
+                  itinerary.imageUrls = [];
+                  itinerary.imageUrls.push(gcpRes.data.toString());
+                },
+                error: (errorMessage: ApiResponse) =>
+                  console.error(errorMessage.errors),
+              });
             }
           }
         });
