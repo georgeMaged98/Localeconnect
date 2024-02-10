@@ -19,8 +19,5 @@ public class TripReviewDTO {
     @Size(max = 1000, message = "The message is too long, exceeded 1000 characters")
     private String text;
     private LocalDateTime timestamp;
-    @Min(value = 0)
-    @Max(value = 5)
-    private Double rating;
 
 }

@@ -1,10 +1,9 @@
 package com.localeconnect.app.itinerary.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 @Getter
 @Setter
@@ -25,5 +24,15 @@ public class ItineraryDTO {
     private List<String> placesToVisit;
     private List<String> dailyActivities;
     private List<String> imageUrls;
+    private double ratingsTotal;
+    private int ratingsCount;
+    @Min(value = 0)
+    @Max(value = 5)
+    private double averageRating;
+    private List<Long> itineraryAttendees = new ArrayList<>();
+
+    public void calcAverageRating() {
+        this.averageRating = (this.ratingsCount > 0) ? this.ratingsTotal / this.ratingsCount : 0;
+    }
 
 }

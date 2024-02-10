@@ -5,13 +5,14 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ItineraryRepository extends JpaRepository<Itinerary, Long> {
-    List<Itinerary> findByUserId(Long userId);
+    Optional<List<Itinerary>> findByUserId(Long userId);
 
-    List<Itinerary> findAllIByNameIgnoreCaseLike(String name);
+    Optional<List<Itinerary>> findAllIByNameIgnoreCaseLike(String name);
 
-    List<Itinerary> findAll(Specification<Itinerary> specification);
+    Optional<List<Itinerary>> findAll(Specification<Itinerary> specification);
 
     Boolean existsByUserIdAndName(Long userId, String name);
 
