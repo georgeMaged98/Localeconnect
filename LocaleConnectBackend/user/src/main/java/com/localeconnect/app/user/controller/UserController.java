@@ -25,7 +25,6 @@ public class UserController {
 
     @GetMapping("/all")
     public ResponseEntity<Object> getAllUsers() {
-        log.info("************entred GETALLUSERS USER CONTROLLER**************");
         List<UserDTO> users = userService.getAllUsers();
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, users, null);
