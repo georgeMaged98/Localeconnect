@@ -11,7 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
+
 import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @RestController
@@ -23,21 +25,9 @@ public class NotificationController {
 
     private final RabbitMQMessageProducer rabbitMQMessageProducer;
 
-    @GetMapping("/notify")
-    public ResponseEntity<Object> getNotification() throws InterruptedException {
-        NotificationDTO notificationDTO = new NotificationDTO(23L, 1L, 2L, LocalDateTime.now(), "test", "TITLE");
-        messagingTemplate.convertAndSend("/topic/notification", notificationDTO);
-        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, notificationDTO, null);
-    }
-
-    @PostMapping("/notify")
-    public ResponseEntity<Object> sendNotification(@RequestBody @Valid NotificationDTO incomingNotificationDTO) {
-//        NotificationDTO notificationDTO = new NotificationDTO(23L, 1L, 2L, LocalDateTime.now(), "test");
-//        messagingTemplate.convertAndSend("/topic/notification", notificationDTO);
-
-//        rabbitMQMessageProducer.publish(incomingNotificationDTO, NotificationRabbitConfig.EXCHANGE, NotificationRabbitConfig.ROUTING_KEY);
-
-        NotificationDTO newNotificationDTO = notificationService.handleIncomingNotification(incomingNotificationDTO);
-        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, newNotificationDTO, null);
+    @GetMapping("/notify/{userId}")
+    public ResponseEntity<Object> getNotification(@PathVariable("userId") Long userId) throws InterruptedException {
+        List<NotificationDTO> notifications = notificationService.getUnReadNotificationsByUserId(userId);
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, notifications, null);
     }
 }

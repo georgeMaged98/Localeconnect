@@ -25,8 +25,8 @@ export class DetailHeaderComponent implements OnInit {
   }
 
   loadNotifications() {
-    this.notificationService.getNotifications().subscribe((notifications) => {
-      this.notifications = notifications;
+    this.notificationService.currentNotifications.subscribe((notifications) => {
+      this.notifications = this.notifications.concat(notifications);
       this.hasNewNotifications = notifications.length > 0;
     });
   }
@@ -36,7 +36,6 @@ export class DetailHeaderComponent implements OnInit {
     this.hasNewNotifications = false;
 
     if (!this.showNotifications) {
-      this.notificationService.deleteAllNotifications();
       this.notifications = [];
     }
   }

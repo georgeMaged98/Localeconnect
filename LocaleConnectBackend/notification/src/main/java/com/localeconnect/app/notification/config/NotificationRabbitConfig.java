@@ -2,28 +2,25 @@ package com.localeconnect.app.notification.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.AllArgsConstructor;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.stereotype.Component;
 
 @Configuration
+@AllArgsConstructor
+@Component
 public class NotificationRabbitConfig {
 
     public static final String QUEUE = "notification.queue";
     public static final String EXCHANGE = "internal.exchange";
     public static final String ROUTING_KEY = "internal.notification.routing-key";
-//    @Value("${rabbitmq.exchanges.internal}")
-//    private String internalExchange;
-//
-//    @Value("${rabbitmq.queues.notification}")
-//    private String notificationQueue;
-//
-//    @Value("${rabbitmq.routing-keys.internal-notification}")
-//    private String internalNotificationRoutingKey;
 
     @Bean
     public TopicExchange internalTopicExchange() {

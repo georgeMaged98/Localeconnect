@@ -30,5 +30,6 @@ public class NotificationDTO implements Serializable {
     @NotBlank(message = "This is a required field")
     private String message;
 
+    private boolean isRead = false;
     private String title;
 }

@@ -1,11 +1,11 @@
-import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
-import {BehaviorSubject, Observable} from 'rxjs';
-import {Itinerary, Tag} from '../model/itinerary';
-import {ApiResponse} from '../model/apiResponse';
-import {AuthService} from './auth.service';
-import {environment} from "../../environments/environment";
-import {UserProfile} from "../model/user";
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { Itinerary, Tag } from '../model/itinerary';
+import { ApiResponse } from '../model/apiResponse';
+import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
+import { UserProfile } from '../model/user';
 
 @Injectable({
   providedIn: 'root',
@@ -16,8 +16,7 @@ export class ItineraryService {
   currentUserId: number | null = null;
   private apiUrl = `${environment.API_URL}/api/itinerary`;
 
-  constructor(private http: HttpClient, private authService: AuthService) {
-  }
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   // changeItinerary(itinerary: any) {
   //   if (itinerary) {
@@ -26,11 +25,8 @@ export class ItineraryService {
   // }
   getItineraries(): Observable<ApiResponse> {
     const httpHeaders = this.authService.getHttpHeaders();
-    return this.http.get<ApiResponse>(`${this.apiUrl}/all`, {
-      headers: httpHeaders,
-    });
+    return this.http.get<ApiResponse>(`${this.apiUrl}/all`);
   }
-
 
   addItinerary(itinerary: Itinerary): Observable<ApiResponse> {
     const httpHeaders = this.authService.getHttpHeaders();
@@ -39,9 +35,11 @@ export class ItineraryService {
       headers: httpHeaders,
     });
   }
-  deleteItinerary(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/delete/${id}`);
+
+  deleteItinerary(id: number): Observable<ApiResponse> {
+    return this.http.delete<ApiResponse>(`${this.apiUrl}/delete/${id}`);
   }
+
   getUserItineraries(userId: number): Observable<Itinerary[]> {
     return this.http.get<Itinerary[]>(`${this.apiUrl}/allByUser/${userId}`);
   }
