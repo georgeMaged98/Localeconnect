@@ -1,9 +1,12 @@
 import {ChangeDetectorRef, Component} from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {MatDialogRef} from '@angular/material/dialog';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {ImagesService} from "../../../service/image.service";
 import {FeedService} from "../../../service/feed.service";
 import {Post} from "../../../model/feed";
+import {PostType} from "../../../model/post-type";
+import {AuthService} from "../../../service/auth.service";
+import {getFormattedDate} from "../../../helper/DateHelper";
 
 @Component({
   selector: 'app-add-post-dialog',
@@ -16,10 +19,11 @@ export class AddPostDialogComponent {
   showEmojiPicker = false;
 
   constructor(private cdr: ChangeDetectorRef,
-    private feedService: FeedService,
-    public dialogRef: MatDialogRef<AddPostDialogComponent>,
-    private formBuilder: FormBuilder,
-    private imageService: ImagesService
+              private feedService: FeedService,
+              public dialogRef: MatDialogRef<AddPostDialogComponent>,
+              private formBuilder: FormBuilder,
+              private imageService: ImagesService,
+              private authService: AuthService,
   ) {
     this.postForm = this.formBuilder.group({
       content: ['', Validators.required],
@@ -32,25 +36,27 @@ export class AddPostDialogComponent {
   }
 
   onSubmit(): void {
+    const currentDate = getFormattedDate(new Date());
+    console.log(this.authService.getCurrentUserProfile());
     if (this.postForm.valid) {
-      const postData = { ...this.postForm.value, images: this.images };
-      const post: Post={
-        id:0,//TODO: generate from backend
-        author:{
-          userId: 1,
-          name: 'Alice Johnson',
-          username: 'alicej',
-          isFollowing: true,
-          profileImage: 'https://www.profilebakery.com/wp-content/uploads/2023/04/AI-Profile-Picture.jpg',
-        } ,//TODO: get current user
-        content:postData.content,
+      const postData: Post = {
+        authorID: this.authService.getUserIdFromLocalStorage(),
+        content: this.postForm.value.content,
         images: this.images,
-        comments:[],
-        date: new Date()
-      }
-      //TODO: add api call
-     this.feedService.changePost(post);
-      this.dialogRef.close(postData);
+        postType: PostType.REGULAR,
+        date: currentDate,
+
+      };
+      console.log(postData);
+      this.feedService.createRegularPost(postData).subscribe({
+        next: (newPost) => {
+          console.log(newPost)
+          this.dialogRef.close(newPost);
+        },
+        error: (error) => {
+          console.error('Failed to create post:', error);
+        }
+      });
     }
   }
 
@@ -60,11 +66,12 @@ export class AddPostDialogComponent {
 
   addEmoji(event: any) {
     const emoji = event.emoji.native;
-    const currentContent: string= this.postForm.value.content;
+    const currentContent: string = this.postForm.value.content;
     this.postForm.controls['content'].setValue(currentContent + emoji);
     this.cdr.detectChanges();
   }
 
+//TODO: add gcp
   onFileSelected(event: any) {
     const files = event.target.files;
     if (files) {
@@ -73,7 +80,7 @@ export class AddPostDialogComponent {
         reader.onload = (e: any) => {
           this.images.push(e.target.result);
           if (this.images.length === files.length) {
-            this.imageService.updateImages(this.images); // Assuming imageService handles image array updates
+            this.imageService.updateImages(this.images);
           }
         };
         reader.readAsDataURL(<Blob>file);

@@ -1,14 +1,13 @@
-import { EventEmitter, Injectable, Output } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { Notification } from '../model/notification';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import {EventEmitter, Injectable, Output} from '@angular/core';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {Notification} from '../model/notification';
+import {MatSnackBar} from '@angular/material/snack-bar';
 import * as Stomp from 'stompjs';
-import * as SockJS from 'sockjs-client';
-import { AuthService } from './auth.service';
-import { User } from 'src/app/model/user';
-import { environment } from '../../environments/environment';
-import { HttpClient } from '@angular/common/http';
-import { ApiResponse } from '../model/apiResponse';
+import {AuthService} from './auth.service';
+import {User} from 'src/app/model/user';
+import {environment} from '../../environments/environment';
+import {HttpClient} from '@angular/common/http';
+import {ApiResponse} from '../model/apiResponse';
 
 @Injectable({
   providedIn: 'root',
