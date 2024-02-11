@@ -2,9 +2,7 @@ package com.localeconnect.app.trip.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.localeconnect.app.trip.dto.TripAttendDTO;
 import com.localeconnect.app.trip.dto.TripDTO;
-import com.localeconnect.app.trip.dto.TripReviewDTO;
 import com.localeconnect.app.trip.service.TripService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -33,7 +32,6 @@ public class TripControllerTest {
 
     private MockMvc mockMvc;
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-
     @Mock
     private TripService tripService;
 
@@ -49,18 +47,19 @@ public class TripControllerTest {
 
     @Test
     void createTrip_ShouldReturnSuccess() throws Exception {
+
         TripDTO tripDTO = TripDTO.builder()
                 .localguideId(1L)
                 .name("Test Trip")
                 .description("A test trip description")
-                .departureTime(LocalDate.now().plusDays(1))
                 .destination("Test Destination")
                 .durationInHours(48)
                 .capacity(5)
                 .languages(List.of("English", "Spanish"))
                 .dailyActivities(List.of("Activity 1", "Activity 2"))
-                .imageUrls(List.of("http://example.com/image1.jpg"))
+                .travelers(List.of(1L))
                 .build();
+
         given(tripService.createTrip(any(TripDTO.class))).willReturn(tripDTO);
 
         mockMvc.perform(post("/api/trip/create")

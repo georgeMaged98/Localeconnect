@@ -92,7 +92,7 @@ public class UserControllerTest {
                 .lastName("TestLastName")
                 .userName("TestUserName")
                 .email("test@example.com")
-                .password("TestPassword") // Note: Passwords are usually not returned in responses for security reasons
+                .password("TestPassword")
                 .dateOfBirth(LocalDate.now().minusYears(20))
                 .build();
         given(userService.updateUser(any(UserDTO.class))).willReturn(userDTO);
@@ -105,7 +105,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.data.lastName").value("TestLastName"))
                 .andExpect(jsonPath("$.data.userName").value("TestUserName"))
                 .andExpect(jsonPath("$.data.email").value("test@example.com"))
-                .andExpect(jsonPath("$.data.dateOfBirth").value(userDTO.getDateOfBirth().toString())); // Comparing date as string
+                .andExpect(jsonPath("$.data.dateOfBirth").value(userDTO.getDateOfBirth().toString()));
     }
 
     @Test
