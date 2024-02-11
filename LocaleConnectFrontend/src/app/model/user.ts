@@ -22,4 +22,5 @@ export interface UserProfile {
   username: string;
   bio?: string;
   imageUrl?: string;
+  isFollowing?: boolean,
 }

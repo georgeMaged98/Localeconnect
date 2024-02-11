@@ -5,8 +5,9 @@ import {GuideProfile} from "../model/guide";
 import {TripPreview} from "../model/trip";
 import {User} from "../model/user";
 import {environment} from "../../environments/environment";
-import {Profile} from "../model/feed";
+import {FollowerProfile} from "../model/feed";
 import {AuthService} from "./auth.service";
+import {ApiResponse} from "../model/apiResponse";
 
 @Injectable({
   providedIn: 'root'
@@ -87,16 +88,12 @@ export class UserService {
     return this.http.get<User>(`${this.apiUrl}/${userId}/profile`);
   }
 
-  getAllFollowingAsProfiles(userId: number): Observable<Profile[]> {
-    return this.http.get<User[]>(`${this.apiUrl}/${userId}/following`).pipe(
-      map(users => users.map(user => ({
-        userId: user.id,
-        name: `${user.firstName} ${user.lastName}`,
-        username: user.userName,
-        isFollowing: false,
-        profileImage: user.imageUrl || 'https://www.profilebakery.com/wp-content/uploads/2023/04/AI-Profile-Picture.jpg',
-      })))
-    );
+  getAllFollowingAsProfiles(userId: number | undefined): Observable<User[]> {
+    const httpHeaders = this.authService.getHttpHeaders();
+
+    return this.http.get<ApiResponse>(`${this.apiUrl}/${userId}/following`, {headers: httpHeaders}).pipe(
+      map(res => res.data? res.data as User[]: []));
+
   }
 
   getAverageRatingOfLocalGuide(userId: number): Observable<number> {

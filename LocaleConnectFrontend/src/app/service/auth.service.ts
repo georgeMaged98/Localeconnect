@@ -1,18 +1,7 @@
 import {Injectable} from '@angular/core';
-import {
-  HttpClient,
-  HttpErrorResponse,
-  HttpHeaders,
-} from '@angular/common/http';
-import {
-  BehaviorSubject,
-  catchError,
-  map,
-  Observable,
-  tap,
-  throwError,
-} from 'rxjs';
-import {User} from '../model/user';
+import {HttpClient, HttpErrorResponse, HttpHeaders,} from '@angular/common/http';
+import {BehaviorSubject, catchError, Observable, of, tap, throwError,} from 'rxjs';
+import {User, UserProfile} from '../model/user';
 import {Traveler} from '../model/traveler';
 import {Guide} from '../model/guide';
 import {environment} from '../../environments/environment';
@@ -26,6 +15,7 @@ export class AuthService {
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser: Observable<User | null>;
 
+
   constructor(private http: HttpClient) {
     this.currentUserSubject = new BehaviorSubject<User | null>(
       this.getUserFromLocalStorage()
@@ -35,6 +25,17 @@ export class AuthService {
 
   public get currentUserValue(): User | null {
     return this.currentUserSubject.value;
+  }
+
+  getCurrentUserProfile(): UserProfile | null {
+    const user = this.getUserFromLocalStorage();
+    return user ? {
+      id: user.id,
+      name: `${user.firstName} ${user.lastName}`,
+      username: user.userName,
+      bio: user.bio,
+      imageUrl: user.imageUrl,
+    } : null;
   }
 
   login(email: string, password: string): Observable<void> {
@@ -51,18 +52,27 @@ export class AuthService {
   }
 
   fetchCurrentUserProfile(): Observable<User> {
-    const httpHeaders = this.getHttpHeaders();
-    console.log(localStorage.getItem('token'))
-    return this.http
-      .get<User>(`${environment.API_URL}/api/user/secured/profile`, {headers: httpHeaders})
-      .pipe(
-        map((response) => {
-          console.log(response);
-          return response;
-        }),
-        catchError(this.handleError<User>('fetchCurrentUserProfile'))
-      );
+    const storedUserProfile = localStorage.getItem('currentUser');
+    if (storedUserProfile) {
+      const userProfile: User = JSON.parse(storedUserProfile);
+      return of(userProfile);
+    } else {
+
+      const httpHeaders = this.getHttpHeaders();
+      return this.http.get<User>(`${environment.API_URL}/api/user/secured/profile`, {headers: httpHeaders})
+        .pipe(
+          tap(userProfile => {
+            localStorage.setItem('currentUser', JSON.stringify(userProfile));
+            console.log('LOCAL' + localStorage.getItem('currentUser'))
+          }),
+          catchError(error => {
+            console.error('Error fetching user profile:', error);
+            return throwError(error);
+          })
+        );
+    }
   }
+
 
   logout(): void {
     localStorage.removeItem('currentUser');
@@ -99,7 +109,11 @@ export class AuthService {
     return !!token;
   }
 
-  private getUserFromLocalStorage(): User | null {
+  public getUserIdFromLocalStorage(): number | undefined {
+    return this.getUserFromLocalStorage() ? this.getUserFromLocalStorage()?.id : undefined;
+  }
+
+  public getUserFromLocalStorage(): User | null {
     const storedUser = localStorage.getItem('currentUser');
     return storedUser ? JSON.parse(storedUser) : null;
   }

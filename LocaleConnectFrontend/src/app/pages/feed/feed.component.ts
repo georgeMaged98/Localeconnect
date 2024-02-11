@@ -1,9 +1,9 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FeedService} from "../../service/feed.service";
-import {Comment, Post, Profile} from "../../model/feed";
+import {Comment, Post} from "../../model/feed";
 import {AddPostDialogComponent} from "./add-post-dialog/add-post-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
-import {Subscription} from "rxjs";
+import {map, Subject, Subscription, switchMap, takeUntil, tap} from "rxjs";
 import {ImagesService} from "../../service/image.service";
 import {User, UserProfile} from "../../model/user";
 import {UserService} from "../../service/user.service";
@@ -14,7 +14,7 @@ import {AuthService} from "../../service/auth.service";
   templateUrl: './feed.component.html',
   styleUrls: ['./feed.component.scss']
 })
-export class FeedComponent implements OnInit {
+export class FeedComponent implements OnInit, OnDestroy {
   posts: Post[] = [];
   followers: any[] = [];
   profileImageSrc = 'assets/pictures/profil.png';
@@ -23,54 +23,89 @@ export class FeedComponent implements OnInit {
   subscription: Subscription = new Subscription();
   images: string[] = [];
   currentUserProfile: UserProfile | null = null;
+  currentUser: User | null = null;
+  private destroy$ = new Subject<void>();
 
 
   constructor(public dialog: MatDialog, private feedService: FeedService, private imageService: ImagesService, private userService: UserService, private authService: AuthService) {
   }
 
   ngOnInit(): void {
+    this.authService.currentUser.subscribe(data => this.currentUser = data);
     if (this.authService.isAuthenticated()) {
-      this.fetchCurrentUserProfile();
+      this.fetchCurrentUserAndFollowing();
     }
-    this.fetchPosts();
-   // this.fetchFollowers();
-    this.subscription = this.feedService.currentPost.subscribe(post => {
-      if (post) {
-        //TODO: replace mock with backend
-        // this.addPost()
-        this.addPostMock(post);
-      }
+    this.fetchUserFeed();
 
-    });
     // this.imageService.currentImages.subscribe(images => {
     //   this.images = images;
     // });
   }
 
-  fetchPosts(): void {
-    //TODO: replace with api call
-    this.feedService.getPostsMock().subscribe({
-        next: (data: Post[]) => {
-          this.posts = data;
-        },
-        error: (err) => {
-          console.error(err);
-        }
-      }
-    );
+  fetchFollowing(): void {
+    console.log(this.currentUserProfile);
+    if (this.currentUserProfile?.id) {
+      this.userService.getAllFollowingAsProfiles(this.currentUserProfile?.id)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (profiles) => {
+            console.log(profiles);
+            this.followers = profiles;
+          },
+          error: (error) => console.error('Error fetching following profiles:', error)
+        });
+    }
+
   }
 
-  // fetchFollowers(): void {
-  //   //TODO: replace with api call
-  //   if (this.currentUserProfile && this.currentUserProfile.id)
-  //     this.userService.getAllFollowingAsProfiles(this.currentUserProfile.id).subscribe({
-  //       next: (users: Profile[]) => {
-  //         this.followers = users;
-  //       },
-  //       error: (err) => console.error(err)
-  //     });
-  //
-  // }
+  fetchUserFeed(): void {
+    const userId = this.authService.getUserIdFromLocalStorage();
+    if (userId) {
+      this.feedService.getUserFeed(userId).subscribe({
+        next: (response) => {
+          if (response) {
+            this.posts = response;
+          } else {
+            console.error('Failed to fetch feed:', response);
+          }
+        },
+        error: (error) => console.error('Error fetching feed:', error)
+      });
+    } else {
+      console.error('User ID not found');
+    }
+  }
+
+  fetchCurrentUserAndFollowing(): void {
+    this.authService.fetchCurrentUserProfile().pipe(
+      tap((currentUser: User) => {
+        this.currentUserProfile = {
+          id: currentUser.id,
+          name: `${currentUser.firstName} ${currentUser.lastName}`,
+          username: currentUser.userName,
+          bio: currentUser.bio,
+          imageUrl: currentUser.imageUrl,
+        };
+      }),
+      switchMap((currentUser: User) =>
+        this.userService.getAllFollowingAsProfiles(currentUser.id)
+      ),
+      map(users => users.map(user => ({
+        userId: user.id,
+        name: `${user.firstName} ${user.lastName}`,
+        username: user.userName,
+        isFollowing: false,
+        profileImage: user.imageUrl || 'https://www.profilebakery.com/wp-content/uploads/2023/04/AI-Profile-Picture.jpg',
+      }))),
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (profiles) => {
+        this.followers = profiles;
+      },
+      error: (error) => console.error('Error fetching user and following profiles:', error)
+    });
+  }
+
 
   fetchCurrentUserProfile(): void {
 
@@ -83,6 +118,7 @@ export class FeedComponent implements OnInit {
           bio: currentUser.bio,
           imageUrl: currentUser.imageUrl,
         };
+        console.log(this.currentUserProfile);
       },
       error: (error) => {
         console.error('Error fetching user profile:', error);
@@ -101,15 +137,10 @@ export class FeedComponent implements OnInit {
     }
   }
 
-  addPostMock(post: Post) {
-    this.feedService.createPost(post);
-    this.posts.push(post);
-
-  }
 
   //TODO: replace with api call
   toggleFollow(post: Post): void {
-    post.author.isFollowing = !post.author.isFollowing;
+    //  post.author.isFollowing = !post.author.isFollowing;
     /*  if (post.author.isFollowing) {
         this.feedService.unfollowUser(post.author.userId).subscribe(() => {
           post.author.isFollowing = false;
@@ -122,18 +153,12 @@ export class FeedComponent implements OnInit {
      */
   }
 
-  addComment(postId: number): void {
-    if (this.newCommentTexts[postId]) {
+  addComment(postId: number | undefined): void {
+    if (postId && this.newCommentTexts[postId]) {
       const newComment: Comment = {
         // TODO: get comment from backend
         id: 0,
-        author: {
-          userId: 1,
-          name: 'Alice Johnson',
-          username: 'alicej',
-          isFollowing: true,
-          profileImage: 'path/to/alice.jpg',
-        },
+        authorId: 0,
         date: new Date(),
         text: this.newCommentTexts[postId],
       };
@@ -142,7 +167,7 @@ export class FeedComponent implements OnInit {
       if (post) {
         // TODO: add comment to backend
 
-        post.comments.push(newComment);
+       // post.comments.push(newComment);
         this.newCommentTexts[postId] = '';
 
       }
@@ -156,6 +181,11 @@ export class FeedComponent implements OnInit {
   openAddPostDialog(): void {
     const dialogRef = this.dialog.open(AddPostDialogComponent, {
       width: '500px',
+    });
+    dialogRef.afterClosed().subscribe((newPost: Post) => {
+      if (newPost) {
+        this.posts.unshift(newPost);
+      }
     });
   }
 
@@ -171,6 +201,10 @@ export class FeedComponent implements OnInit {
     }
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }
 
 
