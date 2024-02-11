@@ -10,7 +10,7 @@ import lombok.*;
 @Builder
 @ToString
 public class CheckUserExistsResponseDTO {
-    private Boolean responseObject;
+    private Boolean data;
     private String message;
     private ErrorResponse errors;
     private int status;

@@ -64,7 +64,7 @@ public class FeedService {
         return postMapper.toDomain(actualPost);
     }
 
-    public PostDTO addComment(Long postId, CommentDTO commentDTO){
+    public PostDTO addComment(Long postId, CommentDTO commentDTO) {
         Optional<Post> optional = postRepository.findById(postId);
         if (optional.isEmpty())
             throw new ResourceNotFoundException("No Post Found with id: " + postId + "!");
@@ -82,7 +82,7 @@ public class FeedService {
         return postMapper.toDomain(actualPost);
     }
 
-    public PostDTO deleteComment(Long postId, Long commentId){
+    public PostDTO deleteComment(Long postId, Long commentId) {
         Optional<Post> optional = postRepository.findById(postId);
         if (optional.isEmpty())
             throw new ResourceNotFoundException("No Post Found with id: " + postId + "!");
@@ -129,7 +129,7 @@ public class FeedService {
     }
 
     public PostDTO shareMeetup(MeetupDTO meetup, Long authorId) {
-        if(!checkUserId(authorId))
+        if (!checkUserId(authorId))
             throw new ResourceNotFoundException("User with id " + authorId + " does not exist!");
         Post post = new Post();
         post.setAuthorID(authorId);
@@ -151,7 +151,7 @@ public class FeedService {
         PostDTO post = getPostById(postId);
         List<String> usersLikedThePost = new ArrayList<>();
 
-        for(Like like : post.getLikes()) {
+        for (Like like : post.getLikes()) {
 
             usersLikedThePost.add(getUserNameById(like.getLikerId()));
         }
@@ -199,7 +199,7 @@ public class FeedService {
     }
 
     public List<PostDTO> getPostsByAuthorId(Long authorId) {
-        if(!checkUserId(authorId))
+        if (!checkUserId(authorId))
             throw new ResourceNotFoundException("User with id " + authorId + " does not exist!");
 
         return postRepository.findByAuthorID(authorId).stream().map(postMapper::toDomain).toList();
@@ -241,7 +241,7 @@ public class FeedService {
                 .retrieve()
                 .bodyToMono(GetFollowingResponseDTO.class).block();
 
-        return res.getResponseObject();
+        return res.getData();
     }
 
    /* public Mono<List<PostDTO>> generateUserFeed(Long userId) {
@@ -302,7 +302,7 @@ public class FeedService {
                 .uri("http://user-service:8084/api/user/auth/exists/{userId}", userId)
                 .retrieve().bodyToMono(CheckUserExistsResponseDTO.class).block();
 
-        Boolean check = res.getResponseObject();
+        Boolean check = res.getData();
         return check != null && check;
     }
 
@@ -310,11 +310,11 @@ public class FeedService {
         if (!checkUserId(id))
             throw new ResourceNotFoundException("User with id " + id + " does not exist!");
 
-        GetUserByIdResponseDTO res =  this.webClient.get()
-                    .uri("http://user-service:8084/api/user/secured/{userId}", id)
-                    .retrieve().bodyToMono(GetUserByIdResponseDTO.class).block();
+        GetUserByIdResponseDTO res = this.webClient.get()
+                .uri("http://user-service:8084/api/user/secured/{userId}", id)
+                .retrieve().bodyToMono(GetUserByIdResponseDTO.class).block();
 
-        UserFeedDTO user = res.getResponseObject();
+        UserFeedDTO user = res.getData();
         return user.getUserName();
     }
 

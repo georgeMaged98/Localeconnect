@@ -10,7 +10,7 @@ import lombok.*;
 @Builder
 @ToString
 public class GetUserByIdResponseDTO {
-    private UserFeedDTO responseObject;
+    private UserFeedDTO data;
     private String message;
     private ErrorResponse errors;
     private int status;
