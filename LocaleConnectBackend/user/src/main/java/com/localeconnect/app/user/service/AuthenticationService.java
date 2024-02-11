@@ -24,7 +24,6 @@ public class AuthenticationService {
 
     public AuthenticationResponse registerTraveler(TravelerDTO traveler) {
 
-        log.info("************entered  SERVICE REGISTER-TRAVELER**************");
         TravelerDTO registeredTraveler = userService.registerTraveler(traveler);
         String accessToken = jwtUtil.generateToken(registeredTraveler.getUserName());
         return new AuthenticationResponse(accessToken);
@@ -39,18 +38,13 @@ public class AuthenticationService {
     }
 
     public String login(AuthenticationRequest request) {
-        log.info("************entered AUTHSERVICE.LOGIN **************");
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
-        log.info("************finished WITH AUTH MANAGER**************");
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        log.info("************finished SET AUTHENTICATION**************");
         if (authentication.isAuthenticated()) {
             String token = jwtUtil.generateToken(request.getEmail());
-            log.info("************GENERATED TOKEN**************");
             jwtUtil.validateToken(token);
-            log.info("************Validated TOKEN**************");
             return token;
         } else {
             throw new ValidationException("Authentication failed");

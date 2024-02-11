@@ -25,7 +25,7 @@ public class Trip {
     private String description;
     private LocalDate departureTime;
     private String destination;
-    private Double travelTime;
+    private Integer durationInHours;
     private Integer capacity;
 
     @ElementCollection

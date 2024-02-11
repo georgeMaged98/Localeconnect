@@ -39,7 +39,6 @@ public class UserService implements UserDetailsService {
     private final TravelerMapper travelerMapper;
     private final LocalguideMapper localguideMapper;
     public TravelerDTO registerTraveler(TravelerDTO travelerDTO) {
-        log.info("************entred USERSERVICE/register-traveler **************");
         if (userRepository.existsByUserName(travelerDTO.getUserName())) {
             throw new UserAlreadyExistsException("A user with the given username already exists.");
         }
@@ -79,9 +78,7 @@ public class UserService implements UserDetailsService {
     }
 
     public List<UserDTO> getAllUsers() {
-        log.info("************entred USERSERVICE GETALLUSERS CONTROLLER**************");
         List<User> allUsers = userRepository.findAll();
-        log.info("************finished fetching ALLUSERS **************");
         return allUsers.stream()
                 .map(userMapper::toDomain)
                 .collect(Collectors.toList());
@@ -133,7 +130,7 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UserDoesNotExistException("Follower not found"));
 
         if (user.getFollowers().contains(follower)) {
-            user.getFollowing().remove(follower);
+            user.getFollowers().remove(follower);
             follower.getFollowing().remove(user);
 
             userRepository.save(user);
@@ -259,9 +256,10 @@ public class UserService implements UserDetailsService {
                 .map(user -> (Localguide) user)
                 .orElseThrow(() -> new UserDoesNotExistException("LocalGuide with id " + guideId + " does not exist"));
 
-        LocalguideDTO ratedLocalGuideDTO = localguideMapper.toDomain(localguide);
-
-        return ratedLocalGuideDTO.getAverageRating();
+        if (localguide.getRatingsCount() == 0) {
+            return 0; // NO division by zero
+        }
+        return localguide.getRatingsTotal() / localguide.getRatingsCount();
     }
 
     public int getRatingCountOfLocalGuide(Long guideId) {
@@ -269,11 +267,9 @@ public class UserService implements UserDetailsService {
                 .filter(user -> user instanceof Localguide)
                 .map(user -> (Localguide) user)
                 .orElseThrow(() -> new UserDoesNotExistException("LocalGuide with id " + guideId + " does not exist"));
-
-        LocalguideDTO ratedLocalGuideDTO = localguideMapper.toDomain(localguide);
-
-        return ratedLocalGuideDTO.getRatingsCount();
+        return localguide.getRatingsCount();
     }
+
 
     public boolean checkUserId(Long userId) {
         return userRepository.findById(userId).isPresent();

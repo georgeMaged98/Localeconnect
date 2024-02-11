@@ -116,7 +116,6 @@ public class FeedService {
     }
 
     public PostDTO shareItinerary(ItineraryDTO itinerary, Long authorId) {
-        log.info("************entred SHARE ITI FEED-SERVICE **************");
         if(!checkUserId(authorId))
             throw new ResourceNotFoundException("User with id " + authorId + " does not exist!");
         Post post = new Post();
@@ -125,7 +124,6 @@ public class FeedService {
         post.setContent(createContentFromItinerary(itinerary));
         post.setDate(LocalDateTime.now());
         post.setImages(itinerary.getImageUrls());
-        log.info("************ SETTED POST TO SHARE **************");
         Post createdPost = postRepository.save(post);
         return postMapper.toDomain(createdPost);
     }
@@ -222,10 +220,16 @@ public class FeedService {
     public List<PostDTO> generateUserFeed(Long userId) {
         List<UserFeedDTO> following = getFollowing(userId);
 
-        return following.stream()
+        List<PostDTO> postList = following.stream()
                 .map(UserFeedDTO::getId)
                 .flatMap(authorId -> getPostsByAuthorId(authorId).stream())
                 .collect(Collectors.toList());
+
+        for (PostDTO p : getPostsByAuthorId(userId)) {
+            postList.add(p);
+        }
+
+        return postList;
     }
 
     private List<UserFeedDTO> getFollowing(Long userId) {
