@@ -63,7 +63,7 @@ export class ItineraryComponent implements OnInit, OnDestroy {
     this.initializeDisplayedItineraries();
     this.itineraryService.getItineraries().subscribe({
       next: (itineraryRes: ApiResponse) => {
-        this.allItineraries = itineraryRes.responseObject as Itinerary[];
+        this.allItineraries = itineraryRes.data as Itinerary[];
         this.itineraries = [...this.allItineraries];
         this.totalLength = this.allItineraries.length;
         this.initializeDisplayedItineraries();
@@ -76,7 +76,7 @@ export class ItineraryComponent implements OnInit, OnDestroy {
               this.imageService.getImage(itinerary.imageUrls[0]).subscribe({
                 next: (gcpRes: ApiResponse) => {
                   itinerary.imageUrls = [];
-                  itinerary.imageUrls.push(gcpRes.responseObject.toString());
+                  itinerary.imageUrls.push(gcpRes.data.toString());
                 },
                 error: (errorMessage: ApiResponse) =>
                   console.error(errorMessage.errors),

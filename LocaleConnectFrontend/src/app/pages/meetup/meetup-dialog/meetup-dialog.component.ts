@@ -55,7 +55,7 @@ export class MeetupDialogComponent {
       this.meetupService.createMeetup(newMeetup).subscribe({
         next: (res: ApiResponse) => {
           console.log(res);
-          this.dialogRef.close(res.responseObject);
+          this.dialogRef.close(res.data);
         },
         error: (error: any) => console.error(error),
       });

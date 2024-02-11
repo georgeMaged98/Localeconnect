@@ -5,7 +5,7 @@ import {User, UserProfile} from '../model/user';
 import {Traveler} from '../model/traveler';
 import {Guide} from '../model/guide';
 import {environment} from '../../environments/environment';
-import {Response} from '../model/response';
+import {ApiResponse} from "../model/apiResponse";
 
 @Injectable({
   providedIn: 'root',
@@ -40,11 +40,11 @@ export class AuthService {
 
   login(email: string, password: string): Observable<void> {
     return this.http
-      .post<Response>(`${this.apiUrl}/login`, {email, password})
+      .post<ApiResponse>(`${this.apiUrl}/login`, {email, password})
       .pipe(
         tap((response) => {
-          console.log(response.responseObject);
-          this.setSession(response.responseObject);
+          console.log(response.data);
+          this.setSession(response.data as string);
           console.log(localStorage.getItem('token'));
         }),
         catchError(this.handleError<any>('login'))
@@ -156,12 +156,6 @@ export class AuthService {
     };
   }
 
-  // public getTokenFromLocalStorage(): string | null {
-  //   const storedUser = localStorage.getItem('currentUser');
-  //   if (!storedUser) return null;
-  //   const token = JSON.parse(storedUser).responseObject;
-  //   return token;
-  // }
   public getTokenFromLocalStorage(): string | null {
     return localStorage.getItem('token');
   }

@@ -36,7 +36,7 @@ export class ReviewComponent implements OnInit {
       (reviews: Review[]) => this.reviews = reviews
     );
   }
-  getStars(rating: number) {
+  getStars(rating: number=0) {
 
     const fullStars = Math.floor(rating);
     const halfStar = rating % 1 !== 0 ? 1 : 0;

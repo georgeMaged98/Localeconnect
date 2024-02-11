@@ -69,7 +69,7 @@ export class UserService {
   getAllGuides(): Observable<Guide[]> {
     const httpHeaders = this.authService.getHttpHeaders();
     return this.http.get<ApiResponse>(`${this.apiUrl}/guides`,{headers:httpHeaders})
-      .pipe(map((response) => response.responseObject as Guide[] | []));
+      .pipe(map((response) => response.data as Guide[] | []));
   }
 
   filterLocalGuideByCity(keyword: string): Observable<User[]> {
@@ -92,18 +92,18 @@ export class UserService {
   getAllFollowing(userId: number | undefined): Observable<User[]> {
 
     return this.http.get<ApiResponse>(`${this.apiUrl}/${userId}/following`, {headers: this.headers}).pipe(
-      map(res => res.responseObject ? res.responseObject as User[] : []));
+      map(res => res.data ? res.data as User[] : []));
 
   }
 
   getAverageRatingOfLocalGuide(userId: number): Observable<number> {
     return this.http.get<ApiResponse>(`${this.apiUrl}/${userId}/rating`, {headers:this.headers}).pipe(
-      map(res => res.responseObject ? res.responseObject as number : 0));
+      map(res => res.data ? res.data as number : 0));
   }
 
   getRatingCountOfLocalGuide(userId: number): Observable<number> {
     return this.http.get<ApiResponse>(`${this.apiUrl}/${userId}/rating-count`,{headers:this.headers}).pipe(
-      map(res => res.responseObject ? res.responseObject as number : 0));
+      map(res => res.data ? res.data as number : 0));
   }
 
   MOCK_TRIP_PREVIEWS: TripPreview[] = [

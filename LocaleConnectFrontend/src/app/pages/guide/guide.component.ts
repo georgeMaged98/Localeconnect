@@ -1,6 +1,6 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {FormControl} from '@angular/forms';
-import {debounceTime, distinctUntilChanged, forkJoin, map, of, switchMap} from 'rxjs';
+import {debounceTime, distinctUntilChanged} from 'rxjs';
 import {MatDialog} from '@angular/material/dialog';
 import {ReviewService} from '../../service/review.service';
 import {UserService} from '../../service/user.service';
@@ -9,7 +9,6 @@ import {GuideProfile} from '../../model/guide';
 import {NotificationService} from '../../service/notification.service';
 import {MatPaginator} from '@angular/material/paginator';
 import {AuthService} from "../../service/auth.service";
-import {catchError} from "rxjs/operators";
 
 @Component({
   selector: 'app-guide',
