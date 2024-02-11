@@ -44,7 +44,7 @@ export class MeetupComponent implements OnInit, OnDestroy {
     this.initializeDisplayedMeetups();
     this.meetupService.getAllMeetups().subscribe({
       next: (meetupRes: ApiResponse) => {
-        this.meetups = meetupRes.data as Meetup[];
+        this.meetups = meetupRes.responseObject as Meetup[];
         this.meetups = [...this.meetups];
         this.totalLength = this.meetups.length;
         const travellerId = this.getTravellerId();
@@ -141,7 +141,7 @@ export class MeetupComponent implements OnInit, OnDestroy {
   checkUserMeetupsBeforeDeletion(id: number): void {
     this.meetupService.getCreatorMeetups(this.userService.getCurrentUserId()).subscribe({
       next: (res) => {
-        const meetups: Meetup[] = res.data as Meetup[];
+        const meetups: Meetup[] = res.responseObject as Meetup[];
         const userHasMeetups = meetups.some(itinerary => itinerary.id === id);
         if (userHasMeetups) {
           this.deleteMeetup(id);
