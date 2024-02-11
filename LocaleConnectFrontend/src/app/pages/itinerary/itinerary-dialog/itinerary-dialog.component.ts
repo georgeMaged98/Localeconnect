@@ -65,7 +65,7 @@ export class ItineraryDialogComponent {
 
       this.itineraryService.addItinerary(itinerary).subscribe({
         next: (res: ApiResponse) => {
-          this.dialogRef.close(res.data);
+          this.dialogRef.close(res.responseObject);
         },
         error: (error: any) => console.error(error),
       });
