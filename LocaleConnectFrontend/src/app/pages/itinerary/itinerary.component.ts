@@ -94,7 +94,6 @@ export class ItineraryComponent implements OnInit, OnDestroy {
 
     // this.subscription = this.itineraryService.currentItinerary.subscribe(
     //   (itinerary) => {
-    //     console.log('WEIRD', itinerary);
 
     //     if (itinerary) {
     //       this.addItinerary(itinerary);
@@ -165,11 +164,9 @@ export class ItineraryComponent implements OnInit, OnDestroy {
   }
 
   // addItinerary(newItinerary: Itinerary): void {
-  //   console.log('ADD IT ', newItinerary);
 
   //   this.itineraryService.addItinerary(newItinerary).subscribe({
   //     next: (res: ApiResponse) => {
-  //       console.log(res);
 
   //       // this.allItineraries.push(itinerary);
   //     },

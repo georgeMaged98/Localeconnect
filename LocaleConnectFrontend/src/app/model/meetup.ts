@@ -13,7 +13,7 @@ export interface Meetup {
   meetupAttendees: number[];
   rating: number;
   ratingSubmitted?: boolean;
-  totalRatings?: number;
+  ratingsCount?: number;
   averageRating?: number;
   expand?: boolean;
   isAttending?: boolean;

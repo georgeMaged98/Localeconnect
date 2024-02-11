@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 @ToString
 public class ShareTripResponseDTO {
-    private String responseObject;
+    private String data;
     private String message;
     private ErrorResponse errors;
     private int status;

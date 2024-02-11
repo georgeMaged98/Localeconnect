@@ -251,7 +251,7 @@ public class MeetupService {
                 .bodyToMono(ShareMeetupResponseDTO.class)
                 .block();
 
-        return res.getResponseObject();
+        return res.getData();
     }
 
     private boolean checkUserId(Long userId) {
@@ -260,7 +260,7 @@ public class MeetupService {
                 .uri("http://user-service:8084/api/user/auth/exists/{userId}", userId)
                 .retrieve().bodyToMono(CheckUserExistsResponseDTO.class).block();
 
-        Boolean check = res.getResponseObject();
+        Boolean check = res.getData();
         return check != null && check;
     }
 

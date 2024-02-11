@@ -1,11 +1,22 @@
-import {Injectable} from '@angular/core';
-import {HttpClient, HttpErrorResponse, HttpHeaders,} from '@angular/common/http';
-import {BehaviorSubject, catchError, Observable, of, tap, throwError,} from 'rxjs';
-import {User, UserProfile} from '../model/user';
-import {Traveler} from '../model/traveler';
-import {Guide} from '../model/guide';
-import {environment} from '../../environments/environment';
-import {ApiResponse} from "../model/apiResponse";
+import { Injectable } from '@angular/core';
+import {
+  HttpClient,
+  HttpErrorResponse,
+  HttpHeaders,
+} from '@angular/common/http';
+import {
+  BehaviorSubject,
+  catchError,
+  Observable,
+  of,
+  tap,
+  throwError,
+} from 'rxjs';
+import { User, UserProfile } from '../model/user';
+import { Traveler } from '../model/traveler';
+import { Guide } from '../model/guide';
+import { environment } from '../../environments/environment';
+import { ApiResponse } from '../model/apiResponse';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +25,6 @@ export class AuthService {
   private apiUrl = `${environment.API_URL}/api/user/auth`;
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser: Observable<User | null>;
-
 
   constructor(private http: HttpClient) {
     this.currentUserSubject = new BehaviorSubject<User | null>(
@@ -29,18 +39,20 @@ export class AuthService {
 
   getCurrentUserProfile(): UserProfile | null {
     const user = this.getUserFromLocalStorage();
-    return user ? {
-      id: user.id,
-      name: `${user.firstName} ${user.lastName}`,
-      username: user.userName,
-      bio: user.bio,
-      imageUrl: user.imageUrl,
-    } : null;
+    return user
+      ? {
+          id: user.id,
+          name: `${user.firstName} ${user.lastName}`,
+          username: user.userName,
+          bio: user.bio,
+          imageUrl: user.imageUrl,
+        }
+      : null;
   }
 
   login(email: string, password: string): Observable<void> {
     return this.http
-      .post<ApiResponse>(`${this.apiUrl}/login`, {email, password})
+      .post<ApiResponse>(`${this.apiUrl}/login`, { email, password })
       .pipe(
         tap((response) => {
           console.log(response.data);
@@ -57,22 +69,23 @@ export class AuthService {
       const userProfile: User = JSON.parse(storedUserProfile);
       return of(userProfile);
     } else {
-
       const httpHeaders = this.getHttpHeaders();
-      return this.http.get<User>(`${environment.API_URL}/api/user/secured/profile`, {headers: httpHeaders})
+      return this.http
+        .get<User>(`${environment.API_URL}/api/user/secured/profile`, {
+          headers: httpHeaders,
+        })
         .pipe(
-          tap(userProfile => {
+          tap((userProfile) => {
             localStorage.setItem('currentUser', JSON.stringify(userProfile));
-            console.log('LOCAL' + localStorage.getItem('currentUser'))
+            console.log('LOCAL' + localStorage.getItem('currentUser'));
           }),
-          catchError(error => {
+          catchError((error) => {
             console.error('Error fetching user profile:', error);
             return throwError(error);
           })
         );
     }
   }
-
 
   logout(): void {
     localStorage.removeItem('currentUser');
@@ -91,7 +104,6 @@ export class AuthService {
   }
 
   registerTraveler(traveler: Traveler): Observable<Traveler> {
-
     return this.http
       .post<Traveler>(`${this.apiUrl}/register-traveler`, traveler)
       .pipe(catchError(this.handleError<Traveler>('register traveler')));
@@ -99,7 +111,7 @@ export class AuthService {
 
   registerGuide(guide: Guide): Observable<Guide> {
     return this.http
-      .post<Guide>(`${this.apiUrl}/register-localguide`, guide, )
+      .post<Guide>(`${this.apiUrl}/register-localguide`, guide)
       .pipe(catchError(this.handleError<Guide>('register guide')));
   }
 
@@ -109,7 +121,9 @@ export class AuthService {
   }
 
   public getUserIdFromLocalStorage(): number | undefined {
-    return this.getUserFromLocalStorage() ? this.getUserFromLocalStorage()?.id : undefined;
+    return this.getUserFromLocalStorage()
+      ? this.getUserFromLocalStorage()?.id
+      : undefined;
   }
 
   public getUserFromLocalStorage(): User | null {
@@ -163,7 +177,7 @@ export class AuthService {
   public getHttpHeaders(): HttpHeaders {
     const token = this.getTokenFromLocalStorage();
     const httpOptions = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     });
     return httpOptions;
   }

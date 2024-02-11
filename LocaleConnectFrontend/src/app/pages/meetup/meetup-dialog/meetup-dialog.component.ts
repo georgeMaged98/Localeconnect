@@ -12,6 +12,10 @@ import { MeetupService } from '../../../service/meetup.service';
 import { Meetup } from '../../../model/meetup';
 import { LANGUAGES } from '../../../helper/DataHelper';
 import { ApiResponse } from 'src/app/model/apiResponse';
+import { HttpErrorResponse } from '@angular/common/http';
+import { NotificationService } from 'src/app/service/notification.service';
+import { AuthService } from 'src/app/service/auth.service';
+import { User } from 'src/app/model/user';
 
 @Component({
   selector: 'app-meetup-dialog',
@@ -24,7 +28,9 @@ export class MeetupDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<MeetupDialogComponent>,
     private formBuilder: FormBuilder,
-    private meetupService: MeetupService
+    private meetupService: MeetupService,
+    private notificationService: NotificationService,
+    private authService: AuthService
   ) {
     this.meetupForm = this.formBuilder.group({
       name: ['', Validators.required],
@@ -46,18 +52,25 @@ export class MeetupDialogComponent {
     if (this.meetupForm.valid) {
       const formData = this.meetupForm.value;
 
-      const newMeetup: Meetup = {
-        ...formData,
-        creatorId: 1,
-        meetupAttendees: [],
-      };
-
-      this.meetupService.createMeetup(newMeetup).subscribe({
-        next: (res: ApiResponse) => {
-          console.log(res);
-          this.dialogRef.close(res.data);
+      this.authService.fetchCurrentUserProfile().subscribe({
+        next: (user: User) => {
+          const newMeetup: Meetup = {
+            ...formData,
+            creatorId: user.id,
+            meetupAttendees: [],
+          };
+          this.meetupService.createMeetup(newMeetup).subscribe({
+            next: (res: ApiResponse) => {
+              this.dialogRef.close(res.data);
+              this.notificationService.showSuccess(
+                'Meetup Created Successfully!'
+              );
+            },
+            error: (error: HttpErrorResponse) => {
+              this.notificationService.showError(error.error.errors.errors[0]);
+            },
+          });
         },
-        error: (error: any) => console.error(error),
       });
     }
   }

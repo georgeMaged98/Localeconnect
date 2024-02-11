@@ -286,7 +286,7 @@ public class TripService {
                 .bodyToMono(ShareTripResponseDTO.class)
                 .block();
 
-        return res.getResponseObject();
+        return res.getData();
     }
     private GCPResponseDTO saveImageToGCP(String image) {
         ResponseEntity<GCPResponseDTO> responseEntity = webClient.post()
@@ -305,7 +305,7 @@ public class TripService {
                 .uri("http://user-service:8084/api/user/auth/exists/{userId}", userId)
                 .retrieve().bodyToMono(CheckUserExistsResponseDTO.class).block();
 
-        Boolean check = res.getResponseObject();
+        Boolean check = res.getData();
         return check != null && check;
     }
 
