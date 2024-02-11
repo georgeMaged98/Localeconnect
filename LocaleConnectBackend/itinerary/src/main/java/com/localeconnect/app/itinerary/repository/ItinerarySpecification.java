@@ -1,6 +1,6 @@
 package com.localeconnect.app.itinerary.repository;
 
-import com.localeconnect.app.itinerary.dto.Tag;
+//import com.localeconnect.app.itinerary.dto.Tag;
 import com.localeconnect.app.itinerary.model.Itinerary;
 import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
@@ -18,12 +18,12 @@ public class ItinerarySpecification {
         };
     }
 
-    public static Specification<Itinerary> hasTag(Tag tag) {
+    public static Specification<Itinerary> hasTag(String tag) {
         return (root, query, criteriaBuilder) -> {
             if (tag == null) {
                 return criteriaBuilder.disjunction();
             }
-            Join<Itinerary, Tag> tagsJoin = root.join("tags");
+            Join<Itinerary, String> tagsJoin = root.join("tags");
             return criteriaBuilder.equal(tagsJoin, tag);
         };
     }
