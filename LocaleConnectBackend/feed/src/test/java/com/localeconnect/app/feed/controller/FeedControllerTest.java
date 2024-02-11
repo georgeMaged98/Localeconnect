@@ -21,8 +21,6 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
-import static net.bytebuddy.matcher.ElementMatchers.is;
-import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -48,7 +46,6 @@ public class FeedControllerTest {
                 .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
                 .build();
     }
-
 
     @Test
     void createRegularPost_ShouldReturnSuccess() throws Exception {
@@ -99,7 +96,6 @@ public class FeedControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.message").value("Success!"));
     }
-
     @Test
     void deleteComment_ShouldReturnSuccess() throws Exception {
         PostDTO updatedPostDTO = new PostDTO();
@@ -110,7 +106,6 @@ public class FeedControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Success!"));
     }
-
     @Test
     void shareTrip_ShouldReturnSuccess() throws Exception {
         TripDTO tripDTO = new TripDTO();
@@ -130,7 +125,6 @@ public class FeedControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Success!"));
     }
-
     @Test
     void shareItinerary_ShouldReturnSuccess() throws Exception {
         ItineraryDTO itineraryDTO = new ItineraryDTO();
@@ -176,7 +170,6 @@ public class FeedControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Success!"));
     }
-
     @Test
     void likePost_ShouldReturnUpdatedPost() throws Exception {
         LikeDTO likeDTO = new LikeDTO();

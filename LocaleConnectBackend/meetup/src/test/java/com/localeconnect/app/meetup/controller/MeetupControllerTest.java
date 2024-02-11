@@ -3,7 +3,6 @@ package com.localeconnect.app.meetup.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.localeconnect.app.meetup.dto.MeetupDTO;
-import com.localeconnect.app.meetup.dto.MeetupEditDTO;
 import com.localeconnect.app.meetup.service.MeetupService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -105,7 +104,6 @@ public class MeetupControllerTest {
                 .andExpect(jsonPath("$.data[0].name").value(meetups.get(0).getName()))
                 .andExpect(jsonPath("$.data[1].name").value(meetups.get(1).getName()));
     }
-
 
     @Test
     void getMeetupById_ShouldReturnMeetup() throws Exception {
