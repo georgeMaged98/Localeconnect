@@ -115,7 +115,7 @@ public class MeetupServiceTest {
     void testDeleteMeetupSuccess() {
         Long meetupId = 1L;
         Meetup existingMeetup = new Meetup();
-        existingMeetup.setId(meetupId); // Assuming the meetup has an ID
+        existingMeetup.setId(meetupId);
         when(meetupRepository.findById(meetupId)).thenReturn(Optional.of(existingMeetup));
 
         meetupService.deleteMeetupById(meetupId);
