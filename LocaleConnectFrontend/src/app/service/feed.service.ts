@@ -25,7 +25,7 @@ export class FeedService {
   createRegularPost(regularPost: Post): Observable<Post> {
     return this.http
       .post<ApiResponse>(`${this.apiUrl}/create`, regularPost, {headers: this.httpHeaders})
-      .pipe(map((response) => response.data as Post));
+      .pipe(map((response) => response.responseObject as Post));
   }
 
   changePost(post: any) {
@@ -43,7 +43,7 @@ export class FeedService {
 
   addComment(postId: number, comment: Comment): Observable<Comment> {
     return this.http.post<ApiResponse>(`${this.apiUrl}/${postId}/comment`, comment, {headers: this.httpHeaders})
-      .pipe(map((response) => response.data as Comment));
+      .pipe(map((response) => response.responseObject as Comment));
   }
 
   deleteComment(postId: number, commentId: number): Observable<ApiResponse> {
@@ -52,11 +52,11 @@ export class FeedService {
 
   getPostById(postId: number): Observable<Post> {
     return this.http.get<ApiResponse>(`${this.apiUrl}/${postId}`, {headers: this.httpHeaders})
-      .pipe(map((response) => response.data as Post));
+      .pipe(map((response) => response.responseObject as Post));
   }
   getUserFeed(userId: number): Observable<Post[]> {
     return this.http.get<ApiResponse>(`${this.apiUrl}/home/${userId}`,{headers: this.httpHeaders})
-      .pipe(map((response) => response.data as Post[] | []));
+      .pipe(map((response) => response.responseObject as Post[] | []));
   }
 
   getPostLikeCount(postId: number): Observable<number> {

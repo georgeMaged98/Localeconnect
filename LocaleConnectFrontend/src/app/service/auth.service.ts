@@ -91,16 +91,15 @@ export class AuthService {
   }
 
   registerTraveler(traveler: Traveler): Observable<Traveler> {
-    const headers = new HttpHeaders({'Content-Type': 'application/json'});
+
     return this.http
-      .post<Traveler>(`${this.apiUrl}/register-traveler`, traveler, {headers})
+      .post<Traveler>(`${this.apiUrl}/register-traveler`, traveler)
       .pipe(catchError(this.handleError<Traveler>('register traveler')));
   }
 
   registerGuide(guide: Guide): Observable<Guide> {
-    const headers = new HttpHeaders({'Content-Type': 'application/json'});
     return this.http
-      .post<Guide>(`${this.apiUrl}/register-localguide`, guide, {headers})
+      .post<Guide>(`${this.apiUrl}/register-localguide`, guide, )
       .pipe(catchError(this.handleError<Guide>('register guide')));
   }
 

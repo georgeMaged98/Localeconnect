@@ -37,6 +37,7 @@ export class AddPostDialogComponent {
 
   onSubmit(): void {
     const currentDate = getFormattedDate(new Date());
+    console.log(this.authService.getCurrentUserProfile());
     if (this.postForm.valid) {
       const postData: Post = {
         authorID: this.authService.getUserIdFromLocalStorage(),
@@ -44,7 +45,6 @@ export class AddPostDialogComponent {
         images: this.images,
         postType: PostType.REGULAR,
         date: currentDate,
-        author: this.authService.getCurrentUserProfile()
 
       };
       console.log(postData);

@@ -35,6 +35,8 @@ export class FeedComponent implements OnInit, OnDestroy {
     if (this.authService.isAuthenticated()) {
       this.fetchCurrentUserAndFollowing();
     }
+
+    //TODO: fetch user from backend and display in the feed!
     this.fetchUserFeed();
 
     // this.imageService.currentImages.subscribe(images => {
@@ -184,7 +186,9 @@ export class FeedComponent implements OnInit, OnDestroy {
     });
     dialogRef.afterClosed().subscribe((newPost: Post) => {
       if (newPost) {
+        newPost.author= this.authService.getCurrentUserProfile()
         this.posts.unshift(newPost);
+
       }
     });
   }
