@@ -42,9 +42,7 @@ export class AuthService {
       .post<Response>(`${this.apiUrl}/login`, {email, password})
       .pipe(
         tap((response) => {
-          console.log(response.responseObject);
           this.setSession(response.responseObject);
-          console.log(localStorage.getItem('token'));
         }),
         catchError(this.handleError<any>('login'))
       );
@@ -52,12 +50,10 @@ export class AuthService {
 
   fetchCurrentUserProfile(): Observable<User> {
     const httpHeaders = this.getHttpHeaders();
-    console.log(localStorage.getItem('token'))
     return this.http
       .get<User>(`${environment.API_URL}/api/user/secured/profile`, {headers: httpHeaders})
       .pipe(
         map((response) => {
-          console.log(response);
           return response;
         }),
         catchError(this.handleError<User>('fetchCurrentUserProfile'))
@@ -143,12 +139,7 @@ export class AuthService {
     };
   }
 
-  // public getTokenFromLocalStorage(): string | null {
-  //   const storedUser = localStorage.getItem('currentUser');
-  //   if (!storedUser) return null;
-  //   const token = JSON.parse(storedUser).responseObject;
-  //   return token;
-  // }
+
   public getTokenFromLocalStorage(): string | null {
     return localStorage.getItem('token');
   }

@@ -32,11 +32,11 @@ export class NotificationService {
   }
 
   initializeWebSocketConnection() {
-    console.log('Initialize Websocket Connection!');
+
     this.authService.fetchCurrentUserProfile().subscribe({
       next: (user: User) => {
         const userId = user.id;
-        console.log(userId);
+
         const serverUrl = this.webSocketEndPoint;
         // const ws = new SockJS(serverUrl);
         const ws = new WebSocket('ws://localhost:8080/ws');
@@ -50,13 +50,12 @@ export class NotificationService {
         const that = this;
         // tslint:disable-next-line:only-arrow-functions
         this.stompClient.connect(headers, function (frame: Stomp.Frame) {
-          that.stompClient.subscribe(
-            '/topic/notification',
-            (message: Stomp.Message) => {
-              console.log(JSON.parse(message.body));
-            }
-          );
-
+          // that.stompClient.subscribe(
+          //   '/topic/notification',
+          //   (message: Stomp.Message) => {
+          //     console.log(JSON.parse(message.body));
+          //   }
+          // );
           that.stompClient.subscribe(
             `/user/${userId}/msg`,
             (response: Stomp.Message) => {
@@ -87,7 +86,6 @@ export class NotificationService {
           .get<ApiResponse>(`${this.apiUrl}/notify/${userId}`)
           .subscribe({
             next: (res: ApiResponse) => {
-              console.log(res);
               const notifications: Notification[] = res.data as Notification[];
               this.notificationSource.next(notifications);
             },
