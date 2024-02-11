@@ -75,4 +75,11 @@ export class ItineraryService {
       itinerary.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }
+
+  rateItinerary(itineraryId: number, userId: number, rating: number) {
+    return this.http.post<ApiResponse>(
+      `${this.apiUrl}/${itineraryId}/rate/${userId}?rating=${rating}`,
+      {}
+    );
+  }
 }

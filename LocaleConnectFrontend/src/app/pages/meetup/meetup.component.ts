@@ -52,13 +52,21 @@ export class MeetupComponent implements OnInit, OnDestroy {
         this.meetups = meetupRes.data as Meetup[];
         this.meetups = [...this.meetups];
         this.totalLength = this.meetups.length;
-        const travellerId = this.getTravellerId();
+        const travellerId = this.userService.getTravellerId();
         this.meetups.forEach((meetup) => {
           if (meetup.meetupAttendees.includes(travellerId)) {
             meetup.isAttending = true;
           } else {
             meetup.isAttending = false;
           }
+
+          // populate username
+          this.userService.getUserById(meetup.creatorId).subscribe({
+            next: (res: ApiResponse) => {
+              const user = res.data as User;
+              meetup.creatorName = user.userName;
+            },
+          });
         });
         this.initializeDisplayedMeetups();
         this.searchMeetups = [...this.meetups];
@@ -108,25 +116,22 @@ export class MeetupComponent implements OnInit, OnDestroy {
       'Are you sure you want to delete this Meetup?'
     );
 
-    if (confirmDelete) {
-      this.meetupService.deleteMeetup(id).subscribe({
-        next: () => {
-          this.notificationService.showSuccess('Meetup deleted successfully!');
-          this.meetups = this.meetups.filter(
-            (itinerary) => itinerary.id !== id
-          );
-          this.updateDisplayedMeetups();
-        },
-        error: (error) => {
-          console.error('Error deleting meetup', error);
-          this.notificationService.showError('Failed to delete meetup.');
-        },
-      });
-    }
+    if (!confirmDelete) return;
+    this.meetupService.deleteMeetup(id).subscribe({
+      next: () => {
+        this.notificationService.showSuccess('Meetup deleted successfully!');
+        this.meetups = this.meetups.filter((meetup) => meetup.id !== id);
+        this.updateDisplayedMeetups();
+      },
+      error: (error) => {
+        console.error('Error deleting meetup', error);
+        this.notificationService.showError('Failed to delete meetup.');
+      },
+    });
   }
 
   attendMeetup(meetupId: number): void {
-    const travellerId = this.getTravellerId();
+    const travellerId = this.userService.getTravellerId();
     this.meetupService.attendMeetup(meetupId, travellerId).subscribe({
       next: (res: ApiResponse) => {
         if (res.status === 200) {
@@ -142,34 +147,15 @@ export class MeetupComponent implements OnInit, OnDestroy {
   }
 
   checkUserMeetupsBeforeDeletion(meetupId: number): void {
-    this.authService.fetchCurrentUserProfile().subscribe({
-      next: (user: User) => {
-        const meetup = this.meetups.find((meetup) => meetup.id === meetupId);
-        if (meetup?.creatorId === user.id) {
-          this.deleteMeetup(meetupId);
-        } else {
-          this.notificationService.showError(
-            'Meetup was created by another traveller!'
-          );
-        }
-      },
-      error: (error: HttpErrorResponse) => {
-        console.error('Error fetching user profile', error);
-        this.notificationService.showError(error.error.errors.errors[0]);
-      },
-    });
-    // this.meetupService.getCreatorMeetups(this.userService.getCurrentUserId()).subscribe({
-    //   next: (res) => {
-    //     const meetups: Meetup[] = res.data as Meetup[];
-    //     const userHasMeetups = meetups.some(itinerary => itinerary.id === id);
-    //     if (userHasMeetups) {
-    //       this.deleteMeetup(id);
-    //     } else {
-    //       this.notificationService.showSuccess('No permission to delete this itinerary or it doesn\'t belong to the user.');
-    //     }
-    //   },
-    //   error: (error) => console.error('Error fetching user itineraries', error),
-    // });
+    const travellerId = this.userService.getTravellerId();
+    const meetup = this.meetups.find((meetup) => meetup.id === meetupId);
+    if (meetup?.creatorId === travellerId) {
+      this.deleteMeetup(meetupId);
+    } else {
+      this.notificationService.showError(
+        'Meetup was created by another traveller!'
+      );
+    }
   }
 
   changeMeetupAttendance(meetupId: number): void {
@@ -182,7 +168,7 @@ export class MeetupComponent implements OnInit, OnDestroy {
   }
 
   unattendMeetup(meetupId: number): void {
-    const travellerId = this.getTravellerId();
+    const travellerId = this.userService.getTravellerId();
     this.meetupService.unattendMeetup(meetupId, travellerId).subscribe({
       next: (res: ApiResponse) => {
         if (res.status === 200) {
@@ -205,7 +191,7 @@ export class MeetupComponent implements OnInit, OnDestroy {
     if (meetup.rating !== 0) {
       meetup.ratingSubmitted = true;
 
-      const userId = 1;
+      const userId = this.userService.getTravellerId();
       this.meetupService.rateMeetup(meetup.id, userId, rating).subscribe({
         next: (res: ApiResponse) => {
           const updatedMeetup: Meetup = res.data as Meetup;
@@ -234,21 +220,17 @@ export class MeetupComponent implements OnInit, OnDestroy {
     });
   }
 
-  private getTravellerId(): number {
-    return 1;
-  }
-
   toggleAttend(meetup: Meetup): void {
     meetup.isAttending = !meetup.isAttending;
     if (meetup.isAttending) {
       this.meetupService
-        .attendMeetup(meetup.id, this.getTravellerId())
+        .attendMeetup(meetup.id, this.userService.getTravellerId())
         .subscribe(() => {
           meetup.isAttending = false;
         });
     } else {
       this.meetupService
-        .unattendMeetup(meetup.id, this.getTravellerId())
+        .unattendMeetup(meetup.id, this.userService.getTravellerId())
         .subscribe(() => {
           meetup.isAttending = true;
         });
