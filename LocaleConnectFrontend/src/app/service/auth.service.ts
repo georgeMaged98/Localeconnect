@@ -55,9 +55,7 @@ export class AuthService {
       .post<ApiResponse>(`${this.apiUrl}/login`, { email, password })
       .pipe(
         tap((response) => {
-          console.log(response.data);
           this.setSession(response.data as string);
-          console.log(localStorage.getItem('token'));
         }),
         catchError(this.handleError<any>('login'))
       );
@@ -77,7 +75,6 @@ export class AuthService {
         .pipe(
           tap((userProfile) => {
             localStorage.setItem('currentUser', JSON.stringify(userProfile));
-            console.log('LOCAL' + localStorage.getItem('currentUser'));
           }),
           catchError((error) => {
             console.error('Error fetching user profile:', error);

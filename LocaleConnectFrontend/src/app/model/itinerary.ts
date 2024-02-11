@@ -1,6 +1,6 @@
 export interface Itinerary {
-  id?: number;
-  userId?: number;
+  id: number;
+  userId: number;
   username?: string;
   name: string;
   description: string;
@@ -15,6 +15,7 @@ export interface Itinerary {
   ratingSubmitted?: boolean;
   totalRatings?: number;
   averageRating?: number;
+  ratingsCount?: number;
 }
 
 export enum Tag {
