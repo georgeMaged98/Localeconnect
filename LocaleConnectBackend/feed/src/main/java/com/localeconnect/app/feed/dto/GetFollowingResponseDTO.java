@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 @ToString
 public class GetFollowingResponseDTO {
-    private List<UserFeedDTO> responseObject;
+    private List<UserFeedDTO> data;
     private String message;
     private ErrorResponse errors;
     private int status;

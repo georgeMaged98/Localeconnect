@@ -282,7 +282,7 @@ public class ItineraryService {
                 .uri("http://user-service:8084/api/user/auth/exists/{userId}", userId)
                 .retrieve().bodyToMono(CheckUserExistsResponseDTO.class).block();
 
-        Boolean check = res.getResponseObject();
+        Boolean check = res.getData();
         return check != null && check;
     }
 
@@ -299,7 +299,7 @@ public class ItineraryService {
                 .bodyToMono(ShareItineraryResponseDTO.class)
                 .block();
 
-        return res.getResponseObject();
+        return res.getData();
     }
 
     private GCPResponseDTO saveImageToGCP(String image) {

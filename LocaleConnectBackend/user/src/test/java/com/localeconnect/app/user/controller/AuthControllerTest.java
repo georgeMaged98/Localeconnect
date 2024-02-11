@@ -53,7 +53,7 @@ class AuthControllerTest {
         ResponseEntity<Object> response = authController.registerTraveler(travelerDTO);
 
         Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
-        AuthenticationResponse actualResponseObject = (AuthenticationResponse) responseBody.get("responseObject");
+        AuthenticationResponse actualResponseObject = (AuthenticationResponse) responseBody.get("data");
 
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -77,7 +77,7 @@ class AuthControllerTest {
         ResponseEntity<Object> response = authController.registerLocalGuide(localguideDTO);
 
         Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
-        AuthenticationResponse actualResponseObject = (AuthenticationResponse) responseBody.get("responseObject");
+        AuthenticationResponse actualResponseObject = (AuthenticationResponse) responseBody.get("data");
 
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -99,7 +99,7 @@ class AuthControllerTest {
         assertNotNull(response.getBody());
 
         Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
-        assertEquals(expectedToken, responseBody.get("responseObject"));
+        assertEquals(expectedToken, responseBody.get("data"));
 
         verify(authService).login(loginRequest);
     }
@@ -130,7 +130,7 @@ class AuthControllerTest {
         assertNotNull(response.getBody());
 
         Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
-        assertEquals(true, responseBody.get("responseObject"));
+        assertEquals(true, responseBody.get("data"));
 
         verify(userService).checkUserId(userId);
     }
@@ -146,7 +146,7 @@ class AuthControllerTest {
         assertNotNull(response.getBody());
 
         Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
-        assertEquals(false, responseBody.get("responseObject"));
+        assertEquals(false, responseBody.get("data"));
 
         verify(userService).checkUserId(userId);
     }

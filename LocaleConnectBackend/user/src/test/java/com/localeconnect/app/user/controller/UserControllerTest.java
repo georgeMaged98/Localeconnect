@@ -50,7 +50,7 @@ public class UserControllerTest {
         ResponseEntity<Object> response = userController.getUserById(userId);
 
         Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
-        UserDTO actualResponseObject = (UserDTO) responseBody.get("responseObject");
+        UserDTO actualResponseObject = (UserDTO) responseBody.get("data");
 
 
         assertNotNull(response);
@@ -93,7 +93,7 @@ public class UserControllerTest {
         ResponseEntity<Object> response = userController.getAllUsers();
 
         Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
-        List<UserDTO> actualResponseObject = (List<UserDTO>) responseBody.get("responseObject");
+        List<UserDTO> actualResponseObject = (List<UserDTO>) responseBody.get("data");
 
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -117,7 +117,7 @@ public class UserControllerTest {
 
         ResponseEntity<Object> response = userController.updateUser(mockUserToUpdate);
         Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
-        UserDTO actualResponseObject = (UserDTO) responseBody.get("responseObject");
+        UserDTO actualResponseObject = (UserDTO) responseBody.get("data");
 
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
