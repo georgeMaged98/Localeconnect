@@ -1,6 +1,5 @@
 package com.localeconnect.app.itinerary.model;
 
-import com.localeconnect.app.itinerary.dto.Tag;
 import jakarta.persistence.*;
 import lombok.*;
 

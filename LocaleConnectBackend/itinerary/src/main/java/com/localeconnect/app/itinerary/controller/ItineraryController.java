@@ -3,7 +3,7 @@ package com.localeconnect.app.itinerary.controller;
 import com.localeconnect.app.itinerary.dto.ItineraryAttendDTO;
 import com.localeconnect.app.itinerary.dto.ItineraryDTO;
 import com.localeconnect.app.itinerary.dto.ReviewDTO;
-import com.localeconnect.app.itinerary.dto.Tag;
+//import com.localeconnect.app.itinerary.dto.Tag;
 import com.localeconnect.app.itinerary.response_handler.ResponseHandler;
 import com.localeconnect.app.itinerary.service.ItineraryService;
 import jakarta.validation.Valid;
@@ -65,7 +65,7 @@ public class ItineraryController {
     @GetMapping("/filter")
     public ResponseEntity<Object> filterItineraries(
             @RequestParam(value = "place", required = false) String place,
-            @RequestParam(value = "tag", required = false) Tag tag,
+            @RequestParam(value = "tag", required = false) String tag,
             @RequestParam(value = "days", required = false) Integer days) {
         List<ItineraryDTO> itineraries = itineraryService.filter(place, tag, days);
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, itineraries, null);

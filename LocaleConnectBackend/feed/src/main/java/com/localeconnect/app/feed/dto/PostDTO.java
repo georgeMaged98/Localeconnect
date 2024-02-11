@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.localeconnect.app.feed.model.Comment;
 import com.localeconnect.app.feed.model.Like;
-import com.localeconnect.app.feed.type.PostType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -38,9 +37,8 @@ public class PostDTO implements Serializable{
 
     private List<Comment> comments = new ArrayList<>();
 
-    @NotNull(message = "Post type cannot be null")
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private PostType postType;
+    @NotNull(message = "Post type cannot be null and must be ITINERARY; REGULAR; TRIP; MEETUP")
+    private String postType;
 
     private List<Like> likes = new ArrayList<>();
 
