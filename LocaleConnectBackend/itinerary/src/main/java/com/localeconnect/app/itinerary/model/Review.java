@@ -1,6 +1,7 @@
 package com.localeconnect.app.itinerary.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.time.LocalDateTime;

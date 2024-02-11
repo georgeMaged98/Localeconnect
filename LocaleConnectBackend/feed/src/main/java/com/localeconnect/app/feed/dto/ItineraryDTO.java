@@ -1,8 +1,5 @@
 package com.localeconnect.app.feed.dto;
 
-import com.netflix.servo.tag.Tag;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -27,8 +24,7 @@ public class ItineraryDTO {
     private String description;
     @Positive(message = "Number of days must be greater than or equal to 1")
     private Integer numberOfDays;
-    @Enumerated(EnumType.STRING)
-    private List<Tag> tags;
+    private List<String> tags;
     @NotEmpty(message = "Provide at least one destination")
     @NotNull
     private List<String> placesToVisit;
