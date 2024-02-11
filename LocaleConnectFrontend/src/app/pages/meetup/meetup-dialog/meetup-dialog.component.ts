@@ -43,33 +43,32 @@ export class MeetupDialogComponent {
       spokenLanguages: ['', Validators.required],
     });
   }
+  private getTravellerId(): number {
+    let traveller = this.authService.getUserFromLocalStorage();
+    if (!traveller || !traveller.id) return -1;
 
+    return traveller.id;
+  }
   onNoClick(): void {
     this.dialogRef.close();
   }
 
   onSubmit(): void {
     if (this.meetupForm.valid) {
+      const travellerId = this.getTravellerId();
       const formData = this.meetupForm.value;
-
-      this.authService.fetchCurrentUserProfile().subscribe({
-        next: (user: User) => {
-          const newMeetup: Meetup = {
-            ...formData,
-            creatorId: user.id,
-            meetupAttendees: [],
-          };
-          this.meetupService.createMeetup(newMeetup).subscribe({
-            next: (res: ApiResponse) => {
-              this.dialogRef.close(res.data);
-              this.notificationService.showSuccess(
-                'Meetup Created Successfully!'
-              );
-            },
-            error: (error: HttpErrorResponse) => {
-              this.notificationService.showError(error.error.errors.errors[0]);
-            },
-          });
+      const newMeetup: Meetup = {
+        ...formData,
+        creatorId: travellerId,
+        meetupAttendees: [],
+      };
+      this.meetupService.createMeetup(newMeetup).subscribe({
+        next: (res: ApiResponse) => {
+          this.dialogRef.close(res.data);
+          this.notificationService.showSuccess('Meetup Created Successfully!');
+        },
+        error: (error: HttpErrorResponse) => {
+          this.notificationService.showError(error.error.errors.errors[0]);
         },
       });
     }

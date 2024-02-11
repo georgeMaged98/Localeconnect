@@ -52,7 +52,6 @@ export class NotificationService {
           // that.stompClient.subscribe(
           //   '/topic/notification',
           //   (message: Stomp.Message) => {
-          //     console.log(JSON.parse(message.body));
           //   }
           // );
           that.stompClient.subscribe(
@@ -89,7 +88,6 @@ export class NotificationService {
               this.notificationSource.next(notifications);
             },
             error: (err) => {
-              console.log(err);
               return [];
             },
           });
