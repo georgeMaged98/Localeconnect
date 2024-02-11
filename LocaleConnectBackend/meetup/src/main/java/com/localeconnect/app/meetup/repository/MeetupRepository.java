@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MeetupRepository extends JpaRepository<Meetup, Long> {
-    List<Meetup> findByCreatorId(Long creatorId);
 
     Optional<List<Meetup>> findByCreatorId(Long userId);
     Optional<List<Meetup>> findAllByNameIgnoreCaseLike(String name);

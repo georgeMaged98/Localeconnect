@@ -133,7 +133,7 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UserDoesNotExistException("Follower not found"));
 
         if (user.getFollowers().contains(follower)) {
-            user.getFollowing().remove(follower);
+            user.getFollowers().remove(follower);
             follower.getFollowing().remove(user);
 
             userRepository.save(user);

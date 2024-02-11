@@ -11,14 +11,11 @@ import com.localeconnect.app.itinerary.repository.ItinerarySpecification;
 import com.localeconnect.app.itinerary.repository.ReviewRepository;
 import jakarta.validation.ValidationException;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,7 +25,6 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-@Slf4j
 public class ItineraryService {
 
     private final ItineraryRepository itineraryRepository;
@@ -52,7 +48,7 @@ public class ItineraryService {
         if (this.itineraryRepository.existsByUserIdAndName(userId, itineraryDTO.getName())) {
             throw new ItineraryAlreadyExistsException("This user already created this itinerary.");
         }
-/*
+
         List<String> images = itineraryDTO.getImageUrls();
 
         if (!images.isEmpty()) {
@@ -63,7 +59,7 @@ public class ItineraryService {
 
         } else {
             itinerary.setImageUrls(new ArrayList<>());
-        }*/
+        }
 
         itinerary.setUserId(userId);
         itineraryRepository.save(itinerary);
@@ -171,7 +167,7 @@ public class ItineraryService {
         return itineraries.stream().map(mapper::toDomain).collect(Collectors.toList());
     }
 
-    public List<ItineraryDTO> filter(String place, String tag, Integer days) {
+    public List<ItineraryDTO> filter(String place, Tag tag, Integer days) {
         if (place == null && tag == null && days < 1) {
             return null;
         }
@@ -296,17 +292,17 @@ public class ItineraryService {
                 .queryParam("authorId", authorId)
                 .toUriString();
 
-       ShareItineraryResponseDTO res = this.webClient.post()
+        ShareItineraryResponseDTO res = webClient.post()
                 .uri(url)
                 .bodyValue(itineraryShareDTO)
                 .retrieve()
                 .bodyToMono(ShareItineraryResponseDTO.class)
                 .block();
 
-            return res.getResponseObject();
+        return res.getResponseObject();
     }
 
-   /* private GCPResponseDTO saveImageToGCP(String image) {
+    private GCPResponseDTO saveImageToGCP(String image) {
         ResponseEntity<GCPResponseDTO> responseEntity = webClient.post()
                 .uri("http://gcp-service:5005/api/gcp/?filename=itinerary")
                 .bodyValue(image)
@@ -314,6 +310,6 @@ public class ItineraryService {
                 .toEntity(GCPResponseDTO.class)
                 .block();
         return responseEntity.getBody();
-    }*/
+    }
 }
 

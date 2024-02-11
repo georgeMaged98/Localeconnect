@@ -1,7 +1,6 @@
-version: "3.8"
+version: '3.8'
 
 services:
-
   postgres-service:
     image: postgres:latest
     container_name: postgres-service
@@ -13,7 +12,7 @@ services:
       - postgres:/data/postgres
       - ./init-scripts:/docker-entrypoint-initdb.d
     ports:
-      - 5432:5432
+      - '5432:5432'
     restart: unless-stopped
 
   pgadmin:
@@ -26,7 +25,7 @@ services:
     volumes:
       - pgadmin:/var/lib/pgadmin
     ports:
-      - "5050:80"
+      - '5050:80'
     restart: unless-stopped
 
   api-gateway:
@@ -35,7 +34,7 @@ services:
     environment:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
     ports:
-      - 8080:8080
+      - '8080:8080'
     restart: always
 
   chat-service:
@@ -50,6 +49,7 @@ services:
     environment:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
       - DB_HOST=postgres-service
+      - RABBITMQ_HOST=rabbitmq
 
   user-service:
     image: localeconnect/user-service:latest
@@ -79,14 +79,23 @@ services:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
       - DB_HOST=postgres-service
 
-#  gcp-service:
-#    image: localeconnect/gcp-service:latest
-#    pull_policy: always
-#    volumes:
-#      - /Users/georgemaged/.config/gcloud/legacy_credentials/g.maged327@gmail.com/adc.json:/configurations
-#    environment:
-#      - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
-#      - GCP_CONFIG=./configurations
+  notification-service:
+    image: georgemaged/notification-service:latest
+    pull_policy: always
+    environment:
+      - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
+      - DB_HOST=postgres-service
+    ports:
+      - '7002:7002'
+
+  gcp-service:
+    image: localeconnect/gcp-service:latest
+    pull_policy: always
+    volumes:
+      - /Users/georgemaged/.config/gcloud/legacy_credentials/g.maged327@gmail.com/adc.json:/configurations
+    environment:
+      - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
+      - GCP_CONFIG=./configurations
 
   discovery-server:
     image: localeconnect/discovery-server:latest
@@ -94,6 +103,14 @@ services:
     ports:
       - '8761:8761'
 
+  rabbitmq:
+    image: rabbitmq:3.9.11-management-alpine
+    container_name: rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+#    networks:
+#      - localeconnect-network
 
 volumes:
   postgres:
