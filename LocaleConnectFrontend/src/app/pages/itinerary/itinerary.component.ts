@@ -18,6 +18,8 @@ import { NotificationService } from '../../service/notification.service';
 import { GuideProfile } from '../../model/guide';
 import { MatPaginator } from '@angular/material/paginator';
 import { ApiResponse } from 'src/app/model/apiResponse';
+import { User } from 'src/app/model/user';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-itinerary',
@@ -70,7 +72,6 @@ export class ItineraryComponent implements OnInit, OnDestroy {
         this.filterItineraries = [...this.allItineraries];
         this.allItineraries.forEach((itinerary) => {
           // itinerary.mappedTags = this.itineraryService.mapTags(itinerary.tags);
-          // this.fetchUsername(itinerary);
           if (itinerary.imageUrls.length > 0) {
             if (itinerary.imageUrls[0].length > 0) {
               this.imageService.getImage(itinerary.imageUrls[0]).subscribe({
@@ -83,27 +84,17 @@ export class ItineraryComponent implements OnInit, OnDestroy {
               });
             }
           }
+
+          this.userService.getUserById(itinerary.userId).subscribe({
+            next: (res: ApiResponse) => {
+              const user = res.data as User;
+              itinerary.username = user.userName;
+            },
+          });
         });
       },
       error: (errorMessage: ApiResponse) => console.error(errorMessage.errors),
     });
-
-    // this.imageService.currentImages.subscribe((images) => {
-    //   this.images = images;
-    // });
-
-    // this.subscription = this.itineraryService.currentItinerary.subscribe(
-    //   (itinerary) => {
-
-    //     if (itinerary) {
-    //       this.addItinerary(itinerary);
-    //       itinerary.imageUrls = this.images;
-    //       this.fetchUsername(itinerary);
-    //       this.updateDisplayedItineraries();
-    //       this.cdr.detectChanges();
-    //     }
-    //   }
-    // );
 
     this.searchControl.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged())
@@ -112,35 +103,40 @@ export class ItineraryComponent implements OnInit, OnDestroy {
       });
   }
   checkUserItinerariesBeforeDeletion(itineraryId: number): void {
-    this.itineraryService.getUserItineraries(this.userService.getCurrentUserId()).subscribe({
-      next: (itineraries) => {
-        const userHasItineraries = itineraries.some(itinerary => itinerary.id === itineraryId);
-        if (userHasItineraries) {
-          this.deleteItinerary(itineraryId);
-        } else {
-          this.notificationService.showSuccess('No permission to delete this itinerary or it doesn\'t belong to the user.');
-        }
-      },
-      error: (error) => console.error('Error fetching user itineraries', error),
-    });
+    const travellerId = this.userService.getTravellerId();
+    const itinerary = this.itineraries.find(
+      (itinerary) => itinerary.id === itineraryId
+    );
+    if (itinerary?.userId === travellerId) {
+      this.deleteItinerary(itineraryId);
+    } else {
+      this.notificationService.showError(
+        'Itinerary was created by another traveller!'
+      );
+    }
   }
 
   deleteItinerary(id: number): void {
-    const confirmDelete = confirm('Are you sure you want to delete this itinerary?');
-    if (confirmDelete) {
-      this.itineraryService.deleteItinerary(id).subscribe({
-        next: () => {
-          this.notificationService.showSuccess('Itinerary deleted successfully!');
-          this.itineraries = this.itineraries.filter(itinerary => itinerary.id !== id);
-          this.allItineraries = this.allItineraries.filter(itinerary => itinerary.id !== id);
-          this.updateDisplayedItineraries();
-        },
-        error: (error) => {
-          console.error('Error deleting itinerary', error);
-          this.notificationService.showError('Failed to delete itinerary.');
-        }
-      });
-    }
+    const confirmDelete = confirm(
+      'Are you sure you want to delete this itinerary?'
+    );
+    if (!confirmDelete) return;
+    this.itineraryService.deleteItinerary(id).subscribe({
+      next: () => {
+        this.notificationService.showSuccess('Itinerary deleted successfully!');
+        this.itineraries = this.itineraries.filter(
+          (itinerary) => itinerary.id !== id
+        );
+        this.filterItineraries = [...this.itineraries];
+        this.allItineraries = [...this.itineraries];
+        this.totalLength = this.itineraries.length;
+        this.updateDisplayedItineraries();
+      },
+      error: (error) => {
+        console.error('Error deleting itinerary', error);
+        this.notificationService.showError('Failed to delete itinerary.');
+      },
+    });
   }
 
   performSearch(searchTerm: string | null = ''): void {
@@ -211,55 +207,27 @@ export class ItineraryComponent implements OnInit, OnDestroy {
     this.displayedItineraries = this.allItineraries.slice(startIndex, endIndex);
   }
 
-
-  fetchUsername(itinerary: Itinerary): void {
-    // this.userService.getUsername(itinerary.userId).subscribe({
-    //   next: (username: string) => {
-    //     itinerary.username = username;
-    //     this.cdr.markForCheck();
-    //   },
-    //   error: (error: any) => {
-    //     console.error('Error fetching username', error);
-    //   },
-    // });
-  }
-
   submitRating(itinerary: Itinerary, rating: number): void {
     if (itinerary.rating !== 0) {
       itinerary.ratingSubmitted = true;
-      itinerary.rating = rating;
-      if (
-        itinerary.averageRating &&
-        itinerary.totalRatings &&
-        itinerary.totalRatings > 0
-      ) {
-        itinerary.averageRating =
-          (itinerary.averageRating * itinerary.totalRatings + rating) /
-          (itinerary.totalRatings + 1);
-      } else {
-        itinerary.averageRating = rating;
-      }
-      itinerary.totalRatings = (itinerary.totalRatings || 0) + 1;
 
+      const userId = this.userService.getTravellerId();
+      this.itineraryService
+        .rateItinerary(itinerary.id, userId, rating)
+        .subscribe({
+          next: (res: ApiResponse) => {
+            const updatedItinerary: Itinerary = res.data as Itinerary;
+            itinerary.averageRating = updatedItinerary.averageRating;
+            itinerary.totalRatings = updatedItinerary.totalRatings;
+          },
+          error: (error: HttpErrorResponse) => {
+            this.notificationService.showError(error.error.errors.errors[0]);
+          },
+        });
       this.notificationService.showSuccess(
         'You submitted the review successfully!'
       );
-      //TODO: uncomment for api call
-      /*
-      const review: Review = { userId: this.getTravellerId(), rating, entityId: itinerary.id, entityType: "itinerary" };
-      this.reviewService.createReview(review).subscribe({
-        next: () => {
-          if (itinerary.averageRating && itinerary.totalRatings && itinerary.totalRatings > 0) {
-            itinerary.averageRating = ((itinerary.averageRating * itinerary.totalRatings) + rating) / (itinerary.totalRatings + 1);
-          } else {
-            itinerary.averageRating = rating;
-          }
-          itinerary.totalRatings = (itinerary.totalRatings || 0) + 1;
-        },
-        error: (error) => console.error('Error submitting review', error)
-      });
-
-       */
+      this.initializeDisplayedItineraries();
     }
   }
   toggleImagesDisplay() {

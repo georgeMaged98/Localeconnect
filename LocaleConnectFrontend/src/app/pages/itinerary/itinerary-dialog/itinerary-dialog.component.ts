@@ -26,7 +26,7 @@ export class ItineraryDialogComponent {
     public dialogRef: MatDialogRef<ItineraryDialogComponent>,
     private formBuilder: FormBuilder,
     private itineraryService: ItineraryService,
-    private authService: AuthService
+    private userService: UserService
   ) {
     this.itineraryForm = this.formBuilder.group({
       name: [, Validators.required],
@@ -47,38 +47,31 @@ export class ItineraryDialogComponent {
     if (this.itineraryForm.valid) {
       const formData = this.itineraryForm.value;
 
-      this.authService.fetchCurrentUserProfile().subscribe({
-        next: (user: User) => {
-          formData.placesToVisit = DataHelper.dataToList(
-            formData.placesToVisit
-          );
-          formData.dailyActivities =
-            formData.dailyActivities === null
-              ? []
-              : DataHelper.dataToList(formData.dailyActivities);
+      formData.placesToVisit = DataHelper.dataToList(formData.placesToVisit);
+      formData.dailyActivities =
+        formData.dailyActivities === null
+          ? []
+          : DataHelper.dataToList(formData.dailyActivities);
 
-          const itinerary: Itinerary = {
-            userId: user.id,
-            name: formData.name,
-            description: formData.description,
-            numberOfDays: formData.numberOfDays,
-            tags: formData.tags === null ? [] : formData.tags,
-            mappedTags: formData.tags,
-            placesToVisit: formData.placesToVisit,
-            dailyActivities: formData.dailyActivities,
-            expand: false,
-            imageUrls: formData.imageUrls === null ? [] : formData.imageUrls,
-            rating: 0,
-            averageRating: 0,
-          };
-
-          this.itineraryService.addItinerary(itinerary).subscribe({
-            next: (res: ApiResponse) => {
-              this.dialogRef.close(res.data);
-            },
-            error: (error: any) => console.error(error),
-          });
+      const travellerId = this.userService.getTravellerId();
+      const itinerary: Itinerary = {
+        ...formData,
+        userId: travellerId,
+        tags: formData.tags === null ? [] : formData.tags,
+        meetupAttendees: [],
+        mappedTags: formData.tags,
+        imageUrls: formData.imageUrls === null ? [] : formData.imageUrls,
+        rating: 0,
+        averageRating: 0,
+        placesToVisit: formData.placesToVisit,
+        dailyActivities: formData.dailyActivities,
+        expand: false,
+      };
+      this.itineraryService.addItinerary(itinerary).subscribe({
+        next: (res: ApiResponse) => {
+          this.dialogRef.close(res.data);
         },
+        error: (error: any) => console.error(error),
       });
     }
   }
