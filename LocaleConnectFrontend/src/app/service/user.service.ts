@@ -86,7 +86,8 @@ export class UserService {
 
 
   getProfile(userId: number): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/${userId}/profile`,{headers:this.headers});
+    return this.http.get<ApiResponse>(`${this.apiUrl}/${userId}/profile`,{headers:this.headers}).pipe(
+      map(res => res.data as User));
   }
 
   getAllFollowing(userId: number | undefined): Observable<User[]> {

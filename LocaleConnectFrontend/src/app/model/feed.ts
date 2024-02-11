@@ -8,10 +8,11 @@ export interface Post {
   authorID: number | undefined;
   content: string;
   images: string[];
-  likedByUser?: boolean;
+  likedByUser: boolean;
   comments?: Comment[];
   likes?: number;
   postType: PostType;
+  isLikingInProgress?: boolean;
 }
 export interface Like {
   id?: number;
@@ -19,9 +20,10 @@ export interface Like {
 }
 export interface Comment {
   id?: number;
-  authorId: number;
-  date: Date;
+  authorID: number;
+  date: string;
   text: string;
+  authorName?: string;
 }
 export interface FollowerProfile {
   userId?: number,

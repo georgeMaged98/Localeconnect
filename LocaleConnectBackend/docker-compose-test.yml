@@ -88,14 +88,14 @@ services:
     ports:
       - '7002:7002'
 
-  gcp-service:
-    image: localeconnect/gcp-service:latest
-    pull_policy: always
-    volumes:
-      - /Users/georgemaged/.config/gcloud/legacy_credentials/g.maged327@gmail.com/adc.json:/configurations
-    environment:
-      - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
-      - GCP_CONFIG=./configurations
+#  gcp-service:
+#    image: localeconnect/gcp-service:latest
+#    pull_policy: always
+#    volumes:
+#      - /Users/georgemaged/.config/gcloud/legacy_credentials/g.maged327@gmail.com/adc.json:/configurations
+#    environment:
+#      - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka
+#      - GCP_CONFIG=./configurations
 
   discovery-server:
     image: localeconnect/discovery-server:latest

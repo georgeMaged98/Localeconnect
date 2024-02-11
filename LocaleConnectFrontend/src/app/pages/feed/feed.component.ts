@@ -8,6 +8,8 @@ import {ImagesService} from "../../service/image.service";
 import {User, UserProfile} from "../../model/user";
 import {UserService} from "../../service/user.service";
 import {AuthService} from "../../service/auth.service";
+import {getFormattedDateAndTime} from "../../helper/DateHelper";
+import {coerceStringArray} from "@angular/cdk/coercion";
 
 @Component({
   selector: 'app-feed',
@@ -25,6 +27,7 @@ export class FeedComponent implements OnInit, OnDestroy {
   currentUserProfile: UserProfile | null = null;
   currentUser: User | null = null;
   private destroy$ = new Subject<void>();
+  disableLike: boolean = false;
 
 
   constructor(public dialog: MatDialog, private feedService: FeedService, private imageService: ImagesService, private userService: UserService, private authService: AuthService) {
@@ -34,39 +37,41 @@ export class FeedComponent implements OnInit, OnDestroy {
     this.authService.currentUser.subscribe(data => this.currentUser = data);
     if (this.authService.isAuthenticated()) {
       this.fetchCurrentUserAndFollowing();
+      this.checkUserLikes();
+      this.fetchUserFeed();
+
     }
 
-    //TODO: fetch user from backend and display in the feed!
-    this.fetchUserFeed();
-
-    // this.imageService.currentImages.subscribe(images => {
-    //   this.images = images;
-    // });
-  }
-
-  fetchFollowing(): void {
-    console.log(this.currentUserProfile);
-    if (this.currentUserProfile?.id) {
-      this.userService.getAllFollowing(this.currentUserProfile?.id)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (profiles) => {
-            console.log(profiles);
-            this.followers = profiles;
-          },
-          error: (error) => console.error('Error fetching following profiles:', error)
-        });
-    }
 
   }
+
 
   fetchUserFeed(): void {
     const userId = this.authService.getUserIdFromLocalStorage();
+    console.log(userId)
     if (userId) {
       this.feedService.getUserFeed(userId).subscribe({
         next: (response) => {
           if (response) {
             this.posts = response;
+
+            this.posts.forEach(post => {
+              this.fetchAuthorNamesForPosts(post);
+
+              if (post.id) {
+                this.refreshPostLikes(post.id)
+                this.feedService.getPostLikeCount(post.id).subscribe({
+                  next: (count) => {
+                    console.log(count);
+                    post.likes = count;
+                  },
+                  error: (error) => console.error('Error fetching like count:', error)
+                });
+                post.comments?.forEach(comment => {
+                  this.fetchAuthorNamesForComments(comment);
+                })
+              }
+            });
           } else {
             console.error('Failed to fetch feed:', response);
           }
@@ -97,7 +102,7 @@ export class FeedComponent implements OnInit, OnDestroy {
         name: `${user.firstName} ${user.lastName}`,
         username: user.userName,
         isFollowing: false,
-        profileImage: user.imageUrl || 'https://www.profilebakery.com/wp-content/uploads/2023/04/AI-Profile-Picture.jpg',
+        profileImage: user.imageUrl || 'assets/pictures/profil.png',
       }))),
       takeUntil(this.destroy$)
     ).subscribe({
@@ -109,72 +114,92 @@ export class FeedComponent implements OnInit, OnDestroy {
   }
 
 
-  fetchCurrentUserProfile(): void {
-
-    this.authService.fetchCurrentUserProfile().subscribe({
-      next: (currentUser: User) => {
-        this.currentUserProfile = {
-          id: currentUser.id,
-          name: `${currentUser.firstName} ${currentUser.lastName}`,
-          username: currentUser.userName,
-          bio: currentUser.bio,
-          imageUrl: currentUser.imageUrl,
-        };
-        console.log(this.currentUserProfile);
-      },
-      error: (error) => {
-        console.error('Error fetching user profile:', error);
-      }
-    });
-  }
-
-  //TODO: add api call
-  likePost(post: Post): void {
-    if (post.likedByUser) {
-      post.likes = (post.likes || 1) - 1;
-      post.likedByUser = false;
-    } else {
-      post.likes = (post.likes || 0) + 1;
-      post.likedByUser = true;
+  fetchAuthorNamesForPosts(post: Post): void {
+    if (post.authorID) {
+      this.userService.getProfile(post.authorID).subscribe(user => {
+        post.author = {
+          name: `${user.firstName} ${user.lastName}`,
+          username: user.userName
+        }
+      });
     }
   }
 
-
-  //TODO: replace with api call
-  toggleFollow(post: Post): void {
-    //  post.author.isFollowing = !post.author.isFollowing;
-    /*  if (post.author.isFollowing) {
-        this.feedService.unfollowUser(post.author.userId).subscribe(() => {
-          post.author.isFollowing = false;
-        });
-      } else {
-        this.feedService.followUser(post.author.userId).subscribe(() => {
-          post.author.isFollowing = true;
-        });
-      }
-     */
+  fetchAuthorNamesForComments(comment: Comment): void {
+    if (comment.authorID) {
+      this.userService.getProfile(comment.authorID).subscribe(user => {
+        comment.authorName = `${user.firstName} ${user.lastName}`;
+      });
+    }
   }
 
-  addComment(postId: number | undefined): void {
-    if (postId && this.newCommentTexts[postId]) {
-      const newComment: Comment = {
-        // TODO: get comment from backend
-        id: 0,
-        authorId: 0,
-        date: new Date(),
-        text: this.newCommentTexts[postId],
-      };
-
+  likePost(post: Post): void {
+    const likerId = this.authService.getUserIdFromLocalStorage();
+    if (likerId && post.id && !post.likedByUser) {
+      this.feedService.likePost(post.id, likerId).subscribe({
+        next: () => {
+        if(post.id){
+          post.likedByUser = true;
+          this.refreshPostLikes(post.id);
+        }
+        },
+        error: (error) => console.error('Error liking post:', error)
+      });
+    }
+  }
+  refreshPostLikes(postId: number): void {
+    this.feedService.getPostLikeCount(postId).subscribe(likeCount => {
       const post = this.posts.find(p => p.id === postId);
       if (post) {
-        // TODO: add comment to backend
-
-       // post.comments.push(newComment);
-        this.newCommentTexts[postId] = '';
-
+        post.likes = likeCount;
       }
+    });
+    this.checkUserLikes();
+  }
+
+  checkUserLikes(): void {
+    const username = this.authService.getUsernameFromLocalStorage();
+    console.log(username)
+    if (username) {
+      this.posts.forEach(post => {
+        if (post.id) {
+          console.log(post)
+          this.feedService.getPostLikes(post.id).subscribe(usersLiked => {
+            console.log(usersLiked);
+            post.likedByUser = usersLiked.includes(username);
+          });
+        }
+      });
+    }
+
+  }
+
+  addComment(postId: number): void {
+    if (postId && this.newCommentTexts[postId]) {
+      const currentUser = this.authService.getCurrentUserProfile(); // Assuming this method exists and returns current user's info
+      const newComment: Comment = {
+        authorID: this.authService.getUserIdFromLocalStorage() || 0,
+        text: this.newCommentTexts[postId],
+        date: getFormattedDateAndTime(new Date()),
+        authorName: currentUser ? currentUser.name : 'Unknown User',
+      };
+
+      // Call the service to add the comment
+      this.feedService.addComment(postId, newComment).subscribe({
+        next: () => {
+          const post = this.posts.find(p => p.id === postId);
+          if (post) {
+            if (!post.comments) post.comments = [];
+            post.comments.push({ ...newComment, authorName: newComment.authorName });
+            this.newCommentTexts[postId] = '';
+          }
+        },
+        error: (error) => console.error('Error adding comment:', error),
+      });
     }
   }
+
+
 
   toggleImagesDisplay() {
     this.showAllImages = !this.showAllImages;
@@ -186,7 +211,7 @@ export class FeedComponent implements OnInit, OnDestroy {
     });
     dialogRef.afterClosed().subscribe((newPost: Post) => {
       if (newPost) {
-        newPost.author= this.authService.getCurrentUserProfile()
+        newPost.author = this.authService.getCurrentUserProfile()
         this.posts.unshift(newPost);
 
       }
