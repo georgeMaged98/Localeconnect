@@ -1,6 +1,6 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {FormControl} from '@angular/forms';
-import {debounceTime, distinctUntilChanged} from 'rxjs';
+import {debounceTime, distinctUntilChanged, forkJoin, map, of, switchMap} from 'rxjs';
 import {MatDialog} from '@angular/material/dialog';
 import {ReviewService} from '../../service/review.service';
 import {UserService} from '../../service/user.service';
@@ -9,6 +9,7 @@ import {GuideProfile} from '../../model/guide';
 import {NotificationService} from '../../service/notification.service';
 import {MatPaginator} from '@angular/material/paginator';
 import {AuthService} from "../../service/auth.service";
+import {catchError} from "rxjs/operators";
 
 @Component({
   selector: 'app-guide',
@@ -48,56 +49,63 @@ export class GuideComponent implements OnInit {
       });
   }
 
+
   fetchGuides(): void {
+    const userId = this.authService.getUserIdFromLocalStorage();
+
     this.userService.getAllGuides().subscribe({
-      next: (guides) => {
-        const userId = this.authService.getUserIdFromLocalStorage();
+      next: guides => {
+        // Initialize guides with basic information
+        this.guides = guides.map(guide => ({
+          id: guide.id,
+          name: `${guide.firstName} ${guide.lastName}`,
+          userName: guide.userName,
+          bio: guide.bio,
+          visitedCountries: guide.visitedCountries,
+          languages: guide.languages,
+          city: guide.city,
+          rating: guide.rating || 0,
+          imageUrl: guide.imageUrl,
+          isFollowing: false,
+          averageRating: 0,
+          totalRatings: 0,
+        }));
+
         if (userId) {
-          this.userService.getAllFollowing(userId).subscribe(followingGuides => {
-            this.guides = guides.map(guide => ({
-              id: guide.id,
-              name: `${guide.firstName} ${guide.lastName}`,
-              userName: guide.userName,
-              bio: guide.bio,
-              visitedCountries: guide.visitedCountries,
-              languages: guide.languages,
-              city: guide.city,
-              rating: guide.rating | 0,
-              imageUrl: guide.imageUrl,
-              isFollowing: followingGuides.some(followingGuide => followingGuide.id === guide.id)
-            }));
-            this.guides.forEach(guide => {
-              this.fetchGuideRatings(guide);
-              console.log(guide.averageRating)
-            });
-            this.initializeDisplayedGuides();
-          });
+          this.updateFollowingStatusAndRatings(userId);
         } else {
-          this.guides = guides.map(guide => ({
-            id: guide.id,
-            name: `${guide.firstName} ${guide.lastName}`,
-            userName: guide.userName,
-            bio: guide.bio,
-            visitedCountries: guide.visitedCountries,
-            languages: guide.languages,
-            city: guide.city,
-            rating: guide.rating | 0,
-            imageUrl: guide.imageUrl,
-            isFollowing: false,
-          }));
-          this.guides.forEach(guide => {
-            this.fetchGuideRatings(guide);
-          });
           this.initializeDisplayedGuides();
         }
-        }
-
-      ,
-      error: (error) => console.error('Error fetching guides:', error),
+      },
+      error: error => console.error('Error fetching guides:', error),
     });
-    this.updateFollowingStatus();
-
   }
+
+  updateFollowingStatusAndRatings(userId: number): void {
+    this.userService.getAllFollowing(userId).subscribe(followingGuides => {
+      this.guides = this.guides.map(guide => ({
+        ...guide,
+        isFollowing: followingGuides.some(followingGuide => followingGuide.id === guide.id),
+      }));
+
+      this.guides.forEach((guide, index) => {
+        if (guide.id) {
+          this.userService.getAverageRatingOfLocalGuide(guide.id).subscribe(averageRating => {
+            guide.averageRating = averageRating;
+          });
+          this.userService.getRatingCountOfLocalGuide(guide.id).subscribe(ratingCount => {
+            guide.totalRatings = ratingCount;
+          });
+          if (index === this.guides.length - 1) {
+            this.initializeDisplayedGuides();
+          }
+        }
+      });
+
+
+    });
+  }
+
 
   fetchGuideRatings(guide: GuideProfile): void {
     if (guide.id
@@ -113,7 +121,7 @@ export class GuideComponent implements OnInit {
 
   }
 
-  submitRating(guide:GuideProfile, rating: number): void {
+  submitRating(guide: GuideProfile, rating: number): void {
     const userId = this.authService.getUserIdFromLocalStorage();
     if (userId && guide.id
     ) {
@@ -207,7 +215,7 @@ export class GuideComponent implements OnInit {
     ) {
       action.call(this.userService, currentUserId, guide.id).subscribe({
         next: () => {
-        guide.isFollowing ? this.notificationService.showSuccess('Unfollowed successfully!'):this.notificationService.showSuccess('Followed successfully!') ;
+          guide.isFollowing ? this.notificationService.showSuccess('Unfollowed successfully!') : this.notificationService.showSuccess('Followed successfully!');
           guide.isFollowing = !guide.isFollowing;
         },
         error: (error) => {
