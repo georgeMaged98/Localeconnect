@@ -1,4 +1,3 @@
-/*
 package com.localeconnect.app.itinerary.dto;
 
 public enum Tag {
@@ -25,4 +24,3 @@ public enum Tag {
 
 }
 
-*/

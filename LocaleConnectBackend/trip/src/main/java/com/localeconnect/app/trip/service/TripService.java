@@ -48,7 +48,7 @@ public class TripService {
         if (tripRepository.findByLocalguideIdAndName(tripDTO.getLocalguideId(), tripDTO.getName()).isPresent())
             throw new LogicException("This user already created this trip.");
 
-    /*    List<String> images = tripDTO.getImageUrls();
+        List<String> images = tripDTO.getImageUrls();
 
         if (!images.isEmpty()) {
 
@@ -58,7 +58,7 @@ public class TripService {
 
         } else {
             trip.setImageUrls(new ArrayList<>());
-        }*/
+        }
 
         tripRepository.save(trip);
 
@@ -288,7 +288,7 @@ public class TripService {
 
         return res.getResponseObject();
     }
-/*    private GCPResponseDTO saveImageToGCP(String image) {
+    private GCPResponseDTO saveImageToGCP(String image) {
         ResponseEntity<GCPResponseDTO> responseEntity = webClient.post()
                 .uri("http://gcp-service:5005/api/gcp/?filename=trip")
                 .bodyValue(image)
@@ -297,7 +297,7 @@ public class TripService {
                 .block();
 
         return responseEntity.getBody();
-    }*/
+    }
 
     private boolean checkUserId(Long userId) {
         System.out.println(userId);

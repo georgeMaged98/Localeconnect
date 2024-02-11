@@ -43,6 +43,12 @@ public class GatewayConfig {
                 .route("gcp-service", r -> r.path("/api/gcp/**")
                         .filters(f -> f.filter(filter))
                         .uri("http://gcp-service:5005"))
+                .route("notification-service", r -> r.path("/api/notification/**")
+                        .filters(f -> f.filter(filter))
+                        .uri("http://notification-service:7002"))
+                .route("notification-websocket", r -> r.path("/ws/**")
+//                        .filters(f -> f.filter(filter))
+                        .uri("ws://notification-service:7002"))
                 .build();
     }
 }

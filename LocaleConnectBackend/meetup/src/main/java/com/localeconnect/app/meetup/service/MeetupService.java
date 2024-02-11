@@ -2,7 +2,6 @@ package com.localeconnect.app.meetup.service;
 
 import com.localeconnect.app.meetup.config.MeetupRabbitConfig;
 import com.localeconnect.app.meetup.dto.*;
-//import com.localeconnect.app.meetup.dto.MeetupEditDTO;
 import com.localeconnect.app.meetup.exceptions.LogicException;
 import com.localeconnect.app.meetup.exceptions.ResourceNotFoundException;
 import com.localeconnect.app.meetup.exceptions.ValidationException;
@@ -10,6 +9,7 @@ import com.localeconnect.app.meetup.mapper.MeetupMapper;
 import com.localeconnect.app.meetup.model.Meetup;
 import com.localeconnect.app.meetup.rabbit.RabbitMQMessageProducer;
 import com.localeconnect.app.meetup.repository.MeetupRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Transactional
 public class MeetupService {
 
     private final MeetupRepository meetupRepository;
@@ -43,6 +44,16 @@ public class MeetupService {
         // return saved meetup
         return meetupMapper.toDomain(createdMeetup);
     }
+
+    public List<MeetupDTO> getAllMeetupsByCreator(Long userId) {
+
+        if (!checkUserId(userId))
+            throw new ResourceNotFoundException("User with id " + userId + " does not exist!");
+
+        Optional<List<Meetup>> meetups = meetupRepository.findByCreatorId(userId);
+        return meetups.map(meetupList -> meetupList.stream().map(meetupMapper::toDomain).collect(Collectors.toList())).orElseGet(ArrayList::new);
+    }
+
     public MeetupDTO updateMeetup(MeetupEditDTO meetupEditDTO, Long meetupId) {
 
         Optional<Meetup> optional = meetupRepository.findById(meetupId);
@@ -80,7 +91,7 @@ public class MeetupService {
         for (Long att : attendees
         ) {
             NotificationDTO newNotification = new NotificationDTO();
-            newNotification.setTitle("New Notification");
+            newNotification.setTitle("New Meetup Notification");
             newNotification.setMessage("Meetup " + meetupId + " Got Updated!");
             newNotification.setSentAt(LocalDateTime.now());
             newNotification.setReceiverID(att);
@@ -164,8 +175,8 @@ public class MeetupService {
         for (Long att : attendees
         ) {
             NotificationDTO newNotification = new NotificationDTO();
-            newNotification.setTitle("New Notification");
-            newNotification.setMessage("Meetup " + actualMeetup.getId() + " Got Updated!");
+            newNotification.setTitle("New Meetup Notification");
+            newNotification.setMessage("Meetup " + actualMeetup.getId() + " Got Deleted!");
             newNotification.setSentAt(LocalDateTime.now());
             newNotification.setReceiverID(att);
             newNotification.setSenderID(actualMeetup.getCreatorId());
@@ -207,6 +218,7 @@ public class MeetupService {
 
         return ratedMeetupDTO.getRatingsCount();
     }
+
     public String shareMeetup(Long meetupId, Long authorId) {
         Meetup meetup = meetupRepository.findById(meetupId)
                 .orElseThrow(() -> new ResourceNotFoundException("Meetup not found with id: " + meetupId));
@@ -218,6 +230,7 @@ public class MeetupService {
 
         return postToFeed(shareDTO, authorId);
     }
+
     public List<MeetupDTO> searchByName(String name) {
 
         List<Meetup> meetups = meetupRepository.findAllByNameIgnoreCaseLike(name)
