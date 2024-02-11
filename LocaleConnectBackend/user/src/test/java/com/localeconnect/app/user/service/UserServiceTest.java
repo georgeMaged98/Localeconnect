@@ -223,7 +223,7 @@ class UserServiceTest {
     }
     @Test
     void testFollowUser() {
-        // Setup follower User
+
         Long followerId = 1L;
         User follower = new User();
         follower.setId(followerId);
@@ -233,7 +233,7 @@ class UserServiceTest {
         follower.setFirstName("Follower");
         follower.setLastName("User");
         follower.setDateOfBirth(LocalDate.now());
-        // Setup followee User
+
         Long followeeId = 2L;
         User followee = new User();
         followee.setId(followeeId);

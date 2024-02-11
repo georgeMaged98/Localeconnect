@@ -123,8 +123,6 @@ public class MeetupServiceTest {
         verify(meetupRepository, times(1)).deleteById(meetupId);
     }
 
-
-
     @Test
     void testSearchMeetupByNameSuccess() {
         String searchPattern = "%Adventure Meetup%";

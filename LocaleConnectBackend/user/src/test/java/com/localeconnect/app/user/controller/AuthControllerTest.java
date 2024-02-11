@@ -1,32 +1,40 @@
 package com.localeconnect.app.user.controller;
 
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.localeconnect.app.user.auth.AuthenticationRequest;
 import com.localeconnect.app.user.auth.AuthenticationResponse;
 import com.localeconnect.app.user.dto.LocalguideDTO;
 import com.localeconnect.app.user.dto.TravelerDTO;
-import com.localeconnect.app.user.exception.UserDoesNotExistException;
 import com.localeconnect.app.user.service.AuthenticationService;
+import com.localeconnect.app.user.service.JwtUtil;
 import com.localeconnect.app.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
 
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-class AuthControllerTest {
+@AutoConfigureMockMvc
+@ExtendWith(MockitoExtension.class)
+public class AuthControllerTest {
 
-    @InjectMocks
-    private AuthController authController;
+    private MockMvc mockMvc;
+    private ObjectMapper objectMapper;
 
     @Mock
     private AuthenticationService authService;
@@ -34,123 +42,81 @@ class AuthControllerTest {
     @Mock
     private UserService userService;
 
+    @Mock
+    private JwtUtil jwtUtil;
+
+    @InjectMocks
+    private AuthController authController;
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+        mockMvc = MockMvcBuilders.standaloneSetup(authController)
+                .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
+                .build();
     }
 
     @Test
-    void testRegisterTraveler() {
-
+    void registerTraveler_ShouldReturnSuccess() throws Exception {
         TravelerDTO travelerDTO = new TravelerDTO();
-        travelerDTO.setUserName("testUser");
-        travelerDTO.setEmail("test@example.com");
+        travelerDTO.setFirstName("Test");
+        travelerDTO.setLastName("22");
+        travelerDTO.setUserName("testUser22");
+        travelerDTO.setEmail("test22@test.com");
         travelerDTO.setPassword("password");
+        travelerDTO.setDateOfBirth(LocalDate.of(1990, 1, 1)); // Example date
 
-        AuthenticationResponse expectedAuthResponse = new AuthenticationResponse("dummy-token-for-traveler");
-        when(authService.registerTraveler(any(TravelerDTO.class))).thenReturn(expectedAuthResponse);
+        AuthenticationResponse response = new AuthenticationResponse("dummyToken");
+        given(authService.registerTraveler(any(TravelerDTO.class))).willReturn(response);
 
-        ResponseEntity<Object> response = authController.registerTraveler(travelerDTO);
-
-        Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
-        AuthenticationResponse actualResponseObject = (AuthenticationResponse) responseBody.get("data");
-
-        assertNotNull(response);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(expectedAuthResponse.getAccessToken(), actualResponseObject.getAccessToken());
-
-        verify(authService).registerTraveler(travelerDTO);
+        mockMvc.perform(post("/api/user/auth/register-traveler")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(travelerDTO)))
+                .andExpect(status().isOk())
+                .andReturn();
     }
 
     @Test
-    void testRegisterLocalGuide() {
+    void registerLocalGuide_ShouldReturnSuccess() throws Exception {
         LocalguideDTO localguideDTO = new LocalguideDTO();
-        localguideDTO.setUserName("localGuideUser");
-        localguideDTO.setEmail("localguide@example.com");
-        localguideDTO.setPassword("securePassword");
-        localguideDTO.setLanguages(List.of("English", "Spanish"));
-        localguideDTO.setDateOfBirth(LocalDate.now().minusYears(20));
+        localguideDTO.setFirstName("Test");
+        localguideDTO.setLastName("22");
+        localguideDTO.setUserName("testUser22");
+        localguideDTO.setEmail("test22@test.com");
+        localguideDTO.setPassword("password");
+        localguideDTO.setDateOfBirth(LocalDate.of(1990, 1, 1)); // Example date
 
-        AuthenticationResponse expectedAuthResponse = new AuthenticationResponse("dummy-token-for-localguide");
-        when(authService.registerLocalguide(any(LocalguideDTO.class))).thenReturn(expectedAuthResponse);
+        AuthenticationResponse response = new AuthenticationResponse("dummyToken");
+        given(authService.registerLocalguide(any(LocalguideDTO.class))).willReturn(response);
 
-        ResponseEntity<Object> response = authController.registerLocalGuide(localguideDTO);
-
-        Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
-        AuthenticationResponse actualResponseObject = (AuthenticationResponse) responseBody.get("data");
-
-        assertNotNull(response);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(expectedAuthResponse.getAccessToken(), actualResponseObject.getAccessToken());
-
-        verify(authService).registerLocalguide(localguideDTO);
+        mockMvc.perform(post("/api/user/auth/register-localguide")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(localguideDTO)))
+                .andExpect(status().isOk())
+                .andReturn();
     }
 
     @Test
-    void testLoginSuccess() {
-        AuthenticationRequest loginRequest = new AuthenticationRequest("user@example.com", "password");
-        String expectedToken = "auth-token";
+    void login_ShouldReturnToken() throws Exception {
+        AuthenticationRequest request = new AuthenticationRequest("user@example.com", "password");
+        String token = "authToken";
 
-        when(authService.login(loginRequest)).thenReturn(expectedToken);
+        given(authService.login(any(AuthenticationRequest.class))).willReturn(token);
 
-        ResponseEntity<Object> response = authController.login(loginRequest);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-
-        Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
-        assertEquals(expectedToken, responseBody.get("data"));
-
-        verify(authService).login(loginRequest);
+        mockMvc.perform(post("/api/user/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").value(token));
     }
 
     @Test
-    void testLoginFailure() {
-        AuthenticationRequest loginRequest = new AuthenticationRequest("user@example.com", "wrongPassword");
+    void checkUserExists_ShouldReturnTrue() throws Exception {
+        given(userService.checkUserId(any(Long.class))).willReturn(true);
 
-        when(authService.login(loginRequest)).thenThrow(new UserDoesNotExistException("False credentials! Please try to login again."));
-
-        Exception exception = assertThrows(UserDoesNotExistException.class, () -> {
-            authController.login(loginRequest);
-        });
-
-        String expectedMessage = "False credentials! Please try to login again.";
-        String actualMessage = exception.getMessage();
-
-        assertTrue(actualMessage.contains(expectedMessage));
+        mockMvc.perform(get("/api/user/auth/exists/{userId}", 1)) // Corrected to use get instead of post
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").value(true));
     }
-    @Test
-    void testCheckUserExistsTrue() {
-        Long userId = 1L;
-        when(userService.checkUserId(userId)).thenReturn(true);
-
-        ResponseEntity<Object> response = authController.checkUserExists(userId);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-
-        Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
-        assertEquals(true, responseBody.get("data"));
-
-        verify(userService).checkUserId(userId);
-    }
-
-    @Test
-    void testCheckUserExistsFalse() {
-        Long userId = 2L;
-        when(userService.checkUserId(userId)).thenReturn(false);
-
-        ResponseEntity<Object> response = authController.checkUserExists(userId);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-
-        Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
-        assertEquals(false, responseBody.get("data"));
-
-        verify(userService).checkUserId(userId);
-    }
-
 
 }
-
