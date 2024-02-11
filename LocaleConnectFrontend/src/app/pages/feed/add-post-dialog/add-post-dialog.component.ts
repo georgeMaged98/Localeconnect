@@ -6,7 +6,7 @@ import {FeedService} from "../../../service/feed.service";
 import {Post} from "../../../model/feed";
 import {PostType} from "../../../model/post-type";
 import {AuthService} from "../../../service/auth.service";
-import {getFormattedDate} from "../../../helper/DateHelper";
+import {getFormattedDateAndTime} from "../../../helper/DateHelper";
 
 @Component({
   selector: 'app-add-post-dialog',
@@ -36,7 +36,7 @@ export class AddPostDialogComponent {
   }
 
   onSubmit(): void {
-    const currentDate = getFormattedDate(new Date());
+    const currentDate = getFormattedDateAndTime(new Date());
     console.log(this.authService.getCurrentUserProfile());
     if (this.postForm.valid) {
       const postData: Post = {
@@ -45,6 +45,7 @@ export class AddPostDialogComponent {
         images: this.images,
         postType: PostType.REGULAR,
         date: currentDate,
+        likedByUser: false,
 
       };
       console.log(postData);

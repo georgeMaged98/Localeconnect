@@ -122,7 +122,11 @@ export class AuthService {
       ? this.getUserFromLocalStorage()?.id
       : undefined;
   }
-
+  public getUsernameFromLocalStorage(): string | undefined {
+    return this.getUserFromLocalStorage()
+      ? this.getUserFromLocalStorage()?.userName
+      : undefined;
+  }
   public getUserFromLocalStorage(): User | null {
     const storedUser = localStorage.getItem('currentUser');
     return storedUser ? JSON.parse(storedUser) : null;

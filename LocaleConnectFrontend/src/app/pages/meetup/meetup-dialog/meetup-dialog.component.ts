@@ -16,6 +16,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { NotificationService } from 'src/app/service/notification.service';
 import { AuthService } from 'src/app/service/auth.service';
 import { User } from 'src/app/model/user';
+import {UserService} from "../../../service/user.service";
 
 @Component({
   selector: 'app-meetup-dialog',
@@ -30,7 +31,8 @@ export class MeetupDialogComponent {
     private formBuilder: FormBuilder,
     private meetupService: MeetupService,
     private notificationService: NotificationService,
-    private authService: AuthService
+    private authService: AuthService,
+    private userService: UserService
   ) {
     this.meetupForm = this.formBuilder.group({
       name: ['', Validators.required],
@@ -43,19 +45,14 @@ export class MeetupDialogComponent {
       spokenLanguages: ['', Validators.required],
     });
   }
-  private getTravellerId(): number {
-    let traveller = this.authService.getUserFromLocalStorage();
-    if (!traveller || !traveller.id) return -1;
 
-    return traveller.id;
-  }
   onNoClick(): void {
     this.dialogRef.close();
   }
 
   onSubmit(): void {
     if (this.meetupForm.valid) {
-      const travellerId = this.getTravellerId();
+      const travellerId = this.userService.getTravellerId();
       const formData = this.meetupForm.value;
       const newMeetup: Meetup = {
         ...formData,

@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Post} from "../model/feed";
+import {Comment, Post} from "../model/feed";
 import {BehaviorSubject, map, Observable} from "rxjs";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {environment} from "../../environments/environment";
@@ -17,11 +17,10 @@ export class FeedService {
   httpHeaders: HttpHeaders;
 
 
-
-
   constructor(private http: HttpClient, private authService: AuthService) {
-    this.httpHeaders= authService.getHttpHeaders();
+    this.httpHeaders = authService.getHttpHeaders();
   }
+
   createRegularPost(regularPost: Post): Observable<Post> {
     return this.http
       .post<ApiResponse>(`${this.apiUrl}/create`, regularPost, {headers: this.httpHeaders})
@@ -54,15 +53,35 @@ export class FeedService {
     return this.http.get<ApiResponse>(`${this.apiUrl}/${postId}`, {headers: this.httpHeaders})
       .pipe(map((response) => response.data as Post));
   }
+
   getUserFeed(userId: number): Observable<Post[]> {
-    return this.http.get<ApiResponse>(`${this.apiUrl}/home/${userId}`,{headers: this.httpHeaders})
+    return this.http.get<ApiResponse>(`${this.apiUrl}/home/${userId}`, {headers: this.httpHeaders})
       .pipe(map((response) => response.data as Post[] | []));
   }
 
   getPostLikeCount(postId: number): Observable<number> {
-    return this.http.get<number>(`${this.apiUrl}/${postId}/like-count`,{headers: this.httpHeaders});
+    return this.http.get<ApiResponse>(`${this.apiUrl}/${postId}/like-count`, {headers: this.httpHeaders})
+      .pipe(map((response) => response.data as number | 0));
+
 
   }
+
+  likePost(postId: number, likerId: number): Observable<Post> {
+    const likeDTO = { likerId };
+    return this.http.post<ApiResponse>(`${this.apiUrl}/${postId}/like`, likeDTO, {headers: this.httpHeaders})
+      .pipe(map((response) => response.data as Post));
+  }
+
+  unlikePost(postId: number, likerId: number): Observable<Post> {
+    const likeDTO = { likerId };
+    return this.http.post<ApiResponse>(`${this.apiUrl}/${postId}/unlike`, likeDTO, {headers: this.httpHeaders})
+      .pipe(map((response) => response.data as Post));
+  }
+  getPostLikes(postId: number): Observable<string[]> {
+    return this.http.get<ApiResponse>(`${this.apiUrl}/${postId}/like-list`, {headers: this.httpHeaders})
+      .pipe(map((response) => response.data as string[]));
+  }
+
 }
 
 

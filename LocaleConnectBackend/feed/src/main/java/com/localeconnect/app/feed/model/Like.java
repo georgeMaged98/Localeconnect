@@ -1,5 +1,6 @@
 package com.localeconnect.app.feed.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
@@ -24,7 +25,7 @@ public class Like {
     private Long likerId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties("likes")
+    @JsonIgnore
     private Post post;
 
     @Override

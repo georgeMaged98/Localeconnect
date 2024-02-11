@@ -6,8 +6,8 @@
              class="profile-image">
       </button>
       <input type="file" #imageInput (change)="changeProfilePicture($event)" style="display: none;" accept="image/*">
-      <h2 class="profile-name">{{ currentUserProfile?.name || 'Anonymous' }}</h2>
-      <p class="profile-handle">@{{ currentUserProfile?.username || 'user' }}</p>
+      <h2 class="profile-name">{{ currentUserProfile?.name || '' }}</h2>
+      <p class="profile-handle">@{{ currentUserProfile?.username || '' }}</p>
       <p *ngIf="currentUserProfile?.bio" class="profile-bio">{{ currentUserProfile?.bio }}</p>
     </div>
     <nav class="profile-nav">
@@ -22,13 +22,10 @@
           <div class="author-details">
             <img [src]="post.author?.imageUrl" alt="Profile Image" class="profile-image">
             <div class="details-section">
-              <mat-card-title>{{ post.author?.username }}</mat-card-title>
+              <mat-card-title>{{ post.author?.username || '' }}</mat-card-title>
               <mat-card-subtitle>{{ post.date | date: 'MMM d. y,  h:mm a' }}</mat-card-subtitle>
             </div>
           </div>
-          <button mat-button class="follow-btn" (click)="toggleFollow(post)">
-            {{ post.author?.isFollowing ? 'Unfollow' : 'Follow' }}
-          </button>
         </div>
       </mat-card-header>
       <mat-card-content>
@@ -45,21 +42,24 @@
         </div>
       </mat-card-content>
       <mat-card-actions>
-        <button mat-button (click)="likePost(post)">
-      <mat-icon [class.liked]="post.likedByUser">thumb_up</mat-icon>
-        <span>{{ post.likes || null }}</span>
-      </button>
+        <mat-card-actions>
+          <button mat-button [disabled]="post.likedByUser" (click)="likePost(post)">
+            <mat-icon [class.liked]="post.likedByUser">thumb_up</mat-icon>
+            <span>{{ post.likes || 0 }}</span>
+          </button>
+        </mat-card-actions>
+
       </mat-card-actions>
       <mat-card-footer>
         <div *ngIf="post.comments">
           <div class="comment" *ngFor="let comment of post.comments">
-            <span class="comment-author">{{ comment }}</span>
+            <span class="comment-author">{{ comment.authorName }}</span>
             <span class="comment-date">{{ comment.date | date: 'MMM d. y,  h:mm a' }}</span>
             <p class="comment-text">{{ comment.text }}</p>
           </div>
         </div>
-        <div class="add-comment-section">
-          <mat-form-field *ngIf="post.id" class="comment-input">
+        <div class="add-comment-section" *ngIf="post.id">
+          <mat-form-field class="comment-input">
             <input matInput placeholder="Write a comment..."
                    [(ngModel)]="newCommentTexts[post.id]"
                    (keyup.enter)="addComment(post.id)">
