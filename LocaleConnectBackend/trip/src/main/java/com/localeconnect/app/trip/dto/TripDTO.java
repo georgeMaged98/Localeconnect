@@ -44,10 +44,6 @@ public class TripDTO {
     @ElementCollection
     private List<String> languages = new ArrayList<>();
 
-    @NotEmpty(message = "At least one place to visit must be specified")
-    @ElementCollection
-    private List<String> placesToVisit = new ArrayList<>();
-
     @ElementCollection
     private List<String> dailyActivities = new ArrayList<>();
 

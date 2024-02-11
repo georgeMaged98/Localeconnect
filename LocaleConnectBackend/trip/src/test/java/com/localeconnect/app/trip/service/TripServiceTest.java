@@ -1,30 +1,22 @@
 package com.localeconnect.app.trip.service;
 
-import com.localeconnect.app.trip.dto.CheckUserExistsResponseDTO;
-import com.localeconnect.app.trip.dto.TripAttendDTO;
 import com.localeconnect.app.trip.dto.TripDTO;
-import com.localeconnect.app.trip.exceptions.ResourceNotFoundException;
-import com.localeconnect.app.trip.exceptions.ValidationException;
 import com.localeconnect.app.trip.mapper.TripMapper;
 import com.localeconnect.app.trip.model.Trip;
 import com.localeconnect.app.trip.repository.TripRepository;
-import feign.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,17 +29,6 @@ public class TripServiceTest {
     private TripRepository tripRepository;
     @Mock
     private TripMapper tripMapper;
-    @Mock
-    private WebClient webClient;
-
-    @Mock
-    private WebClient.RequestHeadersUriSpec requestHeadersUriSpec;
-
-    @Mock
-    private WebClient.RequestHeadersSpec requestHeadersSpec;
-
-    @Mock
-    private WebClient.ResponseSpec responseSpec;
 
     @BeforeEach
     void setUp() {
@@ -75,8 +56,6 @@ public class TripServiceTest {
             return dto;
         });
     }
-
-
 
     @Test
     void testGetAllTrips() {
@@ -142,44 +121,46 @@ public class TripServiceTest {
 
         verify(tripRepository, times(1)).delete(existingTrip);
     }
+
     @Test
-    void testAttendTripSuccess() {
-        Long tripId = 1L;
-        TripAttendDTO tripAttendDTO = new TripAttendDTO();
-        tripAttendDTO.setTravellerId(2L); // ID of the user attending the trip
+    void testSearchTripSuccess() {
+        String tripName = "Adventure Trip";
         Trip trip = new Trip();
-        when(tripRepository.findById(tripId)).thenReturn(Optional.of(trip));
-        when(tripRepository.save(any(Trip.class))).thenReturn(trip);
+        trip.setName(tripName);
+        when(tripRepository.findByName(tripName)).thenReturn(Optional.of(trip));
 
-        when(webClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        CheckUserExistsResponseDTO mockResponse = new CheckUserExistsResponseDTO();
-        mockResponse.setResponseObject(true);
-        when(responseSpec.bodyToMono(CheckUserExistsResponseDTO.class)).thenReturn(Mono.just(mockResponse));
+        TripDTO expectedTripDTO = new TripDTO();
+        expectedTripDTO.setName(tripName);
+        when(tripMapper.toDomain(trip)).thenReturn(expectedTripDTO);
 
-        tripService.attendTrip(tripId, tripAttendDTO);
+        TripDTO result = tripService.searchTrip(tripName);
 
-        assertTrue(trip.getTripAttendees().contains(tripAttendDTO.getTravellerId()));
-        verify(tripRepository, times(1)).save(trip);
+        assertNotNull(result);
+        assertEquals(expectedTripDTO.getName(), result.getName());
+        verify(tripRepository, times(1)).findByName(tripName);
     }
     @Test
-    void testUnattendTripSuccess() {
-        Long tripId = 1L;
-        TripAttendDTO tripAttendDTO = new TripAttendDTO();
-        tripAttendDTO.setTravellerId(2L); // ID of the user unattending the trip
-        Trip trip = new Trip();
-        trip.getTripAttendees().add(tripAttendDTO.getTravellerId());
-        when(tripRepository.findById(tripId)).thenReturn(Optional.of(trip));
-        when(tripRepository.save(any(Trip.class))).thenReturn(trip);
+    void testFilterSuccess() {
+        String destination = "Paris";
+        Double traveltime = 5.0;
+        List<String> languages = List.of("French", "English");
+        List<Trip> trips = new ArrayList<>();
+        trips.add(new Trip());
+        trips.add(new Trip());
 
-        tripService.unattendTrip(tripId, tripAttendDTO);
+        when(tripRepository.findAll(any(Specification.class))).thenReturn(trips);
 
-        assertFalse(trip.getTripAttendees().contains(tripAttendDTO.getTravellerId()));
-        verify(tripRepository, times(1)).save(trip);
+        List<TripDTO> expectedDTOs = trips.stream()
+                .map(trip -> new TripDTO())
+                .collect(Collectors.toList());
+        when(tripMapper.toDomain(any(Trip.class))).thenReturn(new TripDTO());
+
+        List<TripDTO> result = tripService.filter(destination, traveltime, languages);
+
+        assertNotNull(result);
+        assertEquals(expectedDTOs.size(), result.size());
+        verify(tripRepository, times(1)).findAll(any(Specification.class));
     }
-
-
 
 
 }
