@@ -27,7 +27,7 @@ public class AuthController {
     private final UserService userService;
     @PostMapping("/register-traveler")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> registerTraveler(@RequestBody @Valid TravelerDTO travelerDTO) {
+    public ResponseEntity<Object> registerTraveler(@RequestBody @Valid TravelerDTO travelerDTO) {
         log.info("************entred api/user/register-traveler request**************");
         AuthenticationResponse response = authService.registerTraveler(travelerDTO);
 
