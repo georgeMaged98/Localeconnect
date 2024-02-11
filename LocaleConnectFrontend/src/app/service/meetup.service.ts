@@ -4,7 +4,7 @@ import { Meetup } from '../model/meetup';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ApiResponse } from '../model/apiResponse';
 import { AuthService } from './auth.service';
-import {environment} from "../../environments/environment";
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -26,7 +26,7 @@ export class MeetupService {
   getAllMeetups() {
     const httpHeaders = this.authService.getHttpHeaders();
 
-    return this.http.get<ApiResponse>(`${this.apiUrl}/`, {
+    return this.http.get<ApiResponse>(`${this.apiUrl}/all`, {
       headers: httpHeaders,
     });
   }

@@ -13,6 +13,7 @@ import com.localeconnect.app.feed.model.Like;
 import com.localeconnect.app.feed.model.Post;
 import com.localeconnect.app.feed.repository.CommentRepository;
 import com.localeconnect.app.feed.repository.PostRepository;
+import com.localeconnect.app.feed.type.PostType;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -105,7 +106,7 @@ public class FeedService {
             throw new ResourceNotFoundException("User with id " + authorId + " does not exist!");
         Post post = new Post();
         post.setAuthorID(authorId);
-        post.setPostType("TRIP");
+        post.setPostType(PostType.TRIP);
         post.setContent(createContentFromTrip(trip));
         post.setDate(LocalDateTime.now());
         post.setImages(trip.getImageUrls());
@@ -120,7 +121,7 @@ public class FeedService {
             throw new ResourceNotFoundException("User with id " + authorId + " does not exist!");
         Post post = new Post();
         post.setAuthorID(authorId);
-        post.setPostType("ITINERARY");
+        post.setPostType(PostType.ITINERARY);
         post.setContent(createContentFromItinerary(itinerary));
         post.setDate(LocalDateTime.now());
         post.setImages(itinerary.getImageUrls());
@@ -134,7 +135,7 @@ public class FeedService {
             throw new ResourceNotFoundException("User with id " + authorId + " does not exist!");
         Post post = new Post();
         post.setAuthorID(authorId);
-        post.setPostType("MEETUP");
+        post.setPostType(PostType.MEETUP);
         post.setContent(createContentFromMeetup(meetup));
         post.setDate(LocalDateTime.now());
 
@@ -211,7 +212,7 @@ public class FeedService {
                 .stream().map(postMapper::toDomain).collect(Collectors.toList());
     }
 
-    public List<PostDTO> filterPosts(String postType) {
+    public List<PostDTO> filterPosts(PostType postType) {
         List<Post> posts = postRepository.findByPostType(postType);
         return posts.stream()
                 .map(postMapper::toDomain)
