@@ -91,7 +91,7 @@ public class MeetupService {
         for (Long att : attendees
         ) {
             NotificationDTO newNotification = new NotificationDTO();
-            newNotification.setTitle("New Notification");
+            newNotification.setTitle("New Meetup Notification");
             newNotification.setMessage("Meetup " + meetupId + " Got Updated!");
             newNotification.setSentAt(LocalDateTime.now());
             newNotification.setReceiverID(att);
@@ -175,7 +175,7 @@ public class MeetupService {
         for (Long att : attendees
         ) {
             NotificationDTO newNotification = new NotificationDTO();
-            newNotification.setTitle("New Notification");
+            newNotification.setTitle("New Meetup Notification");
             newNotification.setMessage("Meetup " + actualMeetup.getId() + " Got Deleted!");
             newNotification.setSentAt(LocalDateTime.now());
             newNotification.setReceiverID(att);
@@ -218,6 +218,7 @@ public class MeetupService {
 
         return ratedMeetupDTO.getRatingsCount();
     }
+
     public String shareMeetup(Long meetupId, Long authorId) {
         Meetup meetup = meetupRepository.findById(meetupId)
                 .orElseThrow(() -> new ResourceNotFoundException("Meetup not found with id: " + meetupId));
@@ -229,6 +230,7 @@ public class MeetupService {
 
         return postToFeed(shareDTO, authorId);
     }
+
     public List<MeetupDTO> searchByName(String name) {
 
         List<Meetup> meetups = meetupRepository.findAllByNameIgnoreCaseLike(name)

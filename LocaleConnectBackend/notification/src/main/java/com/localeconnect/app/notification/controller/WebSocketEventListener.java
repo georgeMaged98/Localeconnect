@@ -26,15 +26,21 @@ public class WebSocketEventListener {
     @EventListener
     public void handleSessionConnected(SessionConnectEvent event) {
         SimpMessageHeaderAccessor headers = SimpMessageHeaderAccessor.wrap(event.getMessage());
+        String sessionId = headers.getSessionId();
         String userId = headers.getNativeHeader("userId").get(0);
-        log.info("USER CONNECTED WITH ID " + userId);
-        notificationService.addUserToConnected(userId);
+        log.info("USER CONNECTED WITH Session ID " + sessionId);
+        log.info(headers.toString());
+        notificationService.addUserToConnected(sessionId, userId);
     }
 
 
     @EventListener
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
         SimpMessageHeaderAccessor headers = SimpMessageHeaderAccessor.wrap(event.getMessage());
-        log.info("USER DISCONNECTED!!!");
+        String sessionId = headers.getSessionId();
+        notificationService.removeUserFromConnected(sessionId);
+        log.info("USER DISCONNECTED with Session Id: " + sessionId);
+        log.info(headers.toString());
+
     }
 }

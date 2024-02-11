@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class NotificationService {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final NotificationMapper notificationMapper;
 
-    private HashSet<String> connectedUsers;
+    private HashMap<String, String> connectedUsers;
 
     public NotificationDTO handleIncomingNotification(NotificationDTO notificationDTO) {
 
@@ -36,7 +37,7 @@ public class NotificationService {
         String receiverId = notificationDTO.getReceiverID().toString();
 
         //  Check if there exists a websocket connection with notification receiver.
-        if (connectedUsers.contains(receiverId)) {
+        if (connectedUsers.containsValue(receiverId)) {
             log.info("CONNECTED USER: " + receiverId);
             notification.setRead(true);
             Notification createdNotification = notificationRepository.save(notification);
@@ -53,12 +54,12 @@ public class NotificationService {
     }
 
 
-    public void addUserToConnected(String userId) {
-        connectedUsers.add(userId);
+    public void addUserToConnected(String sessionId, String userId) {
+        connectedUsers.put(sessionId, userId);
     }
 
-    public void removeUserFromConnected(String userId) {
-        connectedUsers.remove(userId);
+    public void removeUserFromConnected(String sessionId) {
+        connectedUsers.remove(sessionId);
     }
 
     public List<NotificationDTO> getUnReadNotificationsByUserId(Long userId) {
