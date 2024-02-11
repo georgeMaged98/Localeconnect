@@ -1,22 +1,11 @@
 import {Injectable} from '@angular/core';
-import {
-  HttpClient,
-  HttpErrorResponse,
-  HttpHeaders,
-} from '@angular/common/http';
-import {
-  BehaviorSubject,
-  catchError,
-  map,
-  Observable,
-  tap,
-  throwError,
-} from 'rxjs';
-import {User} from '../model/user';
+import {HttpClient, HttpErrorResponse, HttpHeaders,} from '@angular/common/http';
+import {BehaviorSubject, catchError, Observable, of, tap, throwError,} from 'rxjs';
+import {User, UserProfile} from '../model/user';
 import {Traveler} from '../model/traveler';
 import {Guide} from '../model/guide';
 import {environment} from '../../environments/environment';
-import {Response} from '../model/response';
+import {ApiResponse} from "../model/apiResponse";
 
 @Injectable({
   providedIn: 'root',
@@ -25,6 +14,7 @@ export class AuthService {
   private apiUrl = `${environment.API_URL}/api/user/auth`;
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser: Observable<User | null>;
+
 
   constructor(private http: HttpClient) {
     this.currentUserSubject = new BehaviorSubject<User | null>(
@@ -37,13 +27,24 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
+  getCurrentUserProfile(): UserProfile | null {
+    const user = this.getUserFromLocalStorage();
+    return user ? {
+      id: user.id,
+      name: `${user.firstName} ${user.lastName}`,
+      username: user.userName,
+      bio: user.bio,
+      imageUrl: user.imageUrl,
+    } : null;
+  }
+
   login(email: string, password: string): Observable<void> {
     return this.http
-      .post<Response>(`${this.apiUrl}/login`, {email, password})
+      .post<ApiResponse>(`${this.apiUrl}/login`, {email, password})
       .pipe(
         tap((response) => {
-          console.log(response.responseObject);
-          this.setSession(response.responseObject);
+          console.log(response.data);
+          this.setSession(response.data as string);
           console.log(localStorage.getItem('token'));
         }),
         catchError(this.handleError<any>('login'))
@@ -51,18 +52,27 @@ export class AuthService {
   }
 
   fetchCurrentUserProfile(): Observable<User> {
-    const httpHeaders = this.getHttpHeaders();
-    console.log(localStorage.getItem('token'))
-    return this.http
-      .get<User>(`${environment.API_URL}/api/user/secured/profile`, {headers: httpHeaders})
-      .pipe(
-        map((response) => {
-          console.log(response);
-          return response;
-        }),
-        catchError(this.handleError<User>('fetchCurrentUserProfile'))
-      );
+    const storedUserProfile = localStorage.getItem('currentUser');
+    if (storedUserProfile) {
+      const userProfile: User = JSON.parse(storedUserProfile);
+      return of(userProfile);
+    } else {
+
+      const httpHeaders = this.getHttpHeaders();
+      return this.http.get<User>(`${environment.API_URL}/api/user/secured/profile`, {headers: httpHeaders})
+        .pipe(
+          tap(userProfile => {
+            localStorage.setItem('currentUser', JSON.stringify(userProfile));
+            console.log('LOCAL' + localStorage.getItem('currentUser'))
+          }),
+          catchError(error => {
+            console.error('Error fetching user profile:', error);
+            return throwError(error);
+          })
+        );
+    }
   }
+
 
   logout(): void {
     localStorage.removeItem('currentUser');
@@ -81,16 +91,15 @@ export class AuthService {
   }
 
   registerTraveler(traveler: Traveler): Observable<Traveler> {
-    const headers = new HttpHeaders({'Content-Type': 'application/json'});
+
     return this.http
-      .post<Traveler>(`${this.apiUrl}/register-traveler`, traveler, {headers})
+      .post<Traveler>(`${this.apiUrl}/register-traveler`, traveler)
       .pipe(catchError(this.handleError<Traveler>('register traveler')));
   }
 
   registerGuide(guide: Guide): Observable<Guide> {
-    const headers = new HttpHeaders({'Content-Type': 'application/json'});
     return this.http
-      .post<Guide>(`${this.apiUrl}/register-localguide`, guide, {headers})
+      .post<Guide>(`${this.apiUrl}/register-localguide`, guide, )
       .pipe(catchError(this.handleError<Guide>('register guide')));
   }
 
@@ -99,7 +108,11 @@ export class AuthService {
     return !!token;
   }
 
-  private getUserFromLocalStorage(): User | null {
+  public getUserIdFromLocalStorage(): number | undefined {
+    return this.getUserFromLocalStorage() ? this.getUserFromLocalStorage()?.id : undefined;
+  }
+
+  public getUserFromLocalStorage(): User | null {
     const storedUser = localStorage.getItem('currentUser');
     return storedUser ? JSON.parse(storedUser) : null;
   }
@@ -143,12 +156,6 @@ export class AuthService {
     };
   }
 
-  // public getTokenFromLocalStorage(): string | null {
-  //   const storedUser = localStorage.getItem('currentUser');
-  //   if (!storedUser) return null;
-  //   const token = JSON.parse(storedUser).responseObject;
-  //   return token;
-  // }
   public getTokenFromLocalStorage(): string | null {
     return localStorage.getItem('token');
   }

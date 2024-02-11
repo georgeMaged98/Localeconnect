@@ -36,10 +36,11 @@ export class ReviewComponent implements OnInit {
       (reviews: Review[]) => this.reviews = reviews
     );
   }
-  getStars(rating: number) {
+  getStars(rating: number=0) {
+
     const fullStars = Math.floor(rating);
     const halfStar = rating % 1 !== 0 ? 1 : 0;
-    const emptyStars = 5 - fullStars - halfStar;
+    const emptyStars = Math.max(5 - fullStars - halfStar, 0);
 
     return {
       fullStars: Array(fullStars).fill('star'),
@@ -47,6 +48,7 @@ export class ReviewComponent implements OnInit {
       emptyStars: Array(emptyStars).fill('star_border'),
     };
   }
+
 
   protected readonly onsubmit = onsubmit;
 }
