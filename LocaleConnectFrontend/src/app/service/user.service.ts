@@ -1,21 +1,23 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
-import {map, Observable} from "rxjs";
-import {GuideProfile} from "../model/guide";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
+import {map, Observable, throwError} from "rxjs";
+import {Guide, GuideProfile} from "../model/guide";
 import {TripPreview} from "../model/trip";
 import {User} from "../model/user";
 import {environment} from "../../environments/environment";
-import {Profile} from "../model/feed";
 import {AuthService} from "./auth.service";
+import {ApiResponse} from "../model/apiResponse";
+import {catchError} from "rxjs/operators";
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
   private apiUrl = `${environment.API_URL}/api/user/secured`;
-
+  headers: HttpHeaders;
 
   constructor(private http: HttpClient, private authService: AuthService) {
+    this.headers=this.authService.getHttpHeaders();
   }
 
   getUsername(userId: number): Observable<string> {
@@ -52,130 +54,56 @@ export class UserService {
   }
 
   followUser(userId: number, followerId: number): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/${userId}/follow/${followerId}`, {});
+    return this.http.post<void>(`${this.apiUrl}/${userId}/follow/${followerId}`, {}, {headers:this.headers});
   }
 
   unfollowUser(userId: number, followeeId: number): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/${userId}/unfollow/${followeeId}`, {});
+    return this.http.post<void>(`${this.apiUrl}/${userId}/unfollow/${followeeId}`, {},{headers:this.headers});
   }
 
   rateLocalGuide(guideId: number, travelerId: number, rating: number): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/${guideId}/rate/${travelerId}`, {rating});
+    const params = new HttpParams().set('rating', rating.toString());
+    return this.http.post<void>(`${this.apiUrl}/${guideId}/rate/${travelerId}`, {},{headers:this.headers, params:params });
   }
 
-  getAllGuides(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiUrl}/guides`);
+  getAllGuides(): Observable<Guide[]> {
+    const httpHeaders = this.authService.getHttpHeaders();
+    return this.http.get<ApiResponse>(`${this.apiUrl}/guides`,{headers:httpHeaders})
+      .pipe(map((response) => response.data as Guide[] | []));
   }
 
   filterLocalGuideByCity(keyword: string): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiUrl}/filter-guides-city?keyword=${keyword}`);
+    return this.http.get<User[]>(`${this.apiUrl}/filter-guides-city?keyword=${keyword}`,{headers:this.headers});
   }
 
   searchTravelers(keyword: string): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiUrl}/search-traveler?keyword=${keyword}`);
+    return this.http.get<User[]>(`${this.apiUrl}/search-traveler?keyword=${keyword}`,{headers:this.headers});
   }
 
   getFollowers(userId: number): Observable<User[]> {
     return this.http.get<User[]>(`${this.apiUrl}/${userId}/followers`);
   }
 
-  getFollowing(userId: number): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiUrl}/${userId}/following`);
-  }
 
   getProfile(userId: number): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/${userId}/profile`);
+    return this.http.get<User>(`${this.apiUrl}/${userId}/profile`,{headers:this.headers});
   }
 
-  getAllFollowingAsProfiles(userId: number): Observable<Profile[]> {
-    return this.http.get<User[]>(`${this.apiUrl}/${userId}/following`).pipe(
-      map(users => users.map(user => ({
-        userId: user.id,
-        name: `${user.firstName} ${user.lastName}`,
-        username: user.userName,
-        isFollowing: false,
-        profileImage: user.imageUrl || 'https://www.profilebakery.com/wp-content/uploads/2023/04/AI-Profile-Picture.jpg',
-      })))
-    );
+  getAllFollowing(userId: number | undefined): Observable<User[]> {
+
+    return this.http.get<ApiResponse>(`${this.apiUrl}/${userId}/following`, {headers: this.headers}).pipe(
+      map(res => res.data ? res.data as User[] : []));
+
   }
 
   getAverageRatingOfLocalGuide(userId: number): Observable<number> {
-    return this.http.get<number>(`${this.apiUrl}/${userId}/rating`);
+    return this.http.get<ApiResponse>(`${this.apiUrl}/${userId}/rating`, {headers:this.headers}).pipe(
+      map(res => res.data ? res.data as number : 0));
   }
 
   getRatingCountOfLocalGuide(userId: number): Observable<number> {
-    return this.http.get<number>(`${this.apiUrl}/${userId}/rating-count`);
-  }
-
-  getGuidesMock(): GuideProfile[] {
-    return [
-      {
-        id: 1,
-        name: 'John Doe',
-        userName: 'john_doe',
-        bio: 'Passionate traveler and language enthusiast.',
-        visitedCountries: ['USA', 'Canada', 'France', 'Italy'],
-        languages: ['English', 'French', 'Italian'],
-        city: 'New York',
-        rating: 4.8,
-        ratingSubmitted: true,
-
-        totalRatings: 50,
-        averageRating: 4.8,
-        expand: false
-      },
-      {
-        id: 2,
-        name: 'Emily Smith',
-        userName: 'emily_smith',
-        bio: 'Experienced guide with a love for history.',
-        visitedCountries: ['UK', 'Germany', 'Spain', 'Greece'],
-        languages: ['English', 'German', 'Spanish'],
-        city: 'London',
-        rating: 0,
-        totalRatings: 35,
-        averageRating: 2.5,
-        imageUrl: 'https://www.profilebakery.com/wp-content/uploads/2023/04/AI-Profile-Picture.jpg',
-      },
-      {
-        id: 3,
-        name: 'Carlos Rodriguez',
-        userName: 'carlos_rodriguez',
-        bio: 'Adventure seeker and nature lover.',
-        visitedCountries: ['Mexico', 'Costa Rica', 'Brazil', 'Peru'],
-        languages: ['Spanish', 'Portuguese', 'English'],
-        city: 'Mexico City',
-        rating: 0,
-        totalRatings: 65,
-        averageRating: 4.9,
-      },
-      {
-        id: 4,
-        name: 'Anna Chen',
-        userName: 'anna_chen',
-        bio: 'Food enthusiast and culinary expert.',
-        visitedCountries: ['China', 'Japan', 'Thailand', 'Vietnam'],
-        languages: ['Mandarin', 'Japanese', 'English'],
-        city: 'Beijing',
-        rating: 0,
-        totalRatings: 45,
-        averageRating: 4.7,
-        trips: this.MOCK_TRIP_PREVIEWS
-      },
-      {
-        id: 5,
-        name: 'Ahmed Khalid',
-        userName: 'ahmed_khalid',
-        bio: 'Passionate about showcasing cultural diversity.',
-        visitedCountries: ['Egypt', 'Turkey', 'Morocco', 'UAE'],
-        languages: ['Arabic', 'Turkish', 'English'],
-        city: 'Cairo',
-        rating: 4.6,
-        ratingSubmitted: true,
-        totalRatings: 40,
-        averageRating: 4.6,
-      }
-    ];
+    return this.http.get<ApiResponse>(`${this.apiUrl}/${userId}/rating-count`,{headers:this.headers}).pipe(
+      map(res => res.data ? res.data as number : 0));
   }
 
   MOCK_TRIP_PREVIEWS: TripPreview[] = [
@@ -204,4 +132,12 @@ export class UserService {
       link: '/trips/cultural-heritage'
     }
   ];
+  public getHttpHeadersWithRating(rating : number): HttpHeaders {
+    const token = this.authService.getTokenFromLocalStorage();
+    const httpOptions = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+     ' rating': rating.toString()
+    });
+    return httpOptions;
+  }
 }
