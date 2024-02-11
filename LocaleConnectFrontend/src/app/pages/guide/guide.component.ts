@@ -1,13 +1,14 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { debounceTime, distinctUntilChanged } from 'rxjs';
-import { MatDialog } from '@angular/material/dialog';
-import { ReviewService } from '../../service/review.service';
-import { UserService } from '../../service/user.service';
-import { ImagesService } from '../../service/image.service';
-import { GuideProfile } from '../../model/guide';
-import { NotificationService } from '../../service/notification.service';
-import { MatPaginator } from '@angular/material/paginator';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {FormControl} from '@angular/forms';
+import {debounceTime, distinctUntilChanged} from 'rxjs';
+import {MatDialog} from '@angular/material/dialog';
+import {ReviewService} from '../../service/review.service';
+import {UserService} from '../../service/user.service';
+import {ImagesService} from '../../service/image.service';
+import {GuideProfile} from '../../model/guide';
+import {NotificationService} from '../../service/notification.service';
+import {MatPaginator} from '@angular/material/paginator';
+import {AuthService} from "../../service/auth.service";
 
 @Component({
   selector: 'app-guide',
@@ -30,102 +31,191 @@ export class GuideComponent implements OnInit {
     private imageService: ImagesService,
     private dialog: MatDialog,
     private reviewService: ReviewService,
-    private userService: UserService
-  ) {}
+    private userService: UserService,
+    private authService: AuthService,
+  ) {
+  }
 
   ngOnInit(): void {
-    this.guides = this.userService.getGuidesMock();
+    this.fetchGuides();
     this.totalLength = this.guides.length;
     this.initializeDisplayedGuides();
     this.searchGuides = [...this.guides];
-
-    //TODO: use this api call instead
-    /*this.userService.getAllGuides().subscribe(data => {
-    //TODO: map the data from backend
-      this.guides = data;
-        this.totalLength = data.length;
-      this.updateDisplayedMeetups();
-    });
-
-     */
-    // this.imageService.currentImages.subscribe(images => {
-    //   this.images = images;
-    // });
     this.searchControl.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged())
       .subscribe((searchTerm) => {
         this.performSearch(searchTerm);
       });
   }
+
+  fetchGuides(): void {
+    this.userService.getAllGuides().subscribe({
+      next: (guides) => {
+        const userId = this.authService.getUserIdFromLocalStorage();
+        if (userId) {
+          this.userService.getAllFollowing(userId).subscribe(followingGuides => {
+            this.guides = guides.map(guide => ({
+              id: guide.id,
+              name: `${guide.firstName} ${guide.lastName}`,
+              userName: guide.userName,
+              bio: guide.bio,
+              visitedCountries: guide.visitedCountries,
+              languages: guide.languages,
+              city: guide.city,
+              rating: guide.rating | 0,
+              imageUrl: guide.imageUrl,
+              isFollowing: followingGuides.some(followingGuide => followingGuide.id === guide.id)
+            }));
+            this.guides.forEach(guide => {
+              this.fetchGuideRatings(guide);
+              console.log(guide.averageRating)
+            });
+            this.initializeDisplayedGuides();
+          });
+        } else {
+          this.guides = guides.map(guide => ({
+            id: guide.id,
+            name: `${guide.firstName} ${guide.lastName}`,
+            userName: guide.userName,
+            bio: guide.bio,
+            visitedCountries: guide.visitedCountries,
+            languages: guide.languages,
+            city: guide.city,
+            rating: guide.rating | 0,
+            imageUrl: guide.imageUrl,
+            isFollowing: false,
+          }));
+          this.guides.forEach(guide => {
+            this.fetchGuideRatings(guide);
+          });
+          this.initializeDisplayedGuides();
+        }
+        }
+
+      ,
+      error: (error) => console.error('Error fetching guides:', error),
+    });
+    this.updateFollowingStatus();
+
+  }
+
+  fetchGuideRatings(guide: GuideProfile): void {
+    if (guide.id
+    ) {
+      this.userService.getAverageRatingOfLocalGuide(guide.id).subscribe(averageRating => {
+        guide.averageRating = averageRating;
+        console.log(guide.averageRating)
+      });
+      this.userService.getRatingCountOfLocalGuide(guide.id).subscribe(ratingCount => {
+        guide.totalRatings = ratingCount;
+      });
+    }
+
+  }
+
+  submitRating(guide:GuideProfile, rating: number): void {
+    const userId = this.authService.getUserIdFromLocalStorage();
+    if (userId && guide.id
+    ) {
+
+      this.userService.rateLocalGuide(guide.id, userId, rating).subscribe({
+        next: () => this.notificationService.showSuccess('Rating submitted successfully'),
+        error: () => this.notificationService.showError('Failed to submit rating'),
+      });
+      this.guides.forEach((guide) => {
+        if (guide.id) {
+          this.userService.getAverageRatingOfLocalGuide(guide.id).subscribe((averageRating) => {
+            guide.averageRating = averageRating;
+          });
+          this.userService.getRatingCountOfLocalGuide(guide.id).subscribe((ratingCount) => {
+            guide.totalRatings = ratingCount;
+          });
+        }
+
+      });
+      this.updateDisplayedGuides();
+      guide.ratingSubmitted = true;
+    }
+  }
+
+  updateFollowingStatus()
+    :
+    void {
+    const currentUserId = this.authService.getUserIdFromLocalStorage();
+    if (currentUserId) {
+      this.userService.getAllFollowing(currentUserId).subscribe({
+        next: (followingUsers) => {
+          this.guides = this.guides.map(guide => ({
+                ...guide,
+                isFollowing: followingUsers.some(followingUser => followingUser.id === guide.id)
+              }
+            )
+          );
+        },
+        error: (error) => console.error('Error fetching following status:', error)
+      });
+    }
+  }
+
   ngAfterViewInit() {
     this.paginator.page.subscribe(() => {
       this.updateDisplayedGuides();
     });
   }
-  initializeDisplayedGuides(): void {
+
+  initializeDisplayedGuides()
+    :
+    void {
     this.displayedGuides = this.guides.slice(0, this.pageSize);
   }
-  updateDisplayedGuides(): void {
+
+  updateDisplayedGuides()
+    :
+    void {
     const startIndex = this.paginator.pageIndex * this.paginator.pageSize;
     const endIndex = startIndex + this.paginator.pageSize;
     this.displayedGuides = this.guides.slice(startIndex, endIndex);
   }
-  performSearch(searchTerm: string | null = ''): void {
+
+  performSearch(searchTerm
+                  :
+                  string | null = ''
+  ):
+    void {
     this.displayedGuides = searchTerm
       ? this.userService.searchGuides(searchTerm, this.searchGuides)
       : [...this.searchGuides];
   }
 
-  toggleDetails(guide: GuideProfile): void {
+  toggleDetails(guide
+                  :
+                  GuideProfile
+  ):
+    void {
     guide.expand = !guide.expand;
   }
 
-  submitRating(guide: GuideProfile, rating: number): void {
-    if (guide.rating !== 0) {
-      guide.ratingSubmitted = true;
-      guide.rating = rating;
-      if (guide.averageRating && guide.totalRatings && guide.totalRatings > 0) {
-        guide.averageRating =
-          (guide.averageRating * guide.totalRatings + rating) /
-          (guide.totalRatings + 1);
-      } else {
-        guide.averageRating = rating;
-      }
-      guide.totalRatings = (guide.totalRatings || 0) + 1;
-      this.notificationService.showSuccess(
-        'You submitted the review successfully!'
-      );
+  toggleFollow(guide
+                 :
+                 GuideProfile
+  ):
+    void {
+    const action = guide.isFollowing ? this.userService.unfollowUser : this.userService.followUser;
+    const currentUserId = this.authService.getUserIdFromLocalStorage();
 
-      //TODO: uncomment for api call
-      /*
-      const review: Review = { userId: guide.id, rating, entityId: guide.id, entityType: "guide" };
-      this.reviewService.createReview(review).subscribe({
+    if (currentUserId && guide.id
+    ) {
+      action.call(this.userService, currentUserId, guide.id).subscribe({
         next: () => {
-          if (guide.averageRating && guide.totalRatings && guide.totalRatings > 0) {
-            guide.averageRating = ((guide.averageRating * guide.totalRatings) + rating) / (guide.totalRatings + 1);
-          } else {
-            guide.averageRating = rating;
-          }
-          guide.totalRatings = (guide.totalRatings || 0) + 1;
+        guide.isFollowing ? this.notificationService.showSuccess('Unfollowed successfully!'):this.notificationService.showSuccess('Followed successfully!') ;
+          guide.isFollowing = !guide.isFollowing;
         },
-        error: (error) => console.error('Error submitting review', error)
+        error: (error) => {
+          console.error('Error toggling follow status:', error);
+          guide.isFollowing = !guide.isFollowing;
+        }
       });
-
-       */
     }
-  }
-  //TODO: uncomment for api call
-  toggleFollow(guide: GuideProfile): void {
-    guide.isFollowing = !guide.isFollowing;
-    /*  if (guide.isFollowing) {
-        this.userService.unfollowUser(guide.id).subscribe(() => {
-          guide.isFollowing = false;
-        });
-      } else {
-        this.userService.unfollowUser(guide.id).subscribe(() => {
-          guide.isFollowing = true;
-        });
-      }
-     */
+
   }
 }

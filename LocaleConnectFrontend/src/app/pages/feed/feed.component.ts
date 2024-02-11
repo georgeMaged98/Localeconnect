@@ -47,7 +47,7 @@ export class FeedComponent implements OnInit, OnDestroy {
   fetchFollowing(): void {
     console.log(this.currentUserProfile);
     if (this.currentUserProfile?.id) {
-      this.userService.getAllFollowingAsProfiles(this.currentUserProfile?.id)
+      this.userService.getAllFollowing(this.currentUserProfile?.id)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (profiles) => {
@@ -90,7 +90,7 @@ export class FeedComponent implements OnInit, OnDestroy {
         };
       }),
       switchMap((currentUser: User) =>
-        this.userService.getAllFollowingAsProfiles(currentUser.id)
+        this.userService.getAllFollowing(currentUser.id)
       ),
       map(users => users.map(user => ({
         userId: user.id,
