@@ -1,4 +1,3 @@
-
 export interface TripPreview {
   id: number;
   name: string;
@@ -6,23 +5,27 @@ export interface TripPreview {
   link: string;
 }
 export interface Trip {
-  id:number;
+  id: number;
   localguideId: number;
+  localguideusername: string;
   name: string;
   description?: string;
   departureTime: string;
   destination: string;
-  durationInDays: number;
+  durationInHours: number;
+  durationInDays?: number;
   capacity: number;
   travelers: number[];
+  tripAttendees: number[];
   languages: string[];
   placesToVisit: string[];
   dailyActivities?: string[];
-  imageUrls?: string[];
+  imageUrls: string[];
   isAttending?: boolean;
   rating: number;
   ratingSubmitted?: boolean;
-  totalRatings?: number;
+  ratingsTotal?: number;
+  ratingsCount?: number;
   averageRating?: number;
   expand?: boolean;
 }
