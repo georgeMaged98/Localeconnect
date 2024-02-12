@@ -1,33 +1,34 @@
-import {ChangeDetectorRef, Component} from '@angular/core';
-import {MatDialogRef} from '@angular/material/dialog';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {ImagesService} from "../../../service/image.service";
-import {FeedService} from "../../../service/feed.service";
-import {Post} from "../../../model/feed";
-import {PostType} from "../../../model/post-type";
-import {AuthService} from "../../../service/auth.service";
-import {getFormattedDateAndTime} from "../../../helper/DateHelper";
+import { ChangeDetectorRef, Component } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ImagesService } from '../../../service/image.service';
+import { FeedService } from '../../../service/feed.service';
+import { Post } from '../../../model/feed';
+import { PostType } from '../../../model/post-type';
+import { AuthService } from '../../../service/auth.service';
+import { getFormattedDateAndTime } from '../../../helper/DateHelper';
 
 @Component({
   selector: 'app-add-post-dialog',
   templateUrl: './add-post-dialog.component.html',
-  styleUrls: ['./add-post-dialog.component.scss']
+  styleUrls: ['./add-post-dialog.component.scss'],
 })
 export class AddPostDialogComponent {
   postForm: FormGroup;
   images: string[] = [];
   showEmojiPicker = false;
 
-  constructor(private cdr: ChangeDetectorRef,
-              private feedService: FeedService,
-              public dialogRef: MatDialogRef<AddPostDialogComponent>,
-              private formBuilder: FormBuilder,
-              private imageService: ImagesService,
-              private authService: AuthService,
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private feedService: FeedService,
+    public dialogRef: MatDialogRef<AddPostDialogComponent>,
+    private formBuilder: FormBuilder,
+    private imageService: ImagesService,
+    private authService: AuthService
   ) {
     this.postForm = this.formBuilder.group({
       content: ['', Validators.required],
-      images: ['']
+      images: [''],
     });
   }
 
@@ -37,7 +38,7 @@ export class AddPostDialogComponent {
 
   onSubmit(): void {
     const currentDate = getFormattedDateAndTime(new Date());
-    console.log(this.authService.getCurrentUserProfile());
+
     if (this.postForm.valid) {
       const postData: Post = {
         authorID: this.authService.getUserIdFromLocalStorage(),
@@ -46,17 +47,15 @@ export class AddPostDialogComponent {
         postType: PostType.REGULAR,
         date: currentDate,
         likedByUser: false,
-
       };
-      console.log(postData);
+
       this.feedService.createRegularPost(postData).subscribe({
         next: (newPost) => {
-          console.log(newPost)
           this.dialogRef.close(newPost);
         },
         error: (error) => {
           console.error('Failed to create post:', error);
-        }
+        },
       });
     }
   }
@@ -72,7 +71,7 @@ export class AddPostDialogComponent {
     this.cdr.detectChanges();
   }
 
-//TODO: add gcp
+  //TODO: add gcp
   onFileSelected(event: any) {
     const files = event.target.files;
     if (files) {

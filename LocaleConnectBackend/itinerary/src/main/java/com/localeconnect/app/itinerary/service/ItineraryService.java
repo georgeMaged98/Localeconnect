@@ -52,11 +52,9 @@ public class ItineraryService {
         List<String> images = itineraryDTO.getImageUrls();
 
         if (!images.isEmpty()) {
-
             GCPResponseDTO gcpResponse = saveImageToGCP(itineraryDTO.getImageUrls().get(0));
             String imageUrl = gcpResponse.getData();
             itinerary.setImageUrls(List.of(imageUrl));
-
         } else {
             itinerary.setImageUrls(new ArrayList<>());
         }

@@ -1,9 +1,8 @@
 package com.localeconnect.app.user.service;
 
-import com.localeconnect.app.user.dto.LocalguideDTO;
-import com.localeconnect.app.user.dto.TravelerDTO;
-import com.localeconnect.app.user.dto.UserDTO;
-import com.localeconnect.app.user.dto.UserPrincipalDTO;
+import com.localeconnect.app.user.config.RabbitConfig;
+import com.localeconnect.app.user.dto.*;
+import com.localeconnect.app.user.exception.LogicException;
 import com.localeconnect.app.user.exception.UserAlreadyExistsException;
 import com.localeconnect.app.user.exception.UserDoesNotExistException;
 import com.localeconnect.app.user.exception.ValidationException;
@@ -13,7 +12,9 @@ import com.localeconnect.app.user.mapper.UserMapper;
 import com.localeconnect.app.user.model.Localguide;
 import com.localeconnect.app.user.model.Traveler;
 import com.localeconnect.app.user.model.User;
+import com.localeconnect.app.user.rabbit.RabbitMQMessageProducer;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,7 +28,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @Slf4j
@@ -38,6 +41,9 @@ public class UserService implements UserDetailsService {
     private final UserMapper userMapper;
     private final TravelerMapper travelerMapper;
     private final LocalguideMapper localguideMapper;
+    private final RabbitMQMessageProducer rabbitMQMessageProducer;
+    private final WebClient webClient;
+
     public TravelerDTO registerTraveler(TravelerDTO travelerDTO) {
         if (userRepository.existsByUserName(travelerDTO.getUserName())) {
             throw new UserAlreadyExistsException("A user with the given username already exists.");
@@ -89,6 +95,7 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UserDoesNotExistException("User with the given id does not exist"));
         return userMapper.toDomain(user);
     }
+
     public UserDTO getUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserDoesNotExistException("User with the given email does not exist"));
@@ -101,24 +108,33 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UserDoesNotExistException("User not found"));
         userRepository.delete(user);
     }
+
     public void followUser(Long followerId, Long userId) {
         User userToFollow = userRepository.findById(userId)
                 .orElseThrow(() -> new UserDoesNotExistException("User not found"));
         User follower = userRepository.findById(followerId)
                 .orElseThrow(() -> new UserDoesNotExistException("Follower not found"));
         if (userId.equals(followerId)) {
-            throw new IllegalArgumentException("User cannot follow themselves");
+            throw new LogicException("User cannot follow themselves");
         }
         if (!userToFollow.getFollowers().contains(follower)) {
             userToFollow.getFollowers().add(follower);
             follower.getFollowing().add(userToFollow);
             userRepository.save(userToFollow);
             userRepository.save(follower);
-            // ToDo Notify the user about the new follower
+
+            NotificationDTO newNotification = new NotificationDTO();
+            newNotification.setTitle("New Follow Notification");
+            newNotification.setMessage("Traveller " + followerId + " Followed You!");
+            newNotification.setSentAt(LocalDateTime.now());
+            newNotification.setReceiverID(followerId);
+            newNotification.setSenderID(userId);
+            rabbitMQMessageProducer.publish(newNotification, RabbitConfig.EXCHANGE, RabbitConfig.ROUTING_KEY);
         } else {
             throw new ValidationException("Already following this user");
         }
     }
+
     public void unfollowUser(Long followerId, Long userId) {
         if (userId.equals(followerId)) {
             throw new IllegalArgumentException("User cannot unfollow themselves");
@@ -213,41 +229,43 @@ public class UserService implements UserDetailsService {
     }
 
     public UserDTO getProfileDetails(Long userId) {
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new UserDoesNotExistException("User with the given id does not exist"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserDoesNotExistException("User with the given id does not exist"));
 
-            if (user instanceof Localguide) {
-                LocalguideDTO localguideDTO = LocalguideDTO.builder()
-                        .firstName(user.getFirstName())
-                        .lastName(user.getLastName())
-                        .userName(user.getUserName())
-                        .bio(user.getBio())
-                        .ratingsCount(((Localguide) user).getRatingsCount())
-                        .ratingsTotal(((Localguide) user).getRatingsTotal())
-                        .registeredAsLocalGuide(true)
-                        .languages(user.getLanguages())
-                        .followers(user.getFollowers().stream().map(userMapper::toDomain).toList())
-                        .followings(user.getFollowing().stream().map(userMapper::toDomain).toList())
-                        .role(user.getRole())
-                        .build();
-                localguideDTO.calcAverageRating();
-
-                return localguideDTO;
-            }
-
-            TravelerDTO travelerDTO = TravelerDTO.builder()
+        if (user instanceof Localguide) {
+            LocalguideDTO localguideDTO = LocalguideDTO.builder()
                     .firstName(user.getFirstName())
                     .lastName(user.getLastName())
                     .userName(user.getUserName())
                     .bio(user.getBio())
-                    .registeredAsLocalGuide(false)
+                    .ratingsCount(((Localguide) user).getRatingsCount())
+                    .ratingsTotal(((Localguide) user).getRatingsTotal())
+                    .registeredAsLocalGuide(true)
                     .languages(user.getLanguages())
                     .followers(user.getFollowers().stream().map(userMapper::toDomain).toList())
                     .followings(user.getFollowing().stream().map(userMapper::toDomain).toList())
                     .role(user.getRole())
+                    .profilePicture(user.getProfilePicture())
                     .build();
+            localguideDTO.calcAverageRating();
 
-            return travelerDTO;
+            return localguideDTO;
+        }
+
+        TravelerDTO travelerDTO = TravelerDTO.builder()
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .userName(user.getUserName())
+                .bio(user.getBio())
+                .registeredAsLocalGuide(false)
+                .languages(user.getLanguages())
+                .followers(user.getFollowers().stream().map(userMapper::toDomain).toList())
+                .followings(user.getFollowing().stream().map(userMapper::toDomain).toList())
+                .role(user.getRole())
+                .profilePicture(user.getProfilePicture())
+                .build();
+
+        return travelerDTO;
     }
 
     public double getAverageRatingOfLocalGuide(Long guideId) {
@@ -276,12 +294,41 @@ public class UserService implements UserDetailsService {
     }
 
     @Override
-        public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-            Optional<User> user = userRepository.findByEmail(email);
-            if (user.isEmpty()) {
-                throw new UsernameNotFoundException("user not found with email :" + email);
-            } else {
-                return new UserPrincipalDTO(user.get());
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) {
+            throw new UsernameNotFoundException("user not found with email :" + email);
+        } else {
+            return new UserPrincipalDTO(user.get());
         }
+    }
+
+    public UserDTO uploadProfilePicture(Long travelerId, UploadProfileRequest profile) {
+
+        if (!checkUserId(travelerId))
+            throw new UserDoesNotExistException("Traveler with id " + travelerId + " does not exist");
+
+        Optional<User> user = userRepository.findById(travelerId);
+
+        if (user.isEmpty())
+            throw new UserDoesNotExistException("Traveler with id " + travelerId + " does not exist");
+
+        User actualUser = user.get();
+
+        String image = profile.getProfilePhoto();
+        GCPResponseDTO imaegUrl = saveImageToGCP(image);
+        actualUser.setProfilePicture(imaegUrl.getData());
+        userRepository.save(actualUser);
+        return userMapper.toDomain(actualUser);
+    }
+
+    private GCPResponseDTO saveImageToGCP(String image) {
+        ResponseEntity<GCPResponseDTO> responseEntity = webClient.post()
+                .uri("http://gcp-service:5005/api/gcp/?filename=itinerary")
+                .bodyValue(image)
+                .retrieve()
+                .toEntity(GCPResponseDTO.class)
+                .block();
+        return responseEntity.getBody();
     }
 }

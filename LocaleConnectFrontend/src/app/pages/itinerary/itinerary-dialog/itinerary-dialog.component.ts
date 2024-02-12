@@ -9,6 +9,8 @@ import { ApiResponse } from 'src/app/model/apiResponse';
 import { UserService } from 'src/app/service/user.service';
 import { AuthService } from 'src/app/service/auth.service';
 import { User } from 'src/app/model/user';
+import { NotificationService } from 'src/app/service/notification.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-itinerary-dialog',
@@ -26,7 +28,8 @@ export class ItineraryDialogComponent {
     public dialogRef: MatDialogRef<ItineraryDialogComponent>,
     private formBuilder: FormBuilder,
     private itineraryService: ItineraryService,
-    private userService: UserService
+    private userService: UserService,
+    private notificationService: NotificationService
   ) {
     this.itineraryForm = this.formBuilder.group({
       name: [, Validators.required],
@@ -70,8 +73,13 @@ export class ItineraryDialogComponent {
       this.itineraryService.addItinerary(itinerary).subscribe({
         next: (res: ApiResponse) => {
           this.dialogRef.close(res.data);
+          this.notificationService.showSuccess(
+            'Itinerary Created Successfully!'
+          );
         },
-        error: (error: any) => console.error(error),
+        error: (error: HttpErrorResponse) => {
+          this.notificationService.showError(error.error.errors.errors[0]);
+        },
       });
     }
   }

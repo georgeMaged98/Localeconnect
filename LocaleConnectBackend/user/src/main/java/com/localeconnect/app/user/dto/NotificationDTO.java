@@ -1,9 +1,10 @@
-package com.localeconnect.app.meetup.dto;
+package com.localeconnect.app.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @ToString
 public class NotificationDTO implements Serializable {
+
     private Long id;
 
     @NotNull(message = "This is a required field")
@@ -32,3 +34,4 @@ public class NotificationDTO implements Serializable {
     private boolean isRead = false;
     private String title;
 }
+

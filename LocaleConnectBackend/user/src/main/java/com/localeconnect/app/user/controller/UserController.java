@@ -1,6 +1,7 @@
 package com.localeconnect.app.user.controller;
 
 import com.localeconnect.app.user.dto.LocalguideDTO;
+import com.localeconnect.app.user.dto.UploadProfileRequest;
 import com.localeconnect.app.user.dto.UserDTO;
 import com.localeconnect.app.user.response_handler.ResponseHandler;
 import com.localeconnect.app.user.service.JwtUtil;
@@ -148,6 +149,12 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
     }
 
+    @PostMapping("/{userId}/upload-profile")
+    public ResponseEntity<Object> uploadProfilePicture(@PathVariable("userId") Long userId, @RequestBody @Valid UploadProfileRequest profile) {
+        UserDTO updatedUser = userService.uploadProfilePicture(userId, profile);
+
+        return ResponseHandler.generateResponse("Success!", HttpStatus.OK, updatedUser, null);
+    }
 }
 
 

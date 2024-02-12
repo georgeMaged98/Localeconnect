@@ -169,7 +169,6 @@ public class MeetupService {
             throw new ResourceNotFoundException("No Meetup Found with id: " + id + "!");
 
         Meetup actualMeetup = optional.get();
-        meetupRepository.deleteById(id);
 
         List<Long> attendees = actualMeetup.getMeetupAttendees();
         for (Long att : attendees
@@ -183,8 +182,8 @@ public class MeetupService {
             rabbitMQMessageProducer.publish(newNotification, MeetupRabbitConfig.EXCHANGE, MeetupRabbitConfig.ROUTING_KEY);
         }
 
-        MeetupDTO meetupDTO = meetupMapper.toDomain(optional.get());
-        return meetupDTO;
+        meetupRepository.deleteById(id);
+        return meetupMapper.toDomain(optional.get());
     }
 
     public MeetupDTO rateMeetup(Long meetupId, Long userId, Double rating) {

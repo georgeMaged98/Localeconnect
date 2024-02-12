@@ -5,22 +5,22 @@ export interface User {
   userName: string;
   password: string;
   email: string;
-  dateOfBirth:Date;
+  dateOfBirth: Date;
   bio?: string;
   visitedCountries?: string[];
   languages?: string[];
   followerIds?: number[];
   followingIds?: number[];
   token?: string;
-  imageUrl?: string;
   isEnabled?: boolean;
   role?: string;
+  profilePicture: string;
 }
 export interface UserProfile {
   id?: number;
   name: string;
   username: string;
   bio?: string;
-  imageUrl?: string;
-  isFollowing?: boolean,
+  profilePicture?: string;
+  isFollowing?: boolean;
 }

@@ -1,9 +1,9 @@
-import {PostType} from "./post-type";
-import {UserProfile} from "./user";
+import { PostType } from './post-type';
+import { UserProfile } from './user';
 
 export interface Post {
   id?: number;
-  author?: UserProfile | null;
+  author?: UserProfile;
   date?: string;
   authorID: number | undefined;
   content: string;
@@ -26,9 +26,9 @@ export interface Comment {
   authorName?: string;
 }
 export interface FollowerProfile {
-  userId?: number,
-  name: string,
-  username: string,
-  isFollowing: boolean,
+  userId?: number;
+  name: string;
+  username: string;
+  isFollowing: boolean;
   profileImage: string;
 }
