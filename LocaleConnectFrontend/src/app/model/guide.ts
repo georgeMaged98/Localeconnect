@@ -10,6 +10,8 @@ export interface Guide extends User {
 //TODO: map from guide profile to guide and vices versa
 export interface GuideProfile {
   id?: number;
+  firstName: string;
+  lastName: string;
   name: string;
   userName: string;
   bio?: string;
@@ -18,10 +20,11 @@ export interface GuideProfile {
   city: string;
   rating: number;
   ratingSubmitted?: boolean;
-  totalRatings?: number;
+  ratingsCount?: number;
   averageRating?: number;
   expand?: boolean;
   trips?: TripPreview[];
   isFollowing?: boolean;
   profilePicture?: string;
+  followers?: User[];
 }

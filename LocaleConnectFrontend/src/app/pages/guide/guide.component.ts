@@ -51,26 +51,32 @@ export class GuideComponent implements OnInit {
     const userId = this.authService.getUserIdFromLocalStorage();
 
     this.userService.getAllGuides().subscribe({
-      next: (guides) => {
+      next: (guides: GuideProfile[]) => {
         // Initialize guides with basic information
-        this.displayedGuides = guides.map((guide) => ({
-          id: guide.id,
-          name: `${guide.firstName} ${guide.lastName}`,
-          userName: guide.userName,
-          bio: guide.bio,
-          visitedCountries: guide.visitedCountries,
-          languages: guide.languages,
-          city: guide.city,
-          rating: guide.rating || 0,
-          isFollowing: false,
-          averageRating: 0,
-          totalRatings: 0,
-          profilePicture: guide.profilePicture,
-        }));
+        this.displayedGuides = guides.map((guide) => {
+          const followersList = guide.followers
+            ? guide.followers.map((fl) => fl.id)
+            : [];
+
+          return {
+            id: guide.id,
+            firstName: guide.firstName,
+            lastName: guide.lastName,
+            name: `${guide.firstName} ${guide.lastName}`,
+            userName: guide.userName,
+            bio: guide.bio,
+            visitedCountries: guide.visitedCountries,
+            languages: guide.languages,
+            city: guide.city,
+            rating: guide.rating || 0,
+            isFollowing: followersList.includes(userId),
+            averageRating: guide.averageRating,
+            ratingsCount: guide.ratingsCount,
+            profilePicture: guide.profilePicture,
+          };
+        });
 
         this.displayedGuides.forEach((guide) => {
-          console.log(guide.profilePicture);
-
           if (guide.profilePicture) {
             this.imageService.getImage(guide.profilePicture).subscribe({
               next: (res: ApiResponse) => {
@@ -109,7 +115,7 @@ export class GuideComponent implements OnInit {
           this.userService
             .getRatingCountOfLocalGuide(guide.id)
             .subscribe((ratingCount) => {
-              guide.totalRatings = ratingCount;
+              guide.ratingsCount = ratingCount;
             });
           if (index === this.guides.length - 1) {
             this.initializeDisplayedGuides();
@@ -129,7 +135,7 @@ export class GuideComponent implements OnInit {
       this.userService
         .getRatingCountOfLocalGuide(guide.id)
         .subscribe((ratingCount) => {
-          guide.totalRatings = ratingCount;
+          guide.ratingsCount = ratingCount;
         });
     }
   }
@@ -138,47 +144,53 @@ export class GuideComponent implements OnInit {
     const userId = this.authService.getUserIdFromLocalStorage();
     if (userId && guide.id) {
       this.userService.rateLocalGuide(guide.id, userId, rating).subscribe({
-        next: () =>
-          this.notificationService.showSuccess('Rating submitted successfully'),
-        error: () =>
-          this.notificationService.showError('Failed to submit rating'),
+        next: (res: ApiResponse) => {
+          this.fetchGuideRatings(guide);
+          this.notificationService.showSuccess('Rating submitted successfully');
+        },
+        error: () => {
+          this.notificationService.showError('Failed to submit rating');
+        },
       });
-      this.guides.forEach((guide) => {
-        if (guide.id) {
-          this.userService
-            .getAverageRatingOfLocalGuide(guide.id)
-            .subscribe((averageRating) => {
-              guide.averageRating = averageRating;
-            });
-          this.userService
-            .getRatingCountOfLocalGuide(guide.id)
-            .subscribe((ratingCount) => {
-              guide.totalRatings = ratingCount;
-            });
-        }
-      });
-      this.updateDisplayedGuides();
+      // this.guides.forEach((guide) => {
+      //   if (guide.id) {
+      //     this.userService
+      //       .getAverageRatingOfLocalGuide(guide.id)
+      //       .subscribe((averageRating) => {
+      //         guide.averageRating = averageRating;
+      //       });
+      //     this.userService
+      //       .getRatingCountOfLocalGuide(guide.id)
+      //       .subscribe((ratingCount) => {
+      //         guide.totalRatings = ratingCount;
+      //       });
+      //   }
+      // });
+      // this.updateDisplayedGuides();
       guide.ratingSubmitted = true;
     }
   }
 
-  updateFollowingStatus(): void {
-    const currentUserId = this.authService.getUserIdFromLocalStorage();
-    if (currentUserId) {
-      this.userService.getAllFollowing(currentUserId).subscribe({
-        next: (followingUsers) => {
-          this.guides = this.guides.map((guide) => ({
-            ...guide,
-            isFollowing: followingUsers.some(
-              (followingUser) => followingUser.id === guide.id
-            ),
-          }));
-        },
-        error: (error) =>
-          console.error('Error fetching following status:', error),
-      });
-    }
-  }
+  // updateFollowingStatus(): void {
+  //   const currentUserId = this.authService.getUserIdFromLocalStorage();
+  //   if (currentUserId) {
+  //     this.userService.getAllFollowing(currentUserId).subscribe({
+  //       next: (followingUsers) => {
+  //         this.guides = this.guides.map((guide) => ({
+  //           ...guide,
+  //           isFollowing: followingUsers.some(
+  //             (followingUser) => followingUser.id === guide.id
+  //           ),
+  //         }));
+
+  //         this.updateDisplayedGuides();
+  //       },
+  //       error: (error) =>
+  //         console.error('Error fetching following status:', error),
+  //     });
+  //     this.updateDisplayedGuides();
+  //   }
+  // }
 
   ngAfterViewInit() {
     this.paginator.page.subscribe(() => {

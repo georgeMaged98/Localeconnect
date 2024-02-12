@@ -23,7 +23,7 @@ export class RegisterGuideComponent {
   registerForm: FormGroup;
   currentPage = 1;
   totalPages = 3;
-  profileImageSrc = 'assets/pictures/profil.png';
+  profilePictureSrc = 'assets/pictures/profil.png';
 
   constructor(
     private fb: FormBuilder,
@@ -32,9 +32,9 @@ export class RegisterGuideComponent {
     private cdRef: ChangeDetectorRef
   ) {
     this.registerForm = this.fb.group({
-      firstname: ['', Validators.required],
-      lastname: ['', Validators.required],
-      username: ['', [Validators.required, Validators.minLength(3)]],
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
+      userName: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       dateOfBirth: ['', [Validators.required, this.adultValidator]],
@@ -97,14 +97,14 @@ export class RegisterGuideComponent {
       const file = event.target.files[0];
 
       const reader = new FileReader();
-      reader.onload = (e: any) => (this.profileImageSrc = e.target.result);
+      reader.onload = (e: any) => (this.profilePictureSrc = e.target.result);
       reader.readAsDataURL(file);
     }
   }
 
   private handleError(errorMessage: string) {
-    if (errorMessage.includes('username is already taken')) {
-      this.registerForm.controls['username'].setErrors({ userExists: true });
+    if (errorMessage.includes('userName is already taken')) {
+      this.registerForm.controls['userName'].setErrors({ userExists: true });
     }
     if (errorMessage.includes('email is already in use')) {
       this.registerForm.controls['email'].setErrors({ emailExists: true });

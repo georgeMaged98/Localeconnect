@@ -20,9 +20,9 @@ export class RegisterComponent {
     public dialog: MatDialog
   ) {
     this.registerForm = this.fb.group({
-      firstname: ['', Validators.required],
-      lastname: ['', Validators.required],
-      username: ['', [Validators.required, Validators.minLength(3)]],
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
+      userName: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       dateOfBirth: ['', Validators.required],
@@ -71,8 +71,8 @@ export class RegisterComponent {
   }
 
   private handleError(errorMessage: string) {
-    if (errorMessage.includes('username is already taken')) {
-      this.registerForm.controls['username'].setErrors({ userExists: true });
+    if (errorMessage.includes('userName is already taken')) {
+      this.registerForm.controls['userName'].setErrors({ userExists: true });
     }
     if (errorMessage.includes('email is already in use')) {
       this.registerForm.controls['email'].setErrors({ emailExists: true });
