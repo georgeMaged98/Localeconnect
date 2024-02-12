@@ -11,6 +11,34 @@ LocaleConnect envisions being the ultimate gathering spot for travelers, akin to
 
 ![LocaleConnect Design](screenshot/diagram.jpg "LocaleConnect Design")
 
+## Repository Cloning
+
+1. **Clone the Repository**: `git clone https://gitlab.lrz.de/MoetazKhelil/localeconnect.git`
+
+## Backend Setup Guide for LocaleConnect
+
+### Prerequisites
+- Java JDK 17
+- Maven
+- IDE (IntelliJ IDEA, Eclipse, or Spring Tool Suite)
+
+### Running the Backend with Docker
+- Install Docker Desktop and run `docker-compose -f docker-compose-test.yml up` in `/LocaleConnectBackend`.
+
+### Unit Testing
+- Run `mvn clean test` in `/LocaleConnectBackend`.
+
+
+## Frontend Setup Guide for LocaleConnect
+
+### Installation
+- Node.js (version 10.2.4)
+- Angular CLI (version 15.0.0)
+- Angular Material
+
+### Running the App
+- Run `ng serve` and navigate to `http://localhost:4200/`.
+
 
 ## Code Structure
 
@@ -135,40 +163,15 @@ Implemented with Spring Eureka, the Discovery Service allows services to registe
   - Upload File: `POST /api/gcp/`
   - Read File: `GET /api/gcp/`
 
+### Security
+
+We utilized JWT for authentication. Access to services is managed through the API-Gateway post-registration/login.
+
+
 ## Postman Documentation
 
 [View Postman Documentation](https://www.postman.com/cloudy-shadow-750794/workspace/new-team-workspace/overview)
 
-## Repository Cloning
-
-1. **Clone the Repository**: `git clone https://gitlab.lrz.de/MoetazKhelil/localeconnect.git`
-
-## Backend Setup Guide for LocaleConnect
-
-### Prerequisites
-- Java JDK 17
-- Maven
-- IDE (IntelliJ IDEA, Eclipse, or Spring Tool Suite)
-
-### Running the Backend with Docker
-- Install Docker Desktop and run `docker-compose -f docker-compose-test.yml up` in `/LocaleConnectBackend`.
-
-### Unit Testing
-- Run `mvn clean test` in `/LocaleConnectBackend`.
-
-## Frontend Setup Guide for LocaleConnect
-
-### Installation
-- Node.js (version 10.2.4)
-- Angular CLI (version 15.0.0)
-- Angular Material
-
-### Running the App
-- Run `ng serve` and navigate to `http://localhost:4200/`.
-
-## Security
-
-Utilizes JWT for authentication. Access to services is managed through the API-Gateway post-registration/login.
 
 ## Contributors
 
