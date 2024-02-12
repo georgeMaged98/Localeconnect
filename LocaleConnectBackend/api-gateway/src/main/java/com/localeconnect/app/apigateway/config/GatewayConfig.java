@@ -1,6 +1,5 @@
 package com.localeconnect.app.apigateway.config;
 
-//import com.localeconnect.app.apigateway.filter.AuthenticationFilter;
 
 import com.localeconnect.app.apigateway.filter.AuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;

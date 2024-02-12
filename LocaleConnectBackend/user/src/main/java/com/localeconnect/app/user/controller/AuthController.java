@@ -28,7 +28,6 @@ public class AuthController {
     @PostMapping("/register-traveler")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> registerTraveler(@RequestBody @Valid TravelerDTO travelerDTO) {
-        log.info("************entred api/user/register-traveler request**************");
         AuthenticationResponse response = authService.registerTraveler(travelerDTO);
 
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, response, null);
@@ -44,7 +43,6 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody @Valid AuthenticationRequest request) {
-        log.info("************entred AUTH/LOGIN CONTROLLER**************");
         try {
             String token = authService.login(request);
             return ResponseHandler.generateResponse("Logged In!", HttpStatus.OK, token, null);

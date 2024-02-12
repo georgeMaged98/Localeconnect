@@ -1,3 +1,4 @@
+
 # LocaleConnect Project Documentation
 
 ![LocaleConnect Home Page](screenshot/home page.PNG "LocaleConnect Home Page")
@@ -6,107 +7,173 @@
 
 LocaleConnect envisions being the ultimate gathering spot for travelers, akin to how LinkedIn connects professionals. It serves as a vibrant community where travel enthusiasts and local experts exchange experiences, recommend the best spots to visit in cities or countries, encourage one another, and meet fellow travelers during their explorations.
 
-## Features
+## Project Design
+
+![LocaleConnect Design](screenshot/diagram.jpg "LocaleConnect Design")
+
+
+## Code Structure
+
+This document outlines the structure of example microservices, specifically focusing on the User and Feed services, within the backend of our application. Each microservice follows a comprehensive structure to ensure modularity, maintainability, and scalability. Below, we detail the components of each service.
+
+### Common Components
+
+Most services include the following key components:
+
+- **Controller**: Acts as the entry point for incoming requests. It routes these requests to the appropriate services and returns responses to the client.
+
+- **Service**: Contains the business logic of the microservice. It processes the data received from the controllers, interacts with the repositories, and performs the necessary operations.
+
+- **Repository**: Interfaces with the database to retrieve, update, or delete data. It abstracts the data layer, allowing services to interact with the database without direct SQL queries.
+
+- **Model**: Defines the data structure and its relationships. These are the entity classes that represent tables in the database.
+
+- **DTO (Data Transfer Object)**: Used to transfer data between processes. DTOs help in optimizing network calls by transferring only the necessary data.
+
+- **Mapper**: Facilitates the conversion between DTOs and entities. This is essential for separating the external data structure from the internal model representation.
+
+- **Error Handler**: A global component to catch and handle exceptions thrown across the service. It ensures that all errors are caught and appropriately formatted before sending the response to the client.
+
+- **Exception**: Custom exceptions specific to the microservice. These exceptions are used to handle specific error cases gracefully.
+
+- **Response Handler**: Customizes the API responses, ensuring consistency across the service. It wraps the responses in a standard format, making it easier for clients to parse.
+
+- **Rabbit (RabbitMQ)**: Manages asynchronous communication between microservices. It decouples service dependencies, improving fault tolerance and scalability.
+
+- **Config**: Contains configuration settings for the microservice. This includes database configurations, RabbitMQ settings, and other service-specific configurations.
+
+- **Test**: Ensures the reliability and functionality of the microservice. Each service has a `ControllerTest` class for testing the endpoints via MVC controller testing and a `ServiceTest` class for unit testing the business logic.
+
+
+## Services
+
+### API-Gateway
+
+The API-Gateway acts as the centralized entry point for all client requests, routing them to the appropriate microservice while handling cross-cutting concerns like authentication, logging, and SSL termination. It is implemented using Spring Cloud Gateway, providing dynamic routing, monitoring, resiliency, and security.
+
+- **Base URL**: `http://localhost:8080`
+
+### Discovery Service
+
+Implemented with Spring Eureka, the Discovery Service allows services to register themselves and to discover other services to communicate with, enabling load balancing and a more dynamic architecture.
 
 ### User Service
-- Registration options for Travelers and Local Guides.
-- Login/logout capabilities.
-- Functionality to follow/unfollow other users.
-- View list of followings.
-- Update or delete account features.
-- Travelers can rate Local Guides.
-- Display Local Guides' ratings and counts.
 
-### Trip
-- Exclusive trip creation by Local Guides.
-- Comprehensive list and details of trips accessible to users.
-- Attend/unattend trips functionality.
-- Real-time notifications for updates or deletions of joined trips.
-- Trip sharing option.
+*Postman Documentation Link is provided in the next section*
 
-### Itinerary
-- Itinerary creation by Users.
-- Comprehensive list and details of itineraries accessible to users.
-- Attend/unattend itineraries functionality.
-- Real-time notifications for updates or deletions of joined itineraries.
-- Itinerary sharing option.
+- **Endpoints**:
+  - Registration for Travelers: `POST /api/user/auth/register-traveler`
+  - Registration for Local Guides: `POST /api/user/auth/register-localguide`
+  - Login/Logout capabilities: `POST /api/user/auth/login`
+  - Follow a user: `POST /api/user/secured/{followerId}/follow/{userId}`
+  - Unfollow a user: `POST /api/user/secured/{followerId}/unfollow/{userId}`
+  - Update user profile: `PUT /api/user/secured/update`
+  - Delete user: `DELETE /api/user/secured/delete/{userId}`
+  - Rate a Local Guide: `POST /api/user/{guideId}/rate/{travelerId}`
+  - List all Local Guides: `GET /api/user/guides`
+  - View profile: `GET /api/user/{userId}/profile`
+  - View followers: `GET /api/user/{userId}/followers`
+  - View following: `GET /api/user/{userId}/following`
 
-### Meetup
-- Meetup creation by Users.
-- Comprehensive list and details of meetups accessible to users.
-- Attend/unattend meetups functionality.
-- Real-time notifications for updates or deletions of joined meetups.
-- Meetup sharing option.
+### Trip Service
 
-### Feed
-- Post creation with text content and image support (GCP storage).
-- Personalized feed showcasing posts from the user and their followings.
-- Timeline feature for following users' posts.
-- Like/dislike, comment, and view like count functionalities.
+- **Endpoints**:
+  - Create a Trip: `POST /api/trip/create`
+  - List all Trips: `GET /api/trip/all`
+  - Get Trip by ID: `GET /api/trip/{trip_id}`
+  - Update a Trip: `PUT /api/trip/update/{trip_id}`
+  - Delete a Trip: `DELETE /api/trip/delete/{trip_id}`
+  - Search for a Trip: `GET /api/trip/search`
+  - Filter Trips: `GET /api/trip/filter`
+  - Attend a Trip: `POST /api/trip/{id}/attend`
+  - Unattend a Trip: `POST /api/trip/{id}/unattend`
+  - Rate a Trip: `POST /api/trip/{tripId}/rate/{userId}`
+
+### Itinerary Service
+
+- **Endpoints**:
+  - Create an Itinerary: `POST /api/itinerary/create`
+  - Update an Itinerary: `PUT /api/itinerary/update/{id}`
+  - Delete an Itinerary: `DELETE /api/itinerary/delete/{id}`
+  - Get Itinerary by ID: `GET /api/itinerary/{id}`
+  - List all Itineraries: `GET /api/itinerary/all`
+  - Attend an Itinerary: `POST /api/itinerary/{id}/attend`
+  - Unattend an Itinerary: `POST /api/itinerary/{id}/unattend`
+  - Search Itineraries: `GET /api/itinerary/search`
+  - Filter Itineraries: `GET /api/itinerary/filter`
+
+### Meetup Service
+
+- **Endpoints**:
+  - Create a Meetup: `POST /api/meetup/create`
+  - Update a Meetup: `PUT /api/meetup/update/{id}`
+  - Delete a Meetup: `DELETE /api/meetup/delete/{id}`
+  - Get Meetup by ID: `GET /api/meetup/{id}`
+  - List all Meetups: `GET /api/meetup/all`
+  - Attend a Meetup: `POST /api/meetup/{id}/attend`
+  - Unattend a Meetup: `POST /api/meetup/{id}/unattend`
+  - Search Meetups: `GET /api/meetup/search`
+
+### Feed Service
+
+- **Endpoints**:
+  - Create a Post: `POST /api/feed/create`
+  - Delete a Post: `DELETE /api/feed/delete/{postId}`
+  - Add a Comment: `POST /api/feed/{postId}/comment`
+  - Delete a Comment: `DELETE /api/feed/{postId}/comment/{commentId}`
+  - Like a Post: `POST /api/feed/{postId}/like`
+  - Unlike a Post: `POST /api/feed/{postId}/unlike`
+  - Get Post by ID: `GET /api/feed/{postId}`
+  - Get Posts by Author ID: `GET /api/feed/author/{authorId}`
+  - Search Posts: `GET /api/feed/search`
+  - Filter Posts: `GET /api/feed/filter`
 
 ### Notification Service
-- Real-time notifications with Web-Sockets for new followers or updates/deletions to registered trips or meetups.
+
+- **Endpoints**:
+  - Get Notifications: `GET /api/notification/notify/{userId}`
 
 ### GCP Storage Service
-- Image storage for trips, user profiles, meetups, etc.
 
-### Repository Cloning
-1. **Clone the Repository**: Run `git clone https://gitlab.lrz.de/MoetazKhelil/localeconnect.git`
+- **Endpoints**:
+  - Upload File: `POST /api/gcp/`
+  - Read File: `GET /api/gcp/`
+
+## Postman Documentation
+
+[View Postman Documentation](https://www.postman.com/cloudy-shadow-750794/workspace/new-team-workspace/overview)
+
+## Repository Cloning
+
+1. **Clone the Repository**: `git clone https://gitlab.lrz.de/MoetazKhelil/localeconnect.git`
 
 ## Backend Setup Guide for LocaleConnect
 
 ### Prerequisites
-- **Java JDK 17**: Required for running Spring Boot. Verify or install from [Oracle](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html) or [AdoptOpenJDK](https://adoptopenjdk.net/?variant=openjdk17).
-- **Maven**: Used for dependency management. Check with `mvn -v` or install from [Maven](https://maven.apache.org/install.html).
-- **IDE**: IntelliJ IDEA, Eclipse, or Spring Tool Suite recommended for development.
+- Java JDK 17
+- Maven
+- IDE (IntelliJ IDEA, Eclipse, or Spring Tool Suite)
 
 ### Running the Backend with Docker
-- Install Docker Desktop.
-- **Docker Login**: Run `docker login` and provide the credentials:
-    - Username: `localeconnect`
-    - Password: `lssa2324app`
-- Navigate to `/LocaleConnectBackend` and execute `docker-compose -f docker-compose-test.yml up` to start containers.
+- Install Docker Desktop and run `docker-compose -f docker-compose-test.yml up` in `/LocaleConnectBackend`.
 
 ### Unit Testing
-- Run `mvn clean test` to execute the unit tests.
+- Run `mvn clean test` in `/LocaleConnectBackend`.
 
 ## Frontend Setup Guide for LocaleConnect
 
 ### Installation
-Make sure to install the following:
-- Node (version 10.2.4): to check run => `npm -version`
-- Angular (version 15.0.0)
+- Node.js (version 10.2.4)
+- Angular CLI (version 15.0.0)
 - Angular Material
 
-### Before Running the App
-Run `npm install`
-
-### LocaleConnectFrontend
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.0.0.
-
-#### Development server
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
-
-#### Code scaffolding
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
-
-#### Build
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-#### Running unit tests
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-#### Running end-to-end tests
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-#### Further help
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+### Running the App
+- Run `ng serve` and navigate to `http://localhost:4200/`.
 
 ## Security
-Utilizes JWT for authentication. Users access other services post-registration/login through the API gateway. Implemented in the User Service.
 
-## Postman Documentation
-[View Postman Documentation](https://www.postman.com/cloudy-shadow-750794/workspace/new-team-workspace/overview)
+Utilizes JWT for authentication. Access to services is managed through the API-Gateway post-registration/login.
 
 ## Contributors
+
 This project is brought to life by the dedication and expertise of George Elfayoumi, Maha Marhag, and Moetaz Khelil.

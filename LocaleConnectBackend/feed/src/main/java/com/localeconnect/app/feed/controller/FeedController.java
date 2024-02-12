@@ -1,5 +1,4 @@
 package com.localeconnect.app.feed.controller;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.localeconnect.app.feed.dto.*;
 import com.localeconnect.app.feed.response_handler.ResponseHandler;
 import com.localeconnect.app.feed.service.FeedService;
@@ -8,11 +7,9 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
 import java.util.List;
 
 
@@ -61,9 +58,7 @@ public class FeedController {
     @PostMapping("/share-itinerary")
     public ResponseEntity<Object> shareItinerary(@RequestBody @Valid ItineraryDTO itineraryToShare,
                                  @RequestParam(value = "authorId") @Valid Long authorId) {
-        log.info("************entred SHARE ITI FEEDCONTROLLER **************");
         feedService.shareItinerary(itineraryToShare, authorId);
-        log.info("************saved ITI POST IN REPO**************");
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, "Successfully shared to feed!", null);
     }
 
