@@ -19,7 +19,7 @@ export interface User {
 export interface UserProfile {
   id?: number;
   name: string;
-  username: string;
+  userName: string;
   bio?: string;
   profilePicture?: string;
   isFollowing?: boolean;
