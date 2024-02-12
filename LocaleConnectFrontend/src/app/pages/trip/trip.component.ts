@@ -60,11 +60,11 @@ export class TripComponent implements OnInit, OnDestroy {
             trip.isAttending = false;
           }
 
-          // populate username
+          // populate userName
           this.userService.getUserById(trip.localguideId).subscribe({
             next: (res: ApiResponse) => {
               const user = res.data as User;
-              trip.localguideusername = user.userName;
+              trip.localguideuserName = user.userName;
             },
           });
 
@@ -84,7 +84,7 @@ export class TripComponent implements OnInit, OnDestroy {
           this.userService.getUserById(trip.localguideId).subscribe({
             next: (res: ApiResponse) => {
               const user = res.data as User;
-              trip.localguideusername = user.userName;
+              trip.localguideuserName = user.userName;
             },
           });
         });

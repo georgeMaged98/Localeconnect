@@ -22,7 +22,7 @@
         accept="image/*"
       />
       <h2 class="profile-name">{{ currentUserProfile?.name || "" }}</h2>
-      <p class="profile-handle">@{{ currentUserProfile?.username || "" }}</p>
+      <p class="profile-handle">@{{ currentUserProfile?.userName || "" }}</p>
       <p *ngIf="currentUserProfile?.bio" class="profile-bio">
         {{ currentUserProfile?.bio }}
       </p>
@@ -45,7 +45,7 @@
               class="profile-image"
             />
             <div class="details-section">
-              <mat-card-title>{{ post.author?.username || "" }}</mat-card-title>
+              <mat-card-title>{{ post.author?.userName || "" }}</mat-card-title>
               <mat-card-subtitle>{{
                 post.date | date : "MMM d. y,  h:mm a"
               }}</mat-card-subtitle>
@@ -118,14 +118,14 @@
         <div class="follower-item">
           <div class="profile-avatar">
             <img
-              [src]="follower.profileImage"
+              [src]="follower.profilePicture"
               alt="Profile Image"
               class="profile-image"
             />
           </div>
           <div class="follower-details">
             <h4 class="follower-name">{{ follower.name }}</h4>
-            <p class="follower-handle">@{{ follower.username }}</p>
+            <p class="follower-handle">@{{ follower.userName }}</p>
           </div>
         </div>
       </mat-list-item>

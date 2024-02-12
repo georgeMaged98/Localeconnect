@@ -60,7 +60,7 @@ export class MeetupComponent implements OnInit, OnDestroy {
             meetup.isAttending = false;
           }
 
-          // populate username
+          // populate userName
           this.userService.getUserById(meetup.creatorId).subscribe({
             next: (res: ApiResponse) => {
               const user = res.data as User;

@@ -127,8 +127,8 @@ public class UserService implements UserDetailsService {
             newNotification.setTitle("New Follow Notification");
             newNotification.setMessage("Traveller " + followerId + " Followed You!");
             newNotification.setSentAt(LocalDateTime.now());
-            newNotification.setReceiverID(followerId);
-            newNotification.setSenderID(userId);
+            newNotification.setReceiverID(userId);
+            newNotification.setSenderID(followerId);
             rabbitMQMessageProducer.publish(newNotification, RabbitConfig.EXCHANGE, RabbitConfig.ROUTING_KEY);
         } else {
             throw new ValidationException("Already following this user");
