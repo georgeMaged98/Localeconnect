@@ -4,10 +4,10 @@ export function formatToDateString(date: Date, locale: string = 'de-DE'): string
   return formatDate(date, 'yyyy-MM-dd', locale);
 }
 
-export function getFormattedDate(date: Date): string {
+export function getFormattedDateAndTime(date: Date): string {
   const pad = (num: number) => (num < 10 ? '0' : '') + num;
   const day = pad(date.getDate());
-  const month = pad(date.getMonth() + 1); // Months are zero-based
+  const month = pad(date.getMonth() + 1);
   const year = date.getFullYear();
   const hours = pad(date.getHours());
   const minutes = pad(date.getMinutes());
