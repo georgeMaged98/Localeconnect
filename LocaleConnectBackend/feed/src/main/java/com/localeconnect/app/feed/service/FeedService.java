@@ -18,6 +18,7 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -42,18 +43,32 @@ public class FeedService {
     private final WebClient webClient;
     private final ReactiveRedisTemplate<String, String> reactiveRedisTemplate;
 
-    public PostDTO createPost(RegularPostDTO regularPost){
+    public PostDTO createPost(RegularPostDTO regularPost) {
         Post post = postMapper.toEntity(regularPost);
         long authorId = post.getAuthorID();
         if (!checkUserId(authorId))
             throw new ResourceNotFoundException("No User Found with id: " + authorId + "!");
+
+        List<String> images = post.getImages();
+
+        if (!images.isEmpty()) {
+            List<String> imagesUrls = new ArrayList<>();
+
+            for (String image : images) {
+                GCPResponseDTO gcpResponse = saveImageToGCP(image);
+                String imageUrl = gcpResponse.getData();
+                imagesUrls.add(imageUrl);
+            }
+            post.setImages(imagesUrls);
+        }
 
         Post createdPost = postRepository.save(post);
 
         return postMapper.toDomain(createdPost);
     }
 
-    public PostDTO deletePost(Long postId){
+
+    public PostDTO deletePost(Long postId) {
         Optional<Post> optional = postRepository.findById(postId);
         if (optional.isEmpty())
             throw new ResourceNotFoundException("No Post Found with id: " + postId + "!");
@@ -93,16 +108,17 @@ public class FeedService {
         if (comment.isEmpty())
             throw new ResourceNotFoundException("No Comment Found with id: " + commentId + "!");
 
-       Comment actualComment = comment.get();
-       if (!Objects.equals(actualComment.getPost().getId(), postId))
-           throw new LogicException("Comment with id " + commentId + " Does Not Belong To Post with Id: " + postId);
+        Comment actualComment = comment.get();
+        if (!Objects.equals(actualComment.getPost().getId(), postId))
+            throw new LogicException("Comment with id " + commentId + " Does Not Belong To Post with Id: " + postId);
 
-       actualPost.removeComment(actualComment);
+        actualPost.removeComment(actualComment);
 
         return postMapper.toDomain(actualPost);
     }
+
     public PostDTO shareTrip(TripDTO trip, Long authorId) {
-        if(!checkUserId(authorId))
+        if (!checkUserId(authorId))
             throw new ResourceNotFoundException("User with id " + authorId + " does not exist!");
         Post post = new Post();
         post.setAuthorID(authorId);
@@ -116,7 +132,7 @@ public class FeedService {
     }
 
     public PostDTO shareItinerary(ItineraryDTO itinerary, Long authorId) {
-        if(!checkUserId(authorId))
+        if (!checkUserId(authorId))
             throw new ResourceNotFoundException("User with id " + authorId + " does not exist!");
         Post post = new Post();
         post.setAuthorID(authorId);
@@ -163,7 +179,7 @@ public class FeedService {
                 .orElseThrow(() -> new ResourceNotFoundException("No Post Found with id: " + postId + "!"));
         Long likerId = likeDTO.getLikerId();
 
-        if(!checkUserId(likerId))
+        if (!checkUserId(likerId))
             throw new ResourceNotFoundException("User with id " + likerId + " does not exist!");
 
         boolean alreadyLiked = postToFind.getLikes().stream()
@@ -185,7 +201,7 @@ public class FeedService {
                 .orElseThrow(() -> new ResourceNotFoundException("No Post Found with id: " + postId + "!"));
         Long likerId = likeDTO.getLikerId();
 
-        if(!checkUserId(likerId))
+        if (!checkUserId(likerId))
             throw new ResourceNotFoundException("User with id " + likerId + " does not exist!");
 
         Like likeToRemove = postToFind.getLikes().stream()
@@ -236,7 +252,7 @@ public class FeedService {
         if (!checkUserId(userId))
             throw new ResourceNotFoundException("User with id " + userId + " does not exist!");
 
-        GetFollowingResponseDTO res =  webClient.get()
+        GetFollowingResponseDTO res = webClient.get()
                 .uri("http://user-service:8084/api/user/secured/{userId}/following", userId)
                 .retrieve()
                 .bodyToMono(GetFollowingResponseDTO.class).block();
@@ -244,40 +260,40 @@ public class FeedService {
         return res.getData();
     }
 
-   /* public Mono<List<PostDTO>> generateUserFeed(Long userId) {
-        return getFollowing(userId)
-                .flatMapMany(Flux::fromIterable)
-                .flatMap(this::getPostsByAuthorId)
-                .collectList()
-                .flatMap(feed -> updateFeedCache(userId, feed).thenReturn(feed));
-    }
+    /* public Mono<List<PostDTO>> generateUserFeed(Long userId) {
+         return getFollowing(userId)
+                 .flatMapMany(Flux::fromIterable)
+                 .flatMap(this::getPostsByAuthorId)
+                 .collectList()
+                 .flatMap(feed -> updateFeedCache(userId, feed).thenReturn(feed));
+     }
 
-    private Mono<List<Long>> getFollowing(Long userId) {
-        return webClient.get()
-                .uri("http://user-service:8084/api/user/secured/{userId}/following", userId)
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<Long>>() {});
-    }
+     private Mono<List<Long>> getFollowing(Long userId) {
+         return webClient.get()
+                 .uri("http://user-service:8084/api/user/secured/{userId}/following", userId)
+                 .retrieve()
+                 .bodyToMono(new ParameterizedTypeReference<List<Long>>() {});
+     }
 
-    private List<PostDTO> getPostsByAuthorId(Long authorId) {
-        List<PostDTO> result = new ArrayList<>();
-        List<Post> posts = postRepository.findByAuthorID(authorId);
-        for(Post p : posts) {
-            result.add(postMapper.toDomain(p));
-        }
-        return Flux.fromIterable(result);
-    }
+     private List<PostDTO> getPostsByAuthorId(Long authorId) {
+         List<PostDTO> result = new ArrayList<>();
+         List<Post> posts = postRepository.findByAuthorID(authorId);
+         for(Post p : posts) {
+             result.add(postMapper.toDomain(p));
+         }
+         return Flux.fromIterable(result);
+     }
 
-    private Mono<Boolean> updateFeedCache(Long userId, List<PostDTO> feed) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return Mono.fromCallable(() -> objectMapper.writeValueAsString(feed))
-                .flatMap(serializedFeed -> reactiveRedisTemplate.opsForValue().set("feed:" + userId, serializedFeed));
-    }
-*/
+     private Mono<Boolean> updateFeedCache(Long userId, List<PostDTO> feed) {
+         ObjectMapper objectMapper = new ObjectMapper();
+         return Mono.fromCallable(() -> objectMapper.writeValueAsString(feed))
+                 .flatMap(serializedFeed -> reactiveRedisTemplate.opsForValue().set("feed:" + userId, serializedFeed));
+     }
+ */
     private String createContentFromItinerary(ItineraryDTO dto) {
         return "Itinerary: " + dto.getName() +
                 ", Days: " + dto.getNumberOfDays() +
-                ", Places: " +  dto.getPlacesToVisit() +
+                ", Places: " + dto.getPlacesToVisit() +
                 ", Description: " + dto.getDescription();
     }
 
@@ -316,6 +332,16 @@ public class FeedService {
 
         UserFeedDTO user = res.getData();
         return user.getUserName();
+    }
+
+    private GCPResponseDTO saveImageToGCP(String image) {
+        ResponseEntity<GCPResponseDTO> responseEntity = webClient.post()
+                .uri("http://gcp-service:5005/api/gcp/?filename=itinerary")
+                .bodyValue(image)
+                .retrieve()
+                .toEntity(GCPResponseDTO.class)
+                .block();
+        return responseEntity.getBody();
     }
 
 }

@@ -45,7 +45,7 @@ export class AuthService {
           name: `${user.firstName} ${user.lastName}`,
           username: user.userName,
           bio: user.bio,
-          imageUrl: user.imageUrl,
+          profilePicture: user.profilePicture,
         }
       : null;
   }

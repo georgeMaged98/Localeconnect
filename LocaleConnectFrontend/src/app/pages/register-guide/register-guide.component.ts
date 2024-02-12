@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -6,18 +6,18 @@ import {
   FormGroup,
   ValidationErrors,
   ValidatorFn,
-  Validators
-} from "@angular/forms";
-import {MatDialog} from "@angular/material/dialog";
-import {LoginComponent} from "../login/login.component";
-import {AuthService} from "../../service/auth.service";
-import {Guide} from "../../model/guide";
-import {LANGUAGES, COUNTRIES} from "../../helper/DataHelper";
+  Validators,
+} from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { LoginComponent } from '../login/login.component';
+import { AuthService } from '../../service/auth.service';
+import { Guide } from '../../model/guide';
+import { LANGUAGES, COUNTRIES } from '../../helper/DataHelper';
 
 @Component({
   selector: 'app-register-guide',
   templateUrl: './register-guide.component.html',
-  styleUrls: ['./register-guide.component.scss']
+  styleUrls: ['./register-guide.component.scss'],
 })
 export class RegisterGuideComponent {
   registerForm: FormGroup;
@@ -25,7 +25,12 @@ export class RegisterGuideComponent {
   totalPages = 3;
   profileImageSrc = 'assets/pictures/profil.png';
 
-  constructor(private fb: FormBuilder, private authService: AuthService, public dialog: MatDialog, private cdRef: ChangeDetectorRef) {
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    public dialog: MatDialog,
+    private cdRef: ChangeDetectorRef
+  ) {
     this.registerForm = this.fb.group({
       firstname: ['', Validators.required],
       lastname: ['', Validators.required],
@@ -36,45 +41,34 @@ export class RegisterGuideComponent {
       languages: ['', [Validators.required, this.minLanguagesValidator(2)]],
       bio: [''],
       city: ['', Validators.required],
-      visitedCountries:[''],
-      termsAccepted: [false, Validators.required]
+      visitedCountries: [''],
+      termsAccepted: [false, Validators.required],
     });
   }
 
   onSubmit(): void {
-
     if (this.registerForm.valid) {
-
       const formValue = this.registerForm.value;
-      const formattedDateOfBirth: Date = formValue.dateOfBirth.toISOString().split('T')[0];
+      const formattedDateOfBirth: Date = formValue.dateOfBirth
+        .toISOString()
+        .split('T')[0];
 
       const newUser: Guide = {
-        firstName: formValue.firstname,
-        lastName: formValue.lastname,
-        userName: formValue.username,
-        email: formValue.email,
-        password: formValue.password,
+        ...formValue,
         dateOfBirth: formattedDateOfBirth,
-        languages: formValue.languages,
-        bio: formValue.bio,
-        city: formValue.city,
-        visitedCountries: formValue.visitedCountries,
         isEnabled: true,
-        rating: 0
+        rating: 0,
       };
-      this.authService.registerGuide(newUser).subscribe(
-        {
-          next: (user) => {
-            user = newUser;
-            this.switchToLogin();
-            return user;
-          },
-          error: (errorMessage) => {
-            this.handleError(errorMessage);
-          }
-        }
-      );
-
+      this.authService.registerGuide(newUser).subscribe({
+        next: (user) => {
+          user = newUser;
+          this.switchToLogin();
+          return user;
+        },
+        error: (errorMessage) => {
+          this.handleError(errorMessage);
+        },
+      });
     }
   }
 
@@ -94,27 +88,26 @@ export class RegisterGuideComponent {
     this.dialog.closeAll();
     this.dialog.open(LoginComponent, {
       width: '400px',
-      maxHeight: '600px'
+      maxHeight: '600px',
     });
   }
-
 
   addProfilePicture(event: any): void {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
 
       const reader = new FileReader();
-      reader.onload = (e: any) => this.profileImageSrc = e.target.result;
+      reader.onload = (e: any) => (this.profileImageSrc = e.target.result);
       reader.readAsDataURL(file);
     }
   }
 
   private handleError(errorMessage: string) {
     if (errorMessage.includes('username is already taken')) {
-      this.registerForm.controls['username'].setErrors({userExists: true});
+      this.registerForm.controls['username'].setErrors({ userExists: true });
     }
     if (errorMessage.includes('email is already in use')) {
-      this.registerForm.controls['email'].setErrors({emailExists: true});
+      this.registerForm.controls['email'].setErrors({ emailExists: true });
     }
   }
 
@@ -124,28 +117,29 @@ export class RegisterGuideComponent {
       const birthDate = new Date(control.value);
       const adultAge = 18;
       const currentDate = new Date();
-      const eligibleDate = new Date(currentDate.getFullYear() - adultAge, currentDate.getMonth(), currentDate.getDate());
+      const eligibleDate = new Date(
+        currentDate.getFullYear() - adultAge,
+        currentDate.getMonth(),
+        currentDate.getDate()
+      );
 
       if (birthDate > eligibleDate) {
-        return {'tooYoung': true};
+        return { tooYoung: true };
       }
     }
     return null;
   }
 
-//custom validator to check if the user speaks more than one language
+  //custom validator to check if the user speaks more than one language
   private minLanguagesValidator(min = 2): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       const selected = control.value;
-      return selected?.length >= min ? null : {'minLanguages': {value: control.value}};
+      return selected?.length >= min
+        ? null
+        : { minLanguages: { value: control.value } };
     };
-
-
   }
 
   protected readonly LANGUAGES = LANGUAGES;
   protected readonly COUNTRIES = COUNTRIES;
-
 }
-
-

@@ -1,8 +1,5 @@
 package com.localeconnect.app.meetup.dto;
 
-
-//import jakarta.persistence.*;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -21,10 +18,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MeetupDTO {
-
-    public interface CreateValidation {}
-
-    public interface UpdateValidation{}
 
     private Long id;
 

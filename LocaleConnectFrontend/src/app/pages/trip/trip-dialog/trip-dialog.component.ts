@@ -5,7 +5,7 @@ import { TripService } from '../../../service/trip.service';
 import { LANGUAGES } from '../../../helper/DataHelper';
 import { Trip } from '../../../model/trip';
 import * as DataHelper from 'src/app/helper/DataHelper';
-import { getFormattedDate } from 'src/app/helper/DateHelper';
+import { getFormattedDateAndTime } from 'src/app/helper/DateHelper';
 import { UserService } from 'src/app/service/user.service';
 import { NotificationService } from 'src/app/service/notification.service';
 import { ApiResponse } from 'src/app/model/apiResponse';
@@ -55,7 +55,9 @@ export class TripDialogComponent {
 
       const newTrip: Trip = {
         ...formData,
-        departureTime: getFormattedDate(formData.departureTime).split(' ')[0],
+        departureTime: getFormattedDateAndTime(formData.departureTime).split(
+          ' '
+        )[0],
         localguideId: travellerId,
         ratingsTotal: 0,
         averageRating: 0,

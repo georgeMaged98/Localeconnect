@@ -2,6 +2,7 @@ package com.localeconnect.app.user.service;
 
 import com.localeconnect.app.user.config.RabbitConfig;
 import com.localeconnect.app.user.dto.*;
+import com.localeconnect.app.user.exception.LogicException;
 import com.localeconnect.app.user.exception.UserAlreadyExistsException;
 import com.localeconnect.app.user.exception.UserDoesNotExistException;
 import com.localeconnect.app.user.exception.ValidationException;
@@ -13,6 +14,7 @@ import com.localeconnect.app.user.model.Traveler;
 import com.localeconnect.app.user.model.User;
 import com.localeconnect.app.user.rabbit.RabbitMQMessageProducer;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,6 +30,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @Slf4j
@@ -39,6 +42,7 @@ public class UserService implements UserDetailsService {
     private final TravelerMapper travelerMapper;
     private final LocalguideMapper localguideMapper;
     private final RabbitMQMessageProducer rabbitMQMessageProducer;
+    private final WebClient webClient;
 
     public TravelerDTO registerTraveler(TravelerDTO travelerDTO) {
         if (userRepository.existsByUserName(travelerDTO.getUserName())) {
@@ -111,7 +115,7 @@ public class UserService implements UserDetailsService {
         User follower = userRepository.findById(followerId)
                 .orElseThrow(() -> new UserDoesNotExistException("Follower not found"));
         if (userId.equals(followerId)) {
-            throw new IllegalArgumentException("User cannot follow themselves");
+            throw new LogicException("User cannot follow themselves");
         }
         if (!userToFollow.getFollowers().contains(follower)) {
             userToFollow.getFollowers().add(follower);
@@ -241,6 +245,7 @@ public class UserService implements UserDetailsService {
                     .followers(user.getFollowers().stream().map(userMapper::toDomain).toList())
                     .followings(user.getFollowing().stream().map(userMapper::toDomain).toList())
                     .role(user.getRole())
+                    .profilePicture(user.getProfilePicture())
                     .build();
             localguideDTO.calcAverageRating();
 
@@ -257,6 +262,7 @@ public class UserService implements UserDetailsService {
                 .followers(user.getFollowers().stream().map(userMapper::toDomain).toList())
                 .followings(user.getFollowing().stream().map(userMapper::toDomain).toList())
                 .role(user.getRole())
+                .profilePicture(user.getProfilePicture())
                 .build();
 
         return travelerDTO;
@@ -295,5 +301,34 @@ public class UserService implements UserDetailsService {
         } else {
             return new UserPrincipalDTO(user.get());
         }
+    }
+
+    public UserDTO uploadProfilePicture(Long travelerId, UploadProfileRequest profile) {
+
+        if (!checkUserId(travelerId))
+            throw new UserDoesNotExistException("Traveler with id " + travelerId + " does not exist");
+
+        Optional<User> user = userRepository.findById(travelerId);
+
+        if (user.isEmpty())
+            throw new UserDoesNotExistException("Traveler with id " + travelerId + " does not exist");
+
+        User actualUser = user.get();
+
+        String image = profile.getProfilePhoto();
+        GCPResponseDTO imaegUrl = saveImageToGCP(image);
+        actualUser.setProfilePicture(imaegUrl.getData());
+        userRepository.save(actualUser);
+        return userMapper.toDomain(actualUser);
+    }
+
+    private GCPResponseDTO saveImageToGCP(String image) {
+        ResponseEntity<GCPResponseDTO> responseEntity = webClient.post()
+                .uri("http://gcp-service:5005/api/gcp/?filename=itinerary")
+                .bodyValue(image)
+                .retrieve()
+                .toEntity(GCPResponseDTO.class)
+                .block();
+        return responseEntity.getBody();
     }
 }

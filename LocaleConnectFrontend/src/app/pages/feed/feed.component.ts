@@ -1,20 +1,21 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {FeedService} from "../../service/feed.service";
-import {Comment, Post} from "../../model/feed";
-import {AddPostDialogComponent} from "./add-post-dialog/add-post-dialog.component";
-import {MatDialog} from "@angular/material/dialog";
-import {map, Subject, Subscription, switchMap, takeUntil, tap} from "rxjs";
-import {ImagesService} from "../../service/image.service";
-import {User, UserProfile} from "../../model/user";
-import {UserService} from "../../service/user.service";
-import {AuthService} from "../../service/auth.service";
-import {getFormattedDateAndTime} from "../../helper/DateHelper";
-import {coerceStringArray} from "@angular/cdk/coercion";
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FeedService } from '../../service/feed.service';
+import { Comment, Post } from '../../model/feed';
+import { AddPostDialogComponent } from './add-post-dialog/add-post-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
+import { map, Subject, Subscription, switchMap, takeUntil, tap } from 'rxjs';
+import { ImagesService } from '../../service/image.service';
+import { User, UserProfile } from '../../model/user';
+import { UserService } from '../../service/user.service';
+import { AuthService } from '../../service/auth.service';
+import { getFormattedDateAndTime } from '../../helper/DateHelper';
+import { coerceStringArray } from '@angular/cdk/coercion';
+import { ApiResponse } from 'src/app/model/apiResponse';
 
 @Component({
   selector: 'app-feed',
   templateUrl: './feed.component.html',
-  styleUrls: ['./feed.component.scss']
+  styleUrls: ['./feed.component.scss'],
 })
 export class FeedComponent implements OnInit, OnDestroy {
   posts: Post[] = [];
@@ -29,54 +30,69 @@ export class FeedComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   disableLike: boolean = false;
 
-
-  constructor(public dialog: MatDialog, private feedService: FeedService, private imageService: ImagesService, private userService: UserService, private authService: AuthService) {
-  }
+  constructor(
+    public dialog: MatDialog,
+    private feedService: FeedService,
+    private imageService: ImagesService,
+    private userService: UserService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
-    this.authService.currentUser.subscribe(data => this.currentUser = data);
+    this.authService.currentUser.subscribe((data) => (this.currentUser = data));
     if (this.authService.isAuthenticated()) {
       this.fetchCurrentUserAndFollowing();
       this.checkUserLikes();
       this.fetchUserFeed();
-
+      this.fetchUserProfilePicture();
     }
-
-
   }
-
 
   fetchUserFeed(): void {
     const userId = this.authService.getUserIdFromLocalStorage();
-    console.log(userId)
     if (userId) {
       this.feedService.getUserFeed(userId).subscribe({
         next: (response) => {
           if (response) {
             this.posts = response;
 
-            this.posts.forEach(post => {
+            this.posts.forEach((post) => {
               this.fetchAuthorNamesForPosts(post);
 
               if (post.id) {
-                this.refreshPostLikes(post.id)
+                this.refreshPostLikes(post.id);
                 this.feedService.getPostLikeCount(post.id).subscribe({
                   next: (count) => {
-                    console.log(count);
                     post.likes = count;
                   },
-                  error: (error) => console.error('Error fetching like count:', error)
+                  error: (error) =>
+                    console.error('Error fetching like count:', error),
                 });
-                post.comments?.forEach(comment => {
+                post.comments?.forEach((comment) => {
                   this.fetchAuthorNamesForComments(comment);
-                })
+                });
+
+                // Fetch images
+                if (post.images.length > 0) {
+                  post.images.forEach((img, idx) => {
+                    if (img.length > 0) {
+                      this.imageService.getImage(img).subscribe({
+                        next: (gcpRes: ApiResponse) => {
+                          post.images[idx] = gcpRes.data.toString();
+                        },
+                        error: (errorMessage: ApiResponse) =>
+                          console.error(errorMessage.errors),
+                      });
+                    }
+                  });
+                }
               }
             });
           } else {
             console.error('Failed to fetch feed:', response);
           }
         },
-        error: (error) => console.error('Error fetching feed:', error)
+        error: (error) => console.error('Error fetching feed:', error),
       });
     } else {
       console.error('User ID not found');
@@ -84,52 +100,82 @@ export class FeedComponent implements OnInit, OnDestroy {
   }
 
   fetchCurrentUserAndFollowing(): void {
-    this.authService.fetchCurrentUserProfile().pipe(
-      tap((currentUser: User) => {
-        this.currentUserProfile = {
-          id: currentUser.id,
-          name: `${currentUser.firstName} ${currentUser.lastName}`,
-          username: currentUser.userName,
-          bio: currentUser.bio,
-          imageUrl: currentUser.imageUrl,
-        };
-      }),
-      switchMap((currentUser: User) =>
-        this.userService.getAllFollowing(currentUser.id)
-      ),
-      map(users => users.map(user => ({
-        userId: user.id,
-        name: `${user.firstName} ${user.lastName}`,
-        username: user.userName,
-        isFollowing: false,
-        profileImage: user.imageUrl || 'assets/pictures/profil.png',
-      }))),
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: (profiles) => {
-        this.followers = profiles;
-      },
-      error: (error) => console.error('Error fetching user and following profiles:', error)
-    });
+    this.authService
+      .fetchCurrentUserProfile()
+      .pipe(
+        tap((currentUser: User) => {
+          this.currentUserProfile = {
+            id: currentUser.id,
+            name: `${currentUser.firstName} ${currentUser.lastName}`,
+            username: currentUser.userName,
+            bio: currentUser.bio,
+            profilePicture: currentUser.profilePicture,
+          };
+        }),
+        switchMap((currentUser: User) =>
+          this.userService.getAllFollowing(currentUser.id)
+        ),
+        map((users) =>
+          users.map((user) => ({
+            userId: user.id,
+            name: `${user.firstName} ${user.lastName}`,
+            username: user.userName,
+            isFollowing: false,
+            profileImage: user.profilePicture || 'assets/pictures/profil.png',
+          }))
+        ),
+        takeUntil(this.destroy$)
+      )
+      .subscribe({
+        next: (profiles) => {
+          this.followers = profiles;
+        },
+        error: (error) =>
+          console.error('Error fetching user and following profiles:', error),
+      });
   }
-
 
   fetchAuthorNamesForPosts(post: Post): void {
     if (post.authorID) {
-      this.userService.getProfile(post.authorID).subscribe(user => {
+      this.userService.getProfile(post.authorID).subscribe((user) => {
+        if (user.profilePicture) {
+          this.imageService.getImage(user.profilePicture).subscribe({
+            next: (res: ApiResponse) => {
+              if (post.author) {
+                post.author.profilePicture = res.data as string;
+              }
+            },
+          });
+        }
         post.author = {
           name: `${user.firstName} ${user.lastName}`,
-          username: user.userName
-        }
+          username: user.userName,
+        };
       });
     }
   }
 
   fetchAuthorNamesForComments(comment: Comment): void {
     if (comment.authorID) {
-      this.userService.getProfile(comment.authorID).subscribe(user => {
+      this.userService.getProfile(comment.authorID).subscribe((user) => {
         comment.authorName = `${user.firstName} ${user.lastName}`;
       });
+    }
+  }
+
+  fetchUserProfilePicture() {
+    console.log(this.currentUser);
+
+    if (this.currentUserProfile?.profilePicture) {
+      this.imageService
+        .getImage(this.currentUserProfile.profilePicture)
+        .subscribe({
+          next: (res: ApiResponse) => {
+            if (this.currentUserProfile) {
+              this.currentUserProfile.profilePicture = res.data as string;
+            }
+          },
+        });
     }
   }
 
@@ -138,18 +184,18 @@ export class FeedComponent implements OnInit, OnDestroy {
     if (likerId && post.id && !post.likedByUser) {
       this.feedService.likePost(post.id, likerId).subscribe({
         next: () => {
-        if(post.id){
-          post.likedByUser = true;
-          this.refreshPostLikes(post.id);
-        }
+          if (post.id) {
+            post.likedByUser = true;
+            this.refreshPostLikes(post.id);
+          }
         },
-        error: (error) => console.error('Error liking post:', error)
+        error: (error) => console.error('Error liking post:', error),
       });
     }
   }
   refreshPostLikes(postId: number): void {
-    this.feedService.getPostLikeCount(postId).subscribe(likeCount => {
-      const post = this.posts.find(p => p.id === postId);
+    this.feedService.getPostLikeCount(postId).subscribe((likeCount) => {
+      const post = this.posts.find((p) => p.id === postId);
       if (post) {
         post.likes = likeCount;
       }
@@ -159,19 +205,16 @@ export class FeedComponent implements OnInit, OnDestroy {
 
   checkUserLikes(): void {
     const username = this.authService.getUsernameFromLocalStorage();
-    console.log(username)
+
     if (username) {
-      this.posts.forEach(post => {
+      this.posts.forEach((post) => {
         if (post.id) {
-          console.log(post)
-          this.feedService.getPostLikes(post.id).subscribe(usersLiked => {
-            console.log(usersLiked);
+          this.feedService.getPostLikes(post.id).subscribe((usersLiked) => {
             post.likedByUser = usersLiked.includes(username);
           });
         }
       });
     }
-
   }
 
   addComment(postId: number): void {
@@ -187,10 +230,13 @@ export class FeedComponent implements OnInit, OnDestroy {
       // Call the service to add the comment
       this.feedService.addComment(postId, newComment).subscribe({
         next: () => {
-          const post = this.posts.find(p => p.id === postId);
+          const post = this.posts.find((p) => p.id === postId);
           if (post) {
             if (!post.comments) post.comments = [];
-            post.comments.push({ ...newComment, authorName: newComment.authorName });
+            post.comments.push({
+              ...newComment,
+              authorName: newComment.authorName,
+            });
             this.newCommentTexts[postId] = '';
           }
         },
@@ -198,8 +244,6 @@ export class FeedComponent implements OnInit, OnDestroy {
       });
     }
   }
-
-
 
   toggleImagesDisplay() {
     this.showAllImages = !this.showAllImages;
@@ -211,21 +255,54 @@ export class FeedComponent implements OnInit, OnDestroy {
     });
     dialogRef.afterClosed().subscribe((newPost: Post) => {
       if (newPost) {
-        newPost.author = this.authService.getCurrentUserProfile()
+        const author = this.authService.getCurrentUserProfile();
+        if (author) {
+          newPost.author = author;
+          if (newPost.author.profilePicture) {
+            this.imageService
+              .getImage(newPost.author.profilePicture)
+              .subscribe({
+                next: (gcpRes: ApiResponse) => {
+                  if (newPost.author)
+                    newPost.author.profilePicture = gcpRes.data.toString();
+                },
+              });
+          }
+        }
         this.posts.unshift(newPost);
-
+        newPost.images.forEach((img, idx) => {
+          if (img.length > 0) {
+            this.imageService.getImage(img).subscribe({
+              next: (gcpRes: ApiResponse) => {
+                newPost.images[idx] = gcpRes.data.toString();
+              },
+              error: (errorMessage: ApiResponse) =>
+                console.error(errorMessage.errors),
+            });
+          }
+        });
       }
     });
   }
 
-
-//TODO: configure image storage
+  //TODO: configure image storage
   changeProfilePicture(event: any): void {
+    const travellerId = this.userService.getTravellerId();
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
 
       const reader = new FileReader();
-      reader.onload = (e: any) => this.profileImageSrc = e.target.result;
+      reader.onload = (e: any) => {
+        this.profileImageSrc = e.target.result;
+        this.userService.uploadProfile(travellerId, e.target.result).subscribe({
+          next: (res: ApiResponse) => {
+            console.log(res);
+          },
+          error: (err: ApiResponse) => {
+            console.log(err);
+          },
+        });
+      };
       reader.readAsDataURL(file);
     }
   }
@@ -235,6 +312,3 @@ export class FeedComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 }
-
-
-

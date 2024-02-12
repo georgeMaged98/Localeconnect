@@ -1,5 +1,5 @@
-import {User} from "./user";
-import {TripPreview} from "./trip";
+import { User } from './user';
+import { TripPreview } from './trip';
 
 export interface Guide extends User {
   languages: string[];
@@ -23,5 +23,5 @@ export interface GuideProfile {
   expand?: boolean;
   trips?: TripPreview[];
   isFollowing?: boolean;
-  imageUrl?: string;
+  profilePicture?: string;
 }
