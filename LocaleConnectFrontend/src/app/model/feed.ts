@@ -28,7 +28,7 @@ export interface Comment {
 export interface FollowerProfile {
   userId?: number;
   name: string;
-  username: string;
+  userName: string;
   isFollowing: boolean;
-  profileImage: string;
+  profilePicture: string;
 }

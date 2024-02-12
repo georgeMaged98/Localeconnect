@@ -43,7 +43,7 @@ export class AuthService {
       ? {
           id: user.id,
           name: `${user.firstName} ${user.lastName}`,
-          username: user.userName,
+          userName: user.userName,
           bio: user.bio,
           profilePicture: user.profilePicture,
         }
@@ -62,26 +62,26 @@ export class AuthService {
   }
 
   fetchCurrentUserProfile(): Observable<User> {
-    const storedUserProfile = localStorage.getItem('currentUser');
-    if (storedUserProfile) {
-      const userProfile: User = JSON.parse(storedUserProfile);
-      return of(userProfile);
-    } else {
-      const httpHeaders = this.getHttpHeaders();
-      return this.http
-        .get<User>(`${environment.API_URL}/api/user/secured/profile`, {
-          headers: httpHeaders,
+    // const storedUserProfile = localStorage.getItem('currentUser');
+    // if (storedUserProfile) {
+    //   const userProfile: User = JSON.parse(storedUserProfile);
+    //   return of(userProfile);
+    // } else {
+    const httpHeaders = this.getHttpHeaders();
+    return this.http
+      .get<User>(`${environment.API_URL}/api/user/secured/profile`, {
+        headers: httpHeaders,
+      })
+      .pipe(
+        tap((userProfile) => {
+          localStorage.setItem('currentUser', JSON.stringify(userProfile));
+        }),
+        catchError((error) => {
+          console.error('Error fetching user profile:', error);
+          return throwError(error);
         })
-        .pipe(
-          tap((userProfile) => {
-            localStorage.setItem('currentUser', JSON.stringify(userProfile));
-          }),
-          catchError((error) => {
-            console.error('Error fetching user profile:', error);
-            return throwError(error);
-          })
-        );
-    }
+      );
+    // }
   }
 
   logout(): void {
@@ -122,7 +122,7 @@ export class AuthService {
       ? this.getUserFromLocalStorage()?.id
       : undefined;
   }
-  public getUsernameFromLocalStorage(): string | undefined {
+  public getuserNameFromLocalStorage(): string | undefined {
     return this.getUserFromLocalStorage()
       ? this.getUserFromLocalStorage()?.userName
       : undefined;
@@ -148,14 +148,14 @@ export class AuthService {
       } else {
         // Backend error
         if (error.status === 400) {
-          if (error.error.includes('username already exists')) {
+          if (error.error.includes('userName already exists')) {
             errorMessage =
-              'This username is already taken. Please try a different one.';
+              'This userName is already taken. Please try a different one.';
           } else if (error.error.includes('email already exists')) {
             errorMessage =
               'This email is already in use. Please try a different one.';
-          } else if (error.error.includes('username does not exist')) {
-            errorMessage = 'This username doesnt exist.';
+          } else if (error.error.includes('userName does not exist')) {
+            errorMessage = 'This userName doesnt exist.';
           } else if (error.error.includes('wrong password')) {
             errorMessage = 'This password is wrong.';
           } else {

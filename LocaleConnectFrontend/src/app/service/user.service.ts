@@ -20,7 +20,7 @@ export class UserService {
     this.headers = this.authService.getHttpHeaders();
   }
 
-  getUsername(userId: number): Observable<string> {
+  getuserName(userId: number): Observable<string> {
     return this.http.get<string>(`${this.apiUrl}/${userId}`);
   }
 
@@ -78,20 +78,20 @@ export class UserService {
     guideId: number,
     travelerId: number,
     rating: number
-  ): Observable<void> {
+  ): Observable<ApiResponse> {
     const params = new HttpParams().set('rating', rating.toString());
-    return this.http.post<void>(
+    return this.http.post<ApiResponse>(
       `${this.apiUrl}/${guideId}/rate/${travelerId}`,
       {},
       { headers: this.headers, params: params }
     );
   }
 
-  getAllGuides(): Observable<Guide[]> {
+  getAllGuides(): Observable<GuideProfile[]> {
     const httpHeaders = this.authService.getHttpHeaders();
     return this.http
       .get<ApiResponse>(`${this.apiUrl}/guides`, { headers: httpHeaders })
-      .pipe(map((response) => response.data as Guide[] | []));
+      .pipe(map((response) => response.data as GuideProfile[] | []));
   }
 
   filterLocalGuideByCity(keyword: string): Observable<User[]> {

@@ -88,7 +88,7 @@ export class ItineraryComponent implements OnInit, OnDestroy {
           this.userService.getUserById(itinerary.userId).subscribe({
             next: (res: ApiResponse) => {
               const user = res.data as User;
-              itinerary.username = user.userName;
+              itinerary.userName = user.userName;
             },
           });
         });

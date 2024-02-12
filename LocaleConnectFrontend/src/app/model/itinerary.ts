@@ -1,7 +1,7 @@
 export interface Itinerary {
   id: number;
   userId: number;
-  username?: string;
+  userName?: string;
   name: string;
   description: string;
   numberOfDays: number;

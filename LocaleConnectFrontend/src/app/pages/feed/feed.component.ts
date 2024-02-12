@@ -20,7 +20,7 @@ import { ApiResponse } from 'src/app/model/apiResponse';
 export class FeedComponent implements OnInit, OnDestroy {
   posts: Post[] = [];
   followers: any[] = [];
-  profileImageSrc = 'assets/pictures/profil.png';
+  profilePictureSrc = 'assets/pictures/profil.png';
   newCommentTexts: { [key: number]: string } = {};
   showAllImages = false;
   subscription: Subscription = new Subscription();
@@ -44,7 +44,6 @@ export class FeedComponent implements OnInit, OnDestroy {
       this.fetchCurrentUserAndFollowing();
       this.checkUserLikes();
       this.fetchUserFeed();
-      this.fetchUserProfilePicture();
     }
   }
 
@@ -107,7 +106,7 @@ export class FeedComponent implements OnInit, OnDestroy {
           this.currentUserProfile = {
             id: currentUser.id,
             name: `${currentUser.firstName} ${currentUser.lastName}`,
-            username: currentUser.userName,
+            userName: currentUser.userName,
             bio: currentUser.bio,
             profilePicture: currentUser.profilePicture,
           };
@@ -119,9 +118,9 @@ export class FeedComponent implements OnInit, OnDestroy {
           users.map((user) => ({
             userId: user.id,
             name: `${user.firstName} ${user.lastName}`,
-            username: user.userName,
+            userName: user.userName,
             isFollowing: false,
-            profileImage: user.profilePicture || 'assets/pictures/profil.png',
+            profilePicture: user.profilePicture || 'assets/pictures/profil.png',
           }))
         ),
         takeUntil(this.destroy$)
@@ -149,7 +148,7 @@ export class FeedComponent implements OnInit, OnDestroy {
         }
         post.author = {
           name: `${user.firstName} ${user.lastName}`,
-          username: user.userName,
+          userName: user.userName,
         };
       });
     }
@@ -160,22 +159,6 @@ export class FeedComponent implements OnInit, OnDestroy {
       this.userService.getProfile(comment.authorID).subscribe((user) => {
         comment.authorName = `${user.firstName} ${user.lastName}`;
       });
-    }
-  }
-
-  fetchUserProfilePicture() {
-    console.log(this.currentUser);
-
-    if (this.currentUserProfile?.profilePicture) {
-      this.imageService
-        .getImage(this.currentUserProfile.profilePicture)
-        .subscribe({
-          next: (res: ApiResponse) => {
-            if (this.currentUserProfile) {
-              this.currentUserProfile.profilePicture = res.data as string;
-            }
-          },
-        });
     }
   }
 
@@ -204,13 +187,13 @@ export class FeedComponent implements OnInit, OnDestroy {
   }
 
   checkUserLikes(): void {
-    const username = this.authService.getUsernameFromLocalStorage();
+    const userName = this.authService.getuserNameFromLocalStorage();
 
-    if (username) {
+    if (userName) {
       this.posts.forEach((post) => {
         if (post.id) {
           this.feedService.getPostLikes(post.id).subscribe((usersLiked) => {
-            post.likedByUser = usersLiked.includes(username);
+            post.likedByUser = usersLiked.includes(userName);
           });
         }
       });
@@ -293,7 +276,7 @@ export class FeedComponent implements OnInit, OnDestroy {
 
       const reader = new FileReader();
       reader.onload = (e: any) => {
-        this.profileImageSrc = e.target.result;
+        this.profilePictureSrc = e.target.result;
         this.userService.uploadProfile(travellerId, e.target.result).subscribe({
           next: (res: ApiResponse) => {
             console.log(res);

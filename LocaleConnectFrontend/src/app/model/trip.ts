@@ -7,7 +7,7 @@ export interface TripPreview {
 export interface Trip {
   id: number;
   localguideId: number;
-  localguideusername: string;
+  localguideuserName: string;
   name: string;
   description?: string;
   departureTime: string;
