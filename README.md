@@ -67,6 +67,9 @@ LocaleConnect envisions being the ultimate gathering spot for travelers, akin to
     - Password: `lssa2324app`
 - Navigate to `/LocaleConnectBackend` and execute `docker-compose -f docker-compose-test.yml up` to start containers.
 
+### Unit Testing
+- Run `mvn clean test` to execute the unit tests.
+
 ## Frontend Setup Guide for LocaleConnect
 
 ### Installation
@@ -104,9 +107,6 @@ Utilizes JWT for authentication. Users access other services post-registration/l
 
 ## Postman Documentation
 [View Postman Documentation](https://www.postman.com/cloudy-shadow-750794/workspace/new-team-workspace/overview)
-
-## Testing
-Run `mvn clean test` to execute the tests.
 
 ## Contributors
 This project is brought to life by the dedication and expertise of George Elfayoumi, Maha Marhag, and Moetaz Khelil.
