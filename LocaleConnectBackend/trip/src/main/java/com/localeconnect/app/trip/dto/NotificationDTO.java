@@ -18,10 +18,10 @@ public class NotificationDTO implements Serializable {
     private Long id;
 
     @NotNull(message = "This is a required field")
-    private Long sender;
+    private Long senderID;
 
     @NotNull(message = "This is a required field")
-    private Long receiver;
+    private Long receiverID;
 
     @NotNull(message = "This is a required field")
     @JsonFormat
@@ -31,6 +31,7 @@ public class NotificationDTO implements Serializable {
     @NotBlank(message = "This is a required field")
     private String message;
 
+    private boolean isRead = false;
     private String title;
 }
 

@@ -184,6 +184,10 @@ export class ItineraryComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe((newItinerary: Itinerary) => {
       this.allItineraries.push(newItinerary);
+      this.itineraries = [...this.allItineraries];
+      this.filterItineraries = [...this.allItineraries];
+      this.totalLength = this.allItineraries.length;
+      this.initializeDisplayedItineraries();
     });
   }
 
@@ -225,7 +229,7 @@ export class ItineraryComponent implements OnInit, OnDestroy {
           },
         });
       this.notificationService.showSuccess(
-        'You submitted the review successfully!'
+        'You submitted the rate successfully!'
       );
       this.initializeDisplayedItineraries();
     }

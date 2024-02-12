@@ -74,14 +74,6 @@ export class MeetupComponent implements OnInit, OnDestroy {
       error: (errorMessage: ApiResponse) => console.error(errorMessage.errors),
     });
 
-    // this.subscription = this.meetupService.currentMeetup.subscribe(meetup => {
-    //   if (meetup) {
-    //     //TODO: replace mock with backend
-    //     // this.addMeetup(meetup)
-    //     this.addMeetupMock(meetup);
-    //   }
-    // });
-
     this.searchControl.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged())
       .subscribe((searchTerm) => {
@@ -139,7 +131,7 @@ export class MeetupComponent implements OnInit, OnDestroy {
             (meetup) => meetup.id === meetupId
           );
           if (currentMeetup) currentMeetup.isAttending = true;
-          this.initializeDisplayedMeetups();
+          this.updateDisplayedMeetups();
         }
       },
       error: (errorMessage: ApiResponse) => console.error(errorMessage.errors),
@@ -220,20 +212,20 @@ export class MeetupComponent implements OnInit, OnDestroy {
     });
   }
 
-  toggleAttend(meetup: Meetup): void {
-    meetup.isAttending = !meetup.isAttending;
-    if (meetup.isAttending) {
-      this.meetupService
-        .attendMeetup(meetup.id, this.userService.getTravellerId())
-        .subscribe(() => {
-          meetup.isAttending = false;
-        });
-    } else {
-      this.meetupService
-        .unattendMeetup(meetup.id, this.userService.getTravellerId())
-        .subscribe(() => {
-          meetup.isAttending = true;
-        });
-    }
-  }
+  // toggleAttend(meetup: Meetup): void {
+  //   meetup.isAttending = !meetup.isAttending;
+  //   if (meetup.isAttending) {
+  //     this.meetupService
+  //       .attendMeetup(meetup.id, this.userService.getTravellerId())
+  //       .subscribe(() => {
+  //         meetup.isAttending = false;
+  //       });
+  //   } else {
+  //     this.meetupService
+  //       .unattendMeetup(meetup.id, this.userService.getTravellerId())
+  //       .subscribe(() => {
+  //         meetup.isAttending = true;
+  //       });
+  //   }
+  // }
 }

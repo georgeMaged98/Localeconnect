@@ -1,5 +1,6 @@
 package com.localeconnect.app.trip.service;
 
+import com.localeconnect.app.trip.config.RabbitConfig;
 import com.localeconnect.app.trip.dto.*;
 import com.localeconnect.app.trip.exceptions.ResourceNotFoundException;
 import com.localeconnect.app.trip.exceptions.ValidationException;
@@ -8,6 +9,7 @@ import com.localeconnect.app.trip.mapper.TripMapper;
 import com.localeconnect.app.trip.mapper.TripReviewMapper;
 import com.localeconnect.app.trip.model.Trip;
 import com.localeconnect.app.trip.model.TripReview;
+import com.localeconnect.app.trip.rabbit.RabbitMQMessageProducer;
 import com.localeconnect.app.trip.repository.TripRepository;
 import com.localeconnect.app.trip.repository.TripReviewRepository;
 import com.localeconnect.app.trip.repository.TripSpecification;
@@ -17,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.core.publisher.Mono;
 
 
 import java.time.LocalDateTime;
@@ -34,6 +35,7 @@ public class TripService {
     private final TripReviewMapper tripReviewMapper;
     private final WebClient webClient;
     private final TripReviewRepository tripReviewRepository;
+    private final RabbitMQMessageProducer rabbitMQMessageProducer;
 
     public TripDTO createTrip(TripDTO tripDTO) {
         Trip trip = tripMapper.toEntity(tripDTO);
@@ -97,10 +99,10 @@ public class TripService {
         for (Long traveler : travelers) {
             NotificationDTO newNotification = new NotificationDTO();
             newNotification.setTitle("New Notification");
-            newNotification.setMessage("Meetup " + tripId + " Got Updated!");
+            newNotification.setMessage("Trip " + tripId + " Got Updated!");
             newNotification.setSentAt(LocalDateTime.now());
-            newNotification.setReceiver(traveler);
-            newNotification.setSender(tripToUpdate.getLocalguideId());
+            newNotification.setReceiverID(traveler);
+            newNotification.setSenderID(tripToUpdate.getLocalguideId());
         }
         tripRepository.save(tripToUpdate);
         return tripMapper.toDomain(tripToUpdate);
@@ -111,14 +113,15 @@ public class TripService {
                 .orElseThrow(() -> new ResourceNotFoundException("A trip with the id " + tripId + " does not exist!"));
 
         //send notifications to all travelers
-        List<Long> travelers = tripToDelete.getTravelers();
+        List<Long> travelers = tripToDelete.getTripAttendees();
         for (Long traveler : travelers) {
             NotificationDTO newNotification = new NotificationDTO();
-            newNotification.setTitle("New Notification");
-            newNotification.setMessage("Meetup " + tripId + " Got Deleted!");
+            newNotification.setTitle("New Trip Notification");
+            newNotification.setMessage("Trip " + tripId + " Got Deleted!");
             newNotification.setSentAt(LocalDateTime.now());
-            newNotification.setReceiver(traveler);
-            newNotification.setSender(tripToDelete.getLocalguideId());
+            newNotification.setReceiverID(traveler);
+            newNotification.setSenderID(tripToDelete.getLocalguideId());
+            rabbitMQMessageProducer.publish(newNotification, RabbitConfig.EXCHANGE, RabbitConfig.ROUTING_KEY);
         }
         tripRepository.delete(tripToDelete);
     }
@@ -235,6 +238,7 @@ public class TripService {
 
         return ratedTripDTO.getRatingsCount();
     }
+
     public void attendTrip(Long tripId, TripAttendDTO tripAttendDTO) {
         Optional<Trip> trip = tripRepository.findById(tripId);
         if (trip.isEmpty())
@@ -288,6 +292,7 @@ public class TripService {
 
         return res.getData();
     }
+
     private GCPResponseDTO saveImageToGCP(String image) {
         ResponseEntity<GCPResponseDTO> responseEntity = webClient.post()
                 .uri("http://gcp-service:5005/api/gcp/?filename=trip")

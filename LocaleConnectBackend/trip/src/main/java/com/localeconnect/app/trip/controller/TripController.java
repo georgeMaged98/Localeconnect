@@ -118,7 +118,6 @@ public class TripController {
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, ratingCount, null);
     }
     @PostMapping("/{id}/attend")
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> attendTrip(@PathVariable("id") Long tripId, @RequestBody @Valid TripAttendDTO tripAttendDTO) {
         tripService.attendTrip(tripId, tripAttendDTO);
         return ResponseHandler.generateResponse("Success!", HttpStatus.OK, "Traveller added to trip attendees successfully!", null);

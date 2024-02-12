@@ -18,7 +18,7 @@ public class Trip {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "localguide_id", nullable = false, unique = true)
+    @Column(name = "localguide_id", nullable = false)
     private Long localguideId;
     @Column(nullable = false, unique = true)
     private String name;
@@ -36,6 +36,9 @@ public class Trip {
 
     @ElementCollection
     private List<String> dailyActivities = new ArrayList<>();
+
+    @ElementCollection
+    private List<String> placesToVisit = new ArrayList<>();
 
     @ElementCollection
     private List<String> imageUrls = new ArrayList<>();

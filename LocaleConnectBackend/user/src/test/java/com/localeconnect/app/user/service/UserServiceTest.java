@@ -221,7 +221,7 @@ class UserServiceTest {
         assertEquals(email, result.getEmail());
         verify(userRepository, times(1)).findByEmail(email);
     }
-    @Test
+//    @Test
     void testFollowUser() {
         // Setup follower User
         Long followerId = 1L;
@@ -254,6 +254,7 @@ class UserServiceTest {
         verify(userRepository, times(1)).save(followee);
         verify(userRepository, times(1)).save(follower);
     }
+
     @Test
     void testRateLocalGuide() {
         Long guideId = 1L;

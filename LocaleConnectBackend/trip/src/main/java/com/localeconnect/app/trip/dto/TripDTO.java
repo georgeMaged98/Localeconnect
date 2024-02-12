@@ -16,6 +16,8 @@ import java.util.List;
 @Builder
 public class TripDTO {
 
+    private Long id;
+
     private Long localguideId;
 
     @NotBlank(message = "Trip name is required")
@@ -24,7 +26,7 @@ public class TripDTO {
     private String description;
 
     @FutureOrPresent(message = "Departure time cannot be in the past")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate departureTime;
 
     @NotBlank(message = "Destination is required")
@@ -46,6 +48,9 @@ public class TripDTO {
 
     @ElementCollection
     private List<String> dailyActivities = new ArrayList<>();
+
+    @ElementCollection
+    private List<String> placesToVisit = new ArrayList<>();
 
     @ElementCollection
     private List<String> imageUrls = new ArrayList<>();
