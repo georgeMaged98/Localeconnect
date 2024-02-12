@@ -23,10 +23,14 @@ LocaleConnect envisions being the ultimate gathering spot for travelers, akin to
 - IDE (IntelliJ IDEA, Eclipse, or Spring Tool Suite)
 
 ### Running the Backend with Docker
-- Install Docker Desktop and run `docker-compose -f docker-compose-test.yml up` in `/LocaleConnectBackend`.
+- Install Docker Desktop 
+- Run Docker Desktop in your machine
+- Enter `/LocaleConnectBackend` Folder
+- Run `docker compose -f docker-compose-test.yml up`
 
 ### Unit Testing
-- Run `mvn clean test` in `/LocaleConnectBackend`.
+- Enter `/LocaleConnectBackend` Folder
+- Run `mvn clean test`
 
 
 ## Frontend Setup Guide for LocaleConnect
@@ -37,6 +41,8 @@ LocaleConnect envisions being the ultimate gathering spot for travelers, akin to
 - Angular Material
 
 ### Running the App
+- Enter `/LocaleConnectFrontend` Folder
+- Run `npm install`
 - Run `ng serve` and navigate to `http://localhost:4200/`.
 
 
