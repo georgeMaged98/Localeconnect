@@ -1,15 +1,19 @@
-import {Component} from '@angular/core';
-import {MatDialogRef} from '@angular/material/dialog';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {TripService} from '../../../service/trip.service';
-import {LANGUAGES} from '../../../helper/DataHelper';
-import {Trip} from "../../../model/trip";
+import { Component } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { TripService } from '../../../service/trip.service';
+import { LANGUAGES } from '../../../helper/DataHelper';
+import { Trip } from '../../../model/trip';
 import * as DataHelper from 'src/app/helper/DataHelper';
+import { getFormattedDate } from 'src/app/helper/DateHelper';
+import { UserService } from 'src/app/service/user.service';
+import { NotificationService } from 'src/app/service/notification.service';
+import { ApiResponse } from 'src/app/model/apiResponse';
 
 @Component({
   selector: 'app-trip-dialog',
   templateUrl: './trip-dialog.component.html',
-  styleUrls: ['./trip-dialog.component.scss']
+  styleUrls: ['./trip-dialog.component.scss'],
 })
 export class TripDialogComponent {
   tripForm: FormGroup;
@@ -19,6 +23,8 @@ export class TripDialogComponent {
     public dialogRef: MatDialogRef<TripDialogComponent>,
     private formBuilder: FormBuilder,
     private tripService: TripService,
+    private userService: UserService,
+    private notificationService: NotificationService
   ) {
     this.tripForm = this.formBuilder.group({
       name: ['', Validators.required],
@@ -30,7 +36,7 @@ export class TripDialogComponent {
       languages: ['', Validators.required],
       placesToVisit: ['', Validators.required],
       dailyActivities: [''],
-      imageUrls: []
+      imageUrls: [],
     });
   }
 
@@ -39,26 +45,40 @@ export class TripDialogComponent {
   }
 
   onSubmit(): void {
+    const travellerId = this.userService.getTravellerId();
     if (this.tripForm.valid) {
       const formData = this.tripForm.value;
       formData.placesToVisit = DataHelper.dataToList(formData.placesToVisit);
-      formData.dailyActivities = DataHelper.dataToList(formData.dailyActivities);
+      formData.dailyActivities = DataHelper.dataToList(
+        formData.dailyActivities
+      );
+
       const newTrip: Trip = {
         ...formData,
-        localguideId: 0,//TODO: get from backend
-        id:0,//TODO: get from backend
-        rating: 0,
+        departureTime: getFormattedDate(formData.departureTime).split(' ')[0],
+        localguideId: travellerId,
+        ratingsTotal: 0,
+        averageRating: 0,
+        travelers: [travellerId],
+        durationInHours: formData.durationInDays,
+        imageUrls: formData.imageUrls === null ? [] : formData.imageUrls,
       };
-      this.tripService.changeTrip(newTrip);
-      this.dialogRef.close();
+
+      delete newTrip.durationInDays;
+
       this.tripService.createTrip(newTrip).subscribe({
-        next: (trip) => {
-          this.tripService.changeTrip(trip);
-          this.dialogRef.close(trip);
+        next: (res: ApiResponse) => {
+          if (!res.errors) {
+            console.log(res);
+
+            this.dialogRef.close(res.data);
+            this.notificationService.showSuccess('Trip Created Successfully!');
+          }
         },
         error: (error) => {
           console.error('Error creating trip:', error);
-        }
+          this.notificationService.showError(error.error.errors.errors[0]);
+        },
       });
     }
   }
