@@ -13,8 +13,6 @@ import org.springframework.amqp.support.converter.MessageConverter;
 
 @Configuration
 public class RabbitConfig {
-
-
     public static final String QUEUE = "notification.queue";
     public static final String EXCHANGE = "internal.exchange";
     public static final String ROUTING_KEY = "internal.notification.routing-key";
