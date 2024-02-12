@@ -25,7 +25,9 @@ export class ItineraryService {
   // }
   getItineraries(): Observable<ApiResponse> {
     const httpHeaders = this.authService.getHttpHeaders();
-    return this.http.get<ApiResponse>(`${this.apiUrl}/all`);
+    return this.http.get<ApiResponse>(`${this.apiUrl}/all`,{
+      headers: httpHeaders,
+    });
   }
 
   addItinerary(itinerary: Itinerary): Observable<ApiResponse> {

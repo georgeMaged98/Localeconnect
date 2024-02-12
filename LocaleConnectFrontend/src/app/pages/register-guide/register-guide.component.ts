@@ -41,8 +41,7 @@ export class RegisterGuideComponent {
       languages: ['', [Validators.required, this.minLanguagesValidator(2)]],
       bio: [''],
       city: ['', Validators.required],
-      visitedCountries: [''],
-      termsAccepted: [false, Validators.required],
+      visitedCountries: ['']
     });
   }
 

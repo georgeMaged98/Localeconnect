@@ -7,7 +7,6 @@ import { User } from '../model/user';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 import { ApiResponse } from '../model/apiResponse';
-import { catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',

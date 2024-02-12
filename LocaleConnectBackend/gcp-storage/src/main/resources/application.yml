@@ -17,4 +17,4 @@ eureka:
 
 gcp:
   credentials:
-    path: ${GCP_CONFIG:/Users/georgemaged/.config/gcloud/legacy_credentials/g.maged327@gmail.com/adc.json}
+    path: ${GCP_CONFIG:C:\Users\MahaMarhag\IdeaProjects\localeconnect\LocaleConnectBackend\gcloud.json}

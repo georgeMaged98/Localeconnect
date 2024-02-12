@@ -176,7 +176,7 @@ export class TripComponent implements OnInit, OnDestroy {
         next: (res: ApiResponse) => {
           const updatedItinerary: Trip = res.data as Trip;
           trip.averageRating = updatedItinerary.averageRating;
-          trip.ratingsTotal = updatedItinerary.ratingsTotal;
+          trip.ratingsCount = updatedItinerary.ratingsCount;
         },
         error: (error: HttpErrorResponse) => {
           this.notificationService.showError(error.error.errors.errors[0]);

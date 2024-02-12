@@ -88,7 +88,7 @@
                         <image>openjdk:17-jdk-slim</image>
                     </from>
                     <to>
-                        <image>registry.hub.docker.com/georgemaged/notification-service</image>
+                        <image>registry.hub.docker.com/localeconnect/notification-service</image>
                         <tags>latest</tags>
                     </to>
                 </configuration>

@@ -83,7 +83,7 @@ services:
 
 
   notification-service:
-    image: georgemaged/notification-service:latest
+    image: localeconnect/notification-service:latest
     pull_policy: always
     environment:
       - EUREKA_SERVER_ADDRESS=http://discovery-server:8761/eureka

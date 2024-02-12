@@ -1,16 +1,17 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FeedService } from '../../service/feed.service';
-import { Comment, Post } from '../../model/feed';
-import { AddPostDialogComponent } from './add-post-dialog/add-post-dialog.component';
-import { MatDialog } from '@angular/material/dialog';
-import { map, Subject, Subscription, switchMap, takeUntil, tap } from 'rxjs';
-import { ImagesService } from '../../service/image.service';
-import { User, UserProfile } from '../../model/user';
-import { UserService } from '../../service/user.service';
-import { AuthService } from '../../service/auth.service';
-import { getFormattedDateAndTime } from '../../helper/DateHelper';
-import { coerceStringArray } from '@angular/cdk/coercion';
-import { ApiResponse } from 'src/app/model/apiResponse';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {FeedService} from '../../service/feed.service';
+import {Comment, FollowerProfile, Post} from '../../model/feed';
+import {AddPostDialogComponent} from './add-post-dialog/add-post-dialog.component';
+import {MatDialog} from '@angular/material/dialog';
+import {forkJoin, map, of, Subject, Subscription, switchMap, takeUntil, tap} from 'rxjs';
+import {ImagesService} from '../../service/image.service';
+import {User, UserProfile} from '../../model/user';
+import {UserService} from '../../service/user.service';
+import {AuthService} from '../../service/auth.service';
+import {getFormattedDateAndTime} from '../../helper/DateHelper';
+import {coerceStringArray} from '@angular/cdk/coercion';
+import {ApiResponse} from 'src/app/model/apiResponse';
+import {catchError} from "rxjs/operators";
 
 @Component({
   selector: 'app-feed',
@@ -19,7 +20,7 @@ import { ApiResponse } from 'src/app/model/apiResponse';
 })
 export class FeedComponent implements OnInit, OnDestroy {
   posts: Post[] = [];
-  followers: any[] = [];
+  followers: UserProfile[] = [];
   profilePictureSrc = 'assets/pictures/profil.png';
   newCommentTexts: { [key: number]: string } = {};
   showAllImages = false;
@@ -36,7 +37,8 @@ export class FeedComponent implements OnInit, OnDestroy {
     private imageService: ImagesService,
     private userService: UserService,
     private authService: AuthService
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     this.authService.currentUser.subscribe((data) => (this.currentUser = data));
@@ -110,6 +112,15 @@ export class FeedComponent implements OnInit, OnDestroy {
             bio: currentUser.bio,
             profilePicture: currentUser.profilePicture,
           };
+          this.imageService.getImage(currentUser.profilePicture).subscribe({
+            next: (gcpRes: ApiResponse) => {
+              if (this.currentUserProfile?.profilePicture) {
+                this.currentUserProfile.profilePicture = gcpRes.data.toString();
+              }
+            },
+            error: (errorMessage: ApiResponse) =>
+              console.error(errorMessage.errors),
+          });
         }),
         switchMap((currentUser: User) =>
           this.userService.getAllFollowing(currentUser.id)
@@ -121,8 +132,25 @@ export class FeedComponent implements OnInit, OnDestroy {
             userName: user.userName,
             isFollowing: false,
             profilePicture: user.profilePicture || 'assets/pictures/profil.png',
-          }))
-        ),
+          }
+          )
+          )
+        )
+        ,
+        switchMap(profiles => {
+          console.log(profiles)
+          return forkJoin(
+            profiles.map(profile =>
+              this.imageService.getImage(profile.profilePicture).pipe(
+                map(gcpRes => ({
+                  ...profile,
+                  profilePicture: gcpRes.data.toString()
+                })),
+                catchError(() => of(profile)) // In case of error, return the profile without modification
+              )
+            )
+          );
+        }),
         takeUntil(this.destroy$)
       )
       .subscribe({
@@ -133,6 +161,34 @@ export class FeedComponent implements OnInit, OnDestroy {
           console.error('Error fetching user and following profiles:', error),
       });
   }
+
+  fetchCurrentUserProfile(): void {
+    this.authService.fetchCurrentUserProfile().subscribe({
+      next: (currentUser: User) => {
+        this.currentUserProfile = {
+          id: currentUser.id,
+          name: `${currentUser.firstName} ${currentUser.lastName}`,
+          userName: currentUser.userName,
+          bio: currentUser.bio,
+          profilePicture: currentUser.profilePicture,
+        };
+        this.imageService.getImage(currentUser.profilePicture).subscribe({
+          next: (gcpRes: ApiResponse) => {
+            if (this.currentUserProfile?.profilePicture) {
+              this.currentUserProfile.profilePicture = gcpRes.data.toString();
+            }
+          },
+          error: (errorMessage: ApiResponse) =>
+            console.error(errorMessage.errors),
+        });
+      },
+
+      error: (error) => console.error('Error fetching current user profile:', error)
+    });
+  }
+
+
+
 
   fetchAuthorNamesForPosts(post: Post): void {
     if (post.authorID) {
@@ -176,6 +232,7 @@ export class FeedComponent implements OnInit, OnDestroy {
       });
     }
   }
+
   refreshPostLikes(postId: number): void {
     this.feedService.getPostLikeCount(postId).subscribe((likeCount) => {
       const post = this.posts.find((p) => p.id === postId);
@@ -210,7 +267,6 @@ export class FeedComponent implements OnInit, OnDestroy {
         authorName: currentUser ? currentUser.name : 'Unknown User',
       };
 
-      // Call the service to add the comment
       this.feedService.addComment(postId, newComment).subscribe({
         next: () => {
           const post = this.posts.find((p) => p.id === postId);
@@ -268,7 +324,6 @@ export class FeedComponent implements OnInit, OnDestroy {
     });
   }
 
-  //TODO: configure image storage
   changeProfilePicture(event: any): void {
     const travellerId = this.userService.getTravellerId();
     if (event.target.files && event.target.files[0]) {

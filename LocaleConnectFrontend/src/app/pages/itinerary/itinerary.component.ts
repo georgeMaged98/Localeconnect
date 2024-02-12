@@ -222,7 +222,7 @@ export class ItineraryComponent implements OnInit, OnDestroy {
           next: (res: ApiResponse) => {
             const updatedItinerary: Itinerary = res.data as Itinerary;
             itinerary.averageRating = updatedItinerary.averageRating;
-            itinerary.totalRatings = updatedItinerary.totalRatings;
+            itinerary.ratingsCount = updatedItinerary.ratingsCount;
           },
           error: (error: HttpErrorResponse) => {
             this.notificationService.showError(error.error.errors.errors[0]);
