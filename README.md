@@ -14,10 +14,6 @@ LocaleConnect envisions being the ultimate gathering spot for travelers, akin to
 
 ## Code Structure
 
-This document outlines the structure of example microservices, specifically focusing on the User and Feed services, within the backend of our application. Each microservice follows a comprehensive structure to ensure modularity, maintainability, and scalability. Below, we detail the components of each service.
-
-### Common Components
-
 Most services include the following key components:
 
 - **Controller**: Acts as the entry point for incoming requests. It routes these requests to the appropriate services and returns responses to the client.
