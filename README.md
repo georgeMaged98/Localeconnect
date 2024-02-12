@@ -1,4 +1,3 @@
-
 # LocaleConnect Project Documentation
 
 ![LocaleConnect Home Page](screenshot/home page.PNG "LocaleConnect Home Page")
@@ -63,6 +62,9 @@ LocaleConnect envisions being the ultimate gathering spot for travelers, akin to
 
 ### Running the Backend with Docker
 - Install Docker Desktop.
+- **Docker Login**: Run `docker login` and provide the credentials:
+    - Username: `localeconnect`
+    - Password: `lssa2324app`
 - Navigate to `/LocaleConnectBackend` and execute `docker-compose -f docker-compose-test.yml up` to start containers.
 
 ## Frontend Setup Guide for LocaleConnect
@@ -101,7 +103,7 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 Utilizes JWT for authentication. Users access other services post-registration/login through the API gateway. Implemented in the User Service.
 
 ## Postman Documentation
-_(Example Postman link to be added)_
+[View Postman Documentation](https://www.postman.com/cloudy-shadow-750794/workspace/new-team-workspace/overview)
 
 ## Testing
 Run `mvn clean test` to execute the tests.
