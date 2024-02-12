@@ -83,7 +83,9 @@ Implemented with Spring Eureka, the Discovery Service allows services to registe
 
 ### User Service
 
-*Postman Documentation Link is provided in the next section*
+*Postman Documentation Link is provided in the next section.*
+
+*Note that the **Base URL**: `http://localhost:8080` has to be added as a prefix for all endpoints.*
 
 - **Endpoints**:
   - Registration for Travelers: `POST /api/user/auth/register-traveler`
