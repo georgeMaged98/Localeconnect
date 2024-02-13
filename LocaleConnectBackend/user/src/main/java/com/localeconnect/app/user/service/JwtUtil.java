@@ -19,7 +19,7 @@ import java.util.Map;
 public class JwtUtil {
 
     @Value("${jwt.secret}")
-    private String secret;
+    protected String secret;
 
 
     public void validateToken(final String token) {
