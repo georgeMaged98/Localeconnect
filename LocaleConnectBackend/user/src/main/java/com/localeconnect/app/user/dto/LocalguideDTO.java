@@ -18,15 +18,15 @@ public class LocalguideDTO extends UserDTO {
     private double averageRating;
     private String role = "Localguide";
     private final boolean registeredAsLocalGuide = true;
-
+    private double rating;
     public LocalguideDTO() {
         super();
     }
 
-/*    public void addRating(double rating) {
+    public void addRating(double rating) {
         this.ratingsTotal += rating;
         this.ratingsCount++;
-    }*/
+    }
 
     public void calcAverageRating() {
         this.averageRating = (this.ratingsCount > 0) ? this.ratingsTotal / this.ratingsCount : 0;
