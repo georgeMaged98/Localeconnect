@@ -62,8 +62,6 @@ public class User {
     private List<User> following = new ArrayList<>();
     @Column
     private final Boolean isEnabled = true;
-    @Column
-    private String role;
     @Column(name = "profile_picture")
     private String profilePicture;
 }

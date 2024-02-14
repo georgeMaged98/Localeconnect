@@ -16,7 +16,6 @@ public class LocalguideDTO extends UserDTO {
     @Min(value = 0)
     @Max(value = 5)
     private double averageRating;
-    private String role = "Localguide";
     private final boolean registeredAsLocalGuide = true;
     private double rating;
     public LocalguideDTO() {

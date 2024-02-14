@@ -21,7 +21,7 @@ public class UserPrincipalDTO implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.<GrantedAuthority>of(new SimpleGrantedAuthority(user.getRole()));
+        return List.<GrantedAuthority>of(new SimpleGrantedAuthority("ROLE"));
     }
 
     @Override

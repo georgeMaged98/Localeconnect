@@ -8,7 +8,6 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @SuperBuilder
 public class TravelerDTO extends UserDTO {
-    private String role = "Traveler";
 
     private final boolean registeredAsLocalGuide = false;
     public TravelerDTO() {

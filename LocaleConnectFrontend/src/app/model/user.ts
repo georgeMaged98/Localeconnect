@@ -13,7 +13,6 @@ export interface User {
   followingIds?: number[];
   token?: string;
   isEnabled?: boolean;
-  role?: string;
   profilePicture: string;
 }
 export interface UserProfile {

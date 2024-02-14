@@ -244,7 +244,6 @@ public class UserService implements UserDetailsService {
                     .languages(user.getLanguages())
                     .followers(user.getFollowers().stream().map(userMapper::toDomain).toList())
                     .followings(user.getFollowing().stream().map(userMapper::toDomain).toList())
-                    .role(user.getRole())
                     .profilePicture(user.getProfilePicture())
                     .build();
             localguideDTO.calcAverageRating();
@@ -261,7 +260,6 @@ public class UserService implements UserDetailsService {
                 .languages(user.getLanguages())
                 .followers(user.getFollowers().stream().map(userMapper::toDomain).toList())
                 .followings(user.getFollowing().stream().map(userMapper::toDomain).toList())
-                .role(user.getRole())
                 .profilePicture(user.getProfilePicture())
                 .build();
 

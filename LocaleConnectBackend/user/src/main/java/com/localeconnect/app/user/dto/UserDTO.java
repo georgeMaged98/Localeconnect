@@ -44,6 +44,5 @@ public class UserDTO {
     private List<UserDTO> followers;
     private List<UserDTO> followings;
     private Boolean isEnabled;
-    private String role;
     private String profilePicture;
 }

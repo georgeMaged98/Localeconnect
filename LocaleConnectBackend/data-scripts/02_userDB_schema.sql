@@ -8,16 +8,13 @@ CREATE TABLE IF NOT EXISTS app_user (
                                         bio TEXT,
                                         password VARCHAR(255) NOT NULL,
                                         registered_as_local_guide BOOLEAN NOT NULL,
-                                        role VARCHAR(50),
                                         profile_picture TEXT,
                                         city VARCHAR(255),
                                         ratings_total DOUBLE PRECISION DEFAULT 0,
                                         ratings_count INT DEFAULT 0,
                                         average_rating DOUBLE PRECISION DEFAULT 0,
                                         is_enabled BOOLEAN DEFAULT TRUE,
-                                        dtype VARCHAR(255) NOT NULL,
-                                        rating DOUBLE PRECISION DEFAULT 0,
-                                        CHECK (role IN ('User', 'Traveler', 'Localguide'))
+                                        dtype VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS user_followers (

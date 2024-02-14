@@ -22,7 +22,6 @@ public class Localguide extends User {
 
     @Column
     private double averageRating;
-    private String role = "Localguide";
 
     @Column(nullable = false)
     private final boolean registeredAsLocalGuide = true;
