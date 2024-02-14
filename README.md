@@ -233,7 +233,7 @@ Implemented with Spring Eureka, the Discovery Service allows services to registe
 
 ### Security
 
-We utilized JWT for authentication. Access to services is managed through the API-Gateway post-registration/login.
+We utilized JWT for authentication. Authentication is implemented within the User Service. Access to services is managed through the API-Gateway after successful login.
 
 
 ## Postman Documentation
