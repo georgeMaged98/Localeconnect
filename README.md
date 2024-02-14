@@ -41,9 +41,27 @@ LocaleConnect envisions being the ultimate gathering spot for travelers, akin to
 - Angular Material
 
 ### Running the App
+- Ensure that all Docker containers hosting the services run successfully before proceeding
 - Enter `/LocaleConnectFrontend` Folder
 - Run `npm install`
 - Run `ng serve` and navigate to `http://localhost:4200/`.
+
+### App Testing Instructions
+
+To test the application, you have two options:
+
+1. **Registering New Users**: This involves inputting user details to create new accounts, then logging in the accounts which then allows for various interactions within the platform, such as:
+  - Following other users to view their posts
+  - Creating posts and attaching images
+  - Liking or commenting on posts from followed users
+  - Rating local guides, trips etc..
+  - Participating in trips, itineraries , meetups
+  - And more...
+
+2. **Using Test Credentials**: For a quick overview of pre-set features and interactions, log in using the following test credentials:
+  - **Email**: jbianchi@test.com
+  - **Password**: mypassword
+
 
 
 ## Code Structure
