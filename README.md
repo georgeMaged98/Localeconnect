@@ -17,36 +17,74 @@ LocaleConnect envisions being the ultimate gathering spot for travelers, akin to
 
 ## Backend Setup Guide for LocaleConnect
 
-### Prerequisites
+### Installation
 - Java JDK 17
+  - To install Java JDK 17, follow these steps:
+    1. Visit the official Oracle website or adopt OpenJDK to download and install Java JDK 17 based on your operating system.
+    2. Set up `JAVA_HOME` environment variable pointing to the JDK installation directory.
+
 - Maven
+  - To install Maven, follow these steps:
+    1. Visit the Apache Maven website to download the latest version of Maven.
+    2. Follow the installation instructions provided for your operating system.
+    3. Ensure that Maven is added to your system `PATH`.
+
 - IDE (IntelliJ IDEA, Eclipse, or Spring Tool Suite)
 
-### Running the Backend with Docker
-- Install Docker Desktop 
+## Running the Backend with Docker
+- Install Docker Desktop
 - Run Docker Desktop in your machine
-- Enter `/LocaleConnectBackend` Folder
-- Run `docker compose -f docker-compose-test.yml up`
+- Navigate to the `/LocaleConnectBackend` directory
+- Run
+
+  ``` 
+  docker compose -f docker-compose-test.yml up
+  ```
 
 ### Unit Testing
-- Enter `/LocaleConnectBackend` Folder
-- Run `mvn clean test`
+- Navigate to the `/LocaleConnectBackend` directory
+- Run 
+  ``` 
+   mvn clean test
+   ```
 
 
 ## Frontend Setup Guide for LocaleConnect
 
 ### Installation
 - Node.js (version 10.2.4)
+  - Visit the official Node.js website to download and install Node.js version 10.2.4.
+
 - Angular CLI (version 15.0.0)
+  - Install Angular CLI globally by running the following command in your terminal:
+    ```
+    npm install -g @angular/cli@15.0.0
+    ```
+
 - Angular Material
+  - Angular Material can be installed via npm. Run the following command in your project directory to install Angular Material:
+    ```
+    npm install @angular/material
+    ```
 
-### Running the App
-- Ensure that all Docker containers hosting the services run successfully before proceeding
+## Running the App
+- Ensure that all Docker containers hosting the services run successfully and all apps started before proceeding
+
 - Enter `/LocaleConnectFrontend` Folder
-- Run `npm install`
-- Run `ng serve` and navigate to `http://localhost:4200/`.
+  
+- Run
 
-### App Testing Instructions
+  ```
+  npm install
+  ```
+
+- Run
+  ```
+  ng serve
+  ```
+- Open `http://localhost:4200/` in your browser
+
+## App Testing Instructions
 
 To test the application, you have two options:
 
@@ -62,7 +100,11 @@ To test the application, you have two options:
   - **Email**: jbianchi@test.com
   - **Password**: mypassword
 
+***Remark***: After logging in, to access the home page and load posts, you may need to click on another tab within the app and then return to the home tab to ensure all posts are loaded. Similarly, for other tabs, a refresh or tab switch may be required to view all available data effectively.
 
+
+## Azure Deployment
+**Current Status:** Our database has been successfully deployed on Azure, marking a pivotal first step in our cloud migration. We are actively working on deploying the remaining services to Azure.
 
 ## Code Structure
 
