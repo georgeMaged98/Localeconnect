@@ -40,8 +40,14 @@ LocaleConnect envisions being the ultimate gathering spot for travelers, akin to
   ``` 
   docker compose -f docker-compose-test.yml up
   ```
+## Troubleshooting
 
-### Unit Testing
+### Issue: Problems Running Containers and Starting Apps
+
+If you encounter issues with running containers or starting applications within our project, it is essential to verify that your system meets the minimum hardware requirements. Given the large-scale nature of our project, which utilizes a microservice architecture, sufficient hardware resources are crucial for optimal performance.
+
+
+## Unit Testing
 - Navigate to the `/LocaleConnectBackend` directory
 - Run 
   ``` 
@@ -52,6 +58,9 @@ LocaleConnect envisions being the ultimate gathering spot for travelers, akin to
 ## Frontend Setup Guide for LocaleConnect
 
 ### Installation
+
+Navigate to the `/LocaleConnectBackend` directory
+
 - Node.js (version 10.2.4)
   - Visit the official Node.js website to download and install Node.js version 10.2.4.
 
@@ -70,7 +79,7 @@ LocaleConnect envisions being the ultimate gathering spot for travelers, akin to
 ## Running the App
 - Ensure that all Docker containers hosting the services run successfully and all apps started before proceeding
 
-- Enter `/LocaleConnectFrontend` Folder
+- Navigate to the `/LocaleConnectBackend` directory
   
 - Run
 
