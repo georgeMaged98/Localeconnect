@@ -1,7 +1,7 @@
 
 # LocaleConnect Project Documentation
 
-![LocaleConnect Home Page](screenshot/home_page.png "LocaleConnect Home Page")
+![LocaleConnect Home Page](screenshot/diagram.jpg "LocaleConnect Home Page")
 
 ## Description
 
